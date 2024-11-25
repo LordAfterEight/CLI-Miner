@@ -8,5 +8,5 @@ use ratatui::{
 };
 
 fn main() {
-    println!("Hello, world!");
+    println!("CLI-Miner");
 }
