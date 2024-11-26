@@ -11,18 +11,26 @@ use ratatui::{
 fn main() -> io::Result<()> {
     let mut terminal = ratatui::init();
     terminal.clear()?;
-    let app_result = run(terminal);
+    let app_result = main_menu(terminal);
     ratatui::restore();
     app_result
 }
 
-fn run(mut terminal: DefaultTerminal) -> io::Result<()> {
+fn main_menu(mut terminal: DefaultTerminal) -> io::Result<()> {
     loop {
         terminal.draw(|frame| {
-            let greeting = Paragraph::new("Hello Ratatui! (press 'q' to quit)")
-                .white()
-                .on_blue();
-            frame.render_widget(greeting, frame.area());
+            let menu_ui = Paragraph::new("
+            ┏━━━━━━━━━━━━━━━━━━━━━━ CLI-Miner ━━━━━━━━━━━━━━━━━━━━━┓
+            ┃                                                      ┃
+            ┃                                                      ┃
+            ┃                                                      ┃
+            ┃                                                      ┃
+            ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+            ");
+            let menu_display = menu_ui
+                .light_red()
+                .on_black();
+            frame.render_widget(menu_display, frame.area());
         })?;
 
         if let event::Event::Key(key) = event::read()? {
