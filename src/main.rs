@@ -28,7 +28,7 @@ fn main_menu(mut terminal: DefaultTerminal) -> io::Result<()> {
             ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
             ");
             let menu_display = menu_ui
-                .light_red()
+                .white()
                 .on_black();
             frame.render_widget(menu_display, frame.area());
         })?;
