@@ -13,9 +13,12 @@ use ratatui::{
 
 
 fn main() -> io::Result<()> {
+    let mut settings_mode = false;
     let mut terminal = ratatui::init();
     terminal.clear()?;
     let app_result = main_menu(terminal);
+    while(settings_mode) {
+    }
     ratatui::restore();
     app_result
 }
