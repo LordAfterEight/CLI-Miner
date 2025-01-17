@@ -1,4 +1,5 @@
 use std::{io,thread,time};
+use crate::definitions::*;
 use ratatui::{
     crossterm::event::{self, KeyCode, KeyEventKind},
     style::Stylize,
@@ -34,13 +35,13 @@ pub fn main_menu(mut terminal: DefaultTerminal) -> io::Result<()> {
 
             if key.kind == KeyEventKind::Press && key.code == KeyCode::Char('e') {
                 println!("Settings opened");
-                thread::sleep(time::Duration::from_millis(1000));
+                sleep(1000);
                 return Ok(());
             }
 
             if key.kind == KeyEventKind::Press && key.code == KeyCode::Char('\n') {
                 println!("Enter pressed");
-                thread::sleep(time::Duration::from_millis(1000));
+                sleep(1000);
                 return Ok(());
             }
         }
