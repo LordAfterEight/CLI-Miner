@@ -20,8 +20,10 @@ fn main_menu(mut terminal: DefaultTerminal) -> io::Result<()> {
     loop {
         terminal.draw(|frame| {
             let menu_ui = Paragraph::new("
+            Build: 17.01.2025, made by Elias Stettmayer
+
             ┏━━━━━━━━━━━━━━━━━━━━━━ CLI-Miner ━━━━━━━━━━━━━━━━━━━━━┓
-            ┃                                                      ┃             
+            ┃ Exit [q]                                             ┃             
             ┃                                                      ┃
             ┃           Press [Enter] to start the game            ┃
             ┃                                                      ┃
