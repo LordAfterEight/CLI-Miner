@@ -6,10 +6,11 @@ Todo list is ranked by priority
     - Game
 
 2. Game mechanics:
-    1: Basics (mining, selling, buying)
-    2: Expanded basics (converting, etc.)
-    3: Automation
-    4: Programmable logic (automated buying, converting, selling)
+    2.1: Basics (mining, selling, buying)
+    2.2: Game saving (autosave maybe?)
+    2.3: Expanded basics (converting, etc.)
+    2.4: Automation
+    2.5: Programmable logic (automated buying, converting, selling)
 
 3. Sound:
     - Background music
