@@ -6,3 +6,5 @@ edition = "2021"
 [dependencies]
 crossterm = "0.28.1"
 ratatui = { version = "0.29.0", features = ["all-widgets"] }
+target = "2.1.0"
+windows_x86_64_gnu = "0.53.0"

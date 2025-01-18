@@ -1,16 +1,15 @@
-use std::{io,thread,time};
+use std::io;
 mod definitions;
 mod menus;
 use definitions::*;
 use menus::*;
 
-use ratatui::{
-    crossterm::event::{self, KeyCode, KeyEventKind},
-    style::Stylize,
-    widgets::Paragraph,
-    DefaultTerminal,
-};
-
+//use ratatui::{
+//    crossterm::event::{self, KeyCode, KeyEventKind},
+//    style::Stylize,
+//    widgets::Paragraph,
+//    DefaultTerminal,
+//};
 
 fn main() -> io::Result<()> {
     let mut settings_mode = false;

@@ -8,6 +8,8 @@ version = "0.1.0"
 dependencies = [
  "crossterm",
  "ratatui",
+ "target",
+ "windows_x86_64_gnu 0.53.0",
 ]
 
 [[package]]
@@ -528,6 +530,12 @@ dependencies = [
 ]
 
 [[package]]
+name = "target"
+version = "2.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "1e8f05f774b2db35bdad5a8237a90be1102669f8ea013fea9777b366d34ab145"
+
+[[package]]
 name = "time"
 version = "0.3.36"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -631,7 +639,7 @@ dependencies = [
  "windows_i686_gnu",
  "windows_i686_gnullvm",
  "windows_i686_msvc",
- "windows_x86_64_gnu",
+ "windows_x86_64_gnu 0.52.6",
  "windows_x86_64_gnullvm",
  "windows_x86_64_msvc",
 ]
@@ -671,6 +679,12 @@ name = "windows_x86_64_gnu"
 version = "0.52.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "147a5c80aabfbf0c7d901cb5895d1de30ef2907eb21fbbab29ca94c5b08b1a78"
+
+[[package]]
+name = "windows_x86_64_gnu"
+version = "0.53.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "2e55b5ac9ea33f2fc1716d1742db15574fd6fc8dadc51caab1c16a3d3b4190ba"
 
 [[package]]
 name = "windows_x86_64_gnullvm"
