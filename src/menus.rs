@@ -1,12 +1,10 @@
-use crate::definitions::*;
 use ratatui::{
-    crossterm::event::{self, KeyCode, KeyEventKind},
     style::Stylize,
     widgets::Paragraph,
     DefaultTerminal,
 };
 
-pub fn main_menu(mut terminal: DefaultTerminal) {
+pub fn main_menu(terminal: &mut DefaultTerminal) {
     terminal.draw(|frame| {
         let menu_ui = Paragraph::new("
         Build: 17.01.2025, made by Elias Stettmayer
@@ -27,7 +25,7 @@ pub fn main_menu(mut terminal: DefaultTerminal) {
     });
 }
 
-pub fn settings_menu(mut terminal: DefaultTerminal) {
+pub fn settings_menu(terminal: &mut DefaultTerminal) {
     terminal.draw(|frame| {
         let menu_ui = Paragraph::new("
             Build: 17.01.2025, made by Elias Stettmayer

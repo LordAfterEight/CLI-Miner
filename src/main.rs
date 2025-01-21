@@ -2,41 +2,46 @@ use std::io;
 mod definitions;
 mod menus;
 use menus::*;
-use definitions::*;
-use std::fs::File;
 use clearscreen;
 
-use ratatui::{crossterm::event::{self, KeyCode, KeyEventKind},
-    DefaultTerminal,
-    style::Stylize,
-    widgets::Paragraph,
-};
+use ratatui::crossterm::event::{self, KeyCode, KeyEventKind};
 
 fn main() -> io::Result<()> {
-    let mut settings_mode = false;
+    let game_screen = false;
+    let main_menu_screen = true;
+    let settings_menu_screen = false;
     let mut terminal = ratatui::init();
-    terminal.clear()?;
-    let app_result = main_menu(terminal);
-    ratatui::restore();
-    app_result;
+    let app_result = main_menu(&mut terminal);
+    clearscreen::clear();
 
-    if let event::Event::Key(key) = event::read()? {
-        if key.kind == KeyEventKind::Press && key.code == KeyCode::Char('q')  {
-            return Ok(());
-        }
-        if key.kind == KeyEventKind::Press && key.code == KeyCode::Char('e')  {
-        }
-        if key.kind == KeyEventKind::Press && key.code == KeyCode::Char('\n') {
-        }
+    while main_menu_screen==true {
+        main_menu(&mut terminal);
 
+        if let event::Event::Key(key) = event::read()? {
+
+            if key.kind == KeyEventKind::Press && key.code == KeyCode::Char('q')  {
+                ratatui::restore();
+                clearscreen::clear();
+                return Ok(());
+            }
+
+            if key.kind == KeyEventKind::Press && key.code == KeyCode::Char('e')  {
+                clearscreen::clear();
+            }
+            if key.kind == KeyEventKind::Press && key.code == KeyCode::Char('\n') {
+            }
+            else {continue}
+
+        }
+        continue;
     }
-
-    while(true) {
+    while game_screen==true {
         println!("
             Bits: 
             
             Miners:
         ");
+        definitions::sleep(10);
         clearscreen::clear();
     } Ok(())
 }
