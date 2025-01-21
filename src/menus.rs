@@ -8,6 +8,7 @@ pub fn main_menu(terminal: &mut DefaultTerminal) {
     terminal.draw(|frame| {
         let menu_ui = Paragraph::new("
         Build: 17.01.2025, made by Elias Stettmayer
+
         ┏━━━━━━━━━━━━━━━━━━━━━━ CLI-Miner ━━━━━━━━━━━━━━━━━━━━━┓
         ┃ Exit [q]                                             ┃
         ┃                                                      ┃
@@ -28,18 +29,18 @@ pub fn main_menu(terminal: &mut DefaultTerminal) {
 pub fn settings_menu(terminal: &mut DefaultTerminal) {
     terminal.draw(|frame| {
         let menu_ui = Paragraph::new("
-            Build: 17.01.2025, made by Elias Stettmayer
+        Build: 17.01.2025, made by Elias Stettmayer
 
-            ┏━━━━━━━━━━━━━━━━━━━━━━ Settings ━━━━━━━━━━━━━━━━━━━━━━┓
-            ┃ Back [q]                                             ┃
-            ┃                                                      ┃
-            ┃           ToDo                                       ┃
-            ┃                                                      ┃
-            ┃           ToDo                                       ┃
-            ┃                                                      ┃
-            ┃                                                      ┃
-            ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
-            ");
+        ┏━━━━━━━━━━━━━━━━━━━━━━ Settings ━━━━━━━━━━━━━━━━━━━━━━┓
+        ┃ Back [q]                                             ┃
+        ┃                                                      ┃
+        ┃           ToDo                                       ┃
+        ┃                                                      ┃
+        ┃           ToDo                                       ┃
+        ┃                                                      ┃
+        ┃                                                      ┃
+        ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+        ");
         let menu_display = menu_ui
             .white()
             .on_black();
