@@ -1,7 +1,7 @@
 use std::io;
 mod definitions;
-mod menus;
-use menus::*;
+mod screens;
+use screens::*;
 mod gamedata;
 use gamedata::*;
 use clearscreen;
@@ -34,7 +34,7 @@ fn main() -> io::Result<()> {
                     clearscreen::clear(); 
                 }
 
-                if key.kind == KeyEventKind::Press && key.code == KeyCode::Char('\n') {
+                if key.kind == KeyEventKind::Press && key.code == KeyCode::Enter {
                     main_menu_screen = false;
                     game_screen = true;
                     clearscreen::clear();
@@ -67,11 +67,7 @@ fn main() -> io::Result<()> {
         }
 
         while game_screen==true {
-            println!("
-                Bits: 
-            
-                Miners:
-            ");
+            game(&mut terminal);
 
             if let event::Event::Key(key) = event::read()? {
 
