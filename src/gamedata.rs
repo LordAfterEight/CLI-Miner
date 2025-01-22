@@ -7,3 +7,7 @@ pub struct Player {
     pub miner_price: f32,
     pub converters: u32
 }
+
+pub struct Gamestate {
+    pub state: String,
+}

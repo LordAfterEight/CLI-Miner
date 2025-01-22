@@ -6,10 +6,9 @@ use ratatui::{
     DefaultTerminal,
 };
 
-pub fn render_main_menu(terminal: &mut DefaultTerminal) {
-    let _ = terminal.clear();
+pub fn render_main_menu(terminal: &mut DefaultTerminal, state: String) {
     let _ = terminal.draw(|frame| {
-        let game_ui = format!("Exit [q]\n\nSettings [e]\n\nStart Game [Enter]");
+        let game_ui = format!("Exit [q]\n\nSettings [e]\n\n{state} [Enter]");
         let menu_ui = Paragraph::new(Text::from(game_ui))
             .block(Block::bordered()
             .border_type(BorderType::Rounded)
@@ -24,7 +23,6 @@ pub fn render_main_menu(terminal: &mut DefaultTerminal) {
 }
 
 pub fn render_settings_menu(terminal: &mut DefaultTerminal, frame_delay: u64) {
-    let _ = terminal.clear();
     let _ = terminal.draw(|frame| {
         let game_ui = format!("Back [q]\n\nFrame Delay: {frame_delay} [+]/[-]   Lower this setting to make the game faster or vice versa | 10-20 recommended
                            Warning: There is a known bug that will cause keypresses to be buffered if the delay is too high!");
@@ -42,7 +40,6 @@ pub fn render_settings_menu(terminal: &mut DefaultTerminal, frame_delay: u64) {
 }
 
 pub fn render_game(terminal: &mut DefaultTerminal, bits: u32, bytes: u32, miners: u32, converters: u32, miner_price: f32, money: f32) {
-    let _ = terminal.clear();
     let _ = terminal.draw(|frame| {
         let game_ui = format!("Main Menu [q]\nSettings [e]\n\nMoney: {money}$\n\nBits: {bits}    [2] to convert to money\n\nMiners: {miners}  Price: {miner_price}, [6] to buy");
         let menu_ui = Paragraph::new(Text::from(game_ui))

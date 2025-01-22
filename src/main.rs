@@ -17,6 +17,7 @@ fn main() -> io::Result<()> {
         miner_price: 60.0,
         converters: 0
     };
+    let state = &mut Gamestate { state: "Start Game".to_string() };
     let mut frame_delay = 15;
     let mut game_screen = false;
     let mut main_menu_screen = true;
@@ -24,9 +25,9 @@ fn main() -> io::Result<()> {
     let mut terminal = ratatui::init();
 
     loop {
-        let _ = clearscreen::clear();
+        let _ = terminal.clear();
         while main_menu_screen==true {
-            render_main_menu(&mut terminal);
+            render_main_menu(&mut terminal, state.state.clone());
 
             if let event::Event::Key(key) = event::read()? {
 
@@ -42,6 +43,7 @@ fn main() -> io::Result<()> {
                 }
 
                 if key.kind == KeyEventKind::Press && key.code == KeyCode::Enter {
+                    state.state="Back to Game".to_string();
                     main_menu_screen = false;
                     game_screen = true;
                     break;
@@ -60,7 +62,7 @@ fn main() -> io::Result<()> {
                     main_menu_screen = true;
                     break;
                 }
-                
+
                 if key.kind == KeyEventKind::Press && key.code == KeyCode::Char('+')  {
                     frame_delay += 1;
                     continue;
