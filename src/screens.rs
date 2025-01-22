@@ -1,12 +1,12 @@
 use ratatui::{
     text::Text,
     layout::Alignment,
-    style::{Color,Style,Stylize},
+    style::{Stylize},
     widgets::{Paragraph,Block,BorderType,Padding},
     DefaultTerminal,
 };
 
-pub fn main_menu(terminal: &mut DefaultTerminal) {
+pub fn render_main_menu(terminal: &mut DefaultTerminal) {
     terminal.draw(|frame| {
         let menu_ui = Paragraph::new("
         Build: 17.01.2025, made by Elias Stettmayer
@@ -28,7 +28,7 @@ pub fn main_menu(terminal: &mut DefaultTerminal) {
     });
 }
 
-pub fn settings_menu(terminal: &mut DefaultTerminal) {
+pub fn render_settings_menu(terminal: &mut DefaultTerminal) {
     terminal.draw(|frame| {
         let menu_ui = Paragraph::new("
         Build: 17.01.2025, made by Elias Stettmayer
@@ -50,9 +50,9 @@ pub fn settings_menu(terminal: &mut DefaultTerminal) {
     });
 }
 
-pub fn game(terminal: &mut DefaultTerminal, bits: u8, bytes: u8, miners: u8, converters: u8) {
+pub fn render_game(terminal: &mut DefaultTerminal, bits: u8, bytes: u8, miners: u8, converters: u8) {
     terminal.draw(|frame| {
-        let game_ui = format!("Main Menu [q]\n\nBits:{bits}\n\nMiners:{miners}");
+        let game_ui = format!("Main Menu [q]\nSettings [e]\n\nBits:{bits}\n\nMiners:{miners}");
         let menu_ui = Paragraph::new(Text::from(game_ui))
             .block(Block::bordered()
             .border_type(BorderType::Rounded)

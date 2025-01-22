@@ -21,9 +21,9 @@ fn main() -> io::Result<()> {
     let mut terminal = ratatui::init();
     clearscreen::clear();
     
-    while true {
+    loop {
         while main_menu_screen==true {
-            main_menu(&mut terminal);
+            render_main_menu(&mut terminal);
 
             if let event::Event::Key(key) = event::read()? {
 
@@ -45,13 +45,11 @@ fn main() -> io::Result<()> {
                     clearscreen::clear();
                 }
                 else {continue}
-
             }
-            continue;
         }
 
         while settings_menu_screen==true {
-            settings_menu(&mut terminal);
+            render_settings_menu(&mut terminal);
 
             if let event::Event::Key(key) = event::read()? {
 
@@ -68,11 +66,10 @@ fn main() -> io::Result<()> {
                 }
                 else {continue}
             }
-            continue;
         }
 
         while game_screen==true {
-            game(&mut terminal, player.bits, player.bytes, player.miners, player.converters);
+            render_game(&mut terminal, player.bits, player.bytes, player.miners, player.converters);
 
             if let event::Event::Key(key) = event::read()? {
 
@@ -96,8 +93,6 @@ fn main() -> io::Result<()> {
             }
 
             definitions::sleep(10); //code runs at 100Hz
-            clearscreen::clear();
         }
     }
-    Ok(())
 }
