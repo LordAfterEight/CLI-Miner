@@ -8,7 +8,7 @@ use clearscreen;
 use ratatui::crossterm::event::{self, KeyCode, KeyEventKind};
 
 fn main() -> io::Result<()> {
-    let player = &Player {
+    let player = &mut Player {
         nickname: "player".to_string(),
         bits: 0,
         bytes: 0,
@@ -87,10 +87,15 @@ fn main() -> io::Result<()> {
                     settings_menu_screen = true;
                     clearscreen::clear(); 
                 }
-                else {continue}
+
+                if key.kind == KeyEventKind::Press && key.code == KeyCode::Char('1')  {
+                    player.bits += 1*&player.miners;
+                    clearscreen::clear();
+                    continue;
+                }
             }
 
-            definitions::sleep(10);
+            definitions::sleep(10); //code runs at 100Hz
             clearscreen::clear();
         }
     }

@@ -52,10 +52,11 @@ pub fn settings_menu(terminal: &mut DefaultTerminal) {
 
 pub fn game(terminal: &mut DefaultTerminal, bits: u8, bytes: u8, miners: u8, converters: u8) {
     terminal.draw(|frame| {
-        let game_ui = format!("Bits:{bits}\n\nMiners:{miners}");
+        let game_ui = format!("Main Menu [q]\n\nBits:{bits}\n\nMiners:{miners}");
         let menu_ui = Paragraph::new(Text::from(game_ui))
             .block(Block::bordered()
             .border_type(BorderType::Rounded)
+            .padding(Padding{left:2,right:2,top:1,bottom:1})
             .title("CLI Miner")
             .title_alignment(Alignment::Center));
         let menu_display = menu_ui
