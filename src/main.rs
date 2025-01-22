@@ -19,9 +19,9 @@ fn main() -> io::Result<()> {
     let mut main_menu_screen = true;
     let mut settings_menu_screen = false;
     let mut terminal = ratatui::init();
-    clearscreen::clear();
-    
+
     loop {
+        let _ = clearscreen::clear();
         while main_menu_screen==true {
             render_main_menu(&mut terminal);
 
@@ -29,23 +29,23 @@ fn main() -> io::Result<()> {
 
                 if key.kind == KeyEventKind::Press && key.code == KeyCode::Char('q')  {
                     ratatui::restore();
-                    clearscreen::clear();
                     return Ok(());
                 }
 
                 if key.kind == KeyEventKind::Press && key.code == KeyCode::Char('e')  {
                     main_menu_screen = false;
                     settings_menu_screen = true;
-                    clearscreen::clear(); 
+                    break;
                 }
 
                 if key.kind == KeyEventKind::Press && key.code == KeyCode::Enter {
                     main_menu_screen = false;
                     game_screen = true;
-                    clearscreen::clear();
+                    break;
                 }
                 else {continue}
             }
+            definitions::sleep(10);
         }
 
         while settings_menu_screen==true {
@@ -56,16 +56,11 @@ fn main() -> io::Result<()> {
                 if key.kind == KeyEventKind::Press && key.code == KeyCode::Char('q')  {
                     settings_menu_screen = false;
                     main_menu_screen = true;
-                    clearscreen::clear();
-                }
-
-                if key.kind == KeyEventKind::Press && key.code == KeyCode::Char('e')  {
-                    main_menu_screen = false;
-                    settings_menu_screen = true;
-                    clearscreen::clear(); 
+                    break;
                 }
                 else {continue}
             }
+            definitions::sleep(10);
         }
 
         while game_screen==true {
@@ -76,22 +71,20 @@ fn main() -> io::Result<()> {
                 if key.kind == KeyEventKind::Press && key.code == KeyCode::Char('q')  {
                     game_screen = false;
                     main_menu_screen = true;
-                    clearscreen::clear();
+                    break;
                 }
 
                 if key.kind == KeyEventKind::Press && key.code == KeyCode::Char('e')  {
                     main_menu_screen = false;
                     settings_menu_screen = true;
-                    clearscreen::clear(); 
+                    break;
                 }
 
                 if key.kind == KeyEventKind::Press && key.code == KeyCode::Char('1')  {
                     player.bits += 1*&player.miners;
-                    clearscreen::clear();
                     continue;
                 }
             }
-
             definitions::sleep(10); //code runs at 100Hz
         }
     }
