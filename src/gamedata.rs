@@ -1,7 +1,7 @@
 pub struct Player {
-    nickname: String,
-    bits: u8,
-    bytes: u8,
-    miners: u8,
-    converters: u8
+    pub nickname: String,
+    pub bits: u8,
+    pub bytes: u8,
+    pub miners: u8,
+    pub converters: u8
 }

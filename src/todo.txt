@@ -3,6 +3,7 @@ Todo list is ranked by priority
 1. Menus/Windows (and functional switching between them):
     - Main menu
     - Settings menu
+        - Keybinds?
     - Game
 
 2. Game mechanics:

@@ -5,15 +5,20 @@ use screens::*;
 mod gamedata;
 use gamedata::*;
 use clearscreen;
-
 use ratatui::crossterm::event::{self, KeyCode, KeyEventKind};
 
 fn main() -> io::Result<()> {
+    let player = &Player {
+        nickname: "player".to_string(),
+        bits: 0,
+        bytes: 0,
+        miners: 1,
+        converters: 0
+    };
     let mut game_screen = false;
     let mut main_menu_screen = true;
     let mut settings_menu_screen = false;
     let mut terminal = ratatui::init();
-    let app_result = main_menu(&mut terminal);
     clearscreen::clear();
     
     while true {
@@ -67,7 +72,7 @@ fn main() -> io::Result<()> {
         }
 
         while game_screen==true {
-            game(&mut terminal);
+            game(&mut terminal, player.bits, player.bytes, player.miners, player.converters);
 
             if let event::Event::Key(key) = event::read()? {
 

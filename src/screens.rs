@@ -1,6 +1,8 @@
 use ratatui::{
-    style::Stylize,
-    widgets::Paragraph,
+    text::Text,
+    layout::Alignment,
+    style::{Color,Style,Stylize},
+    widgets::{Paragraph,Block,BorderType,Padding},
     DefaultTerminal,
 };
 
@@ -48,21 +50,14 @@ pub fn settings_menu(terminal: &mut DefaultTerminal) {
     });
 }
 
-pub fn game(terminal: &mut DefaultTerminal) {
+pub fn game(terminal: &mut DefaultTerminal, bits: u8, bytes: u8, miners: u8, converters: u8) {
     terminal.draw(|frame| {
-        let menu_ui = Paragraph::new("
-        Build: 17.01.2025, made by Elias Stettmayer
-
-        ┏━━━━━━━━━━━━━━━━━━━━━━ Settings ━━━━━━━━━━━━━━━━━━━━━━┓
-        ┃ Back [q]                                             ┃
-        ┃                                                      ┃
-        ┃ Bits:                                                ┃
-        ┃                                                      ┃
-        ┃ Miners:                                              ┃
-        ┃                                                      ┃
-        ┃                                                      ┃
-        ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
-        ");
+        let game_ui = format!("Bits:{bits}\n\nMiners:{miners}");
+        let menu_ui = Paragraph::new(Text::from(game_ui))
+            .block(Block::bordered()
+            .border_type(BorderType::Rounded)
+            .title("CLI Miner")
+            .title_alignment(Alignment::Center));
         let menu_display = menu_ui
             .white()
             .on_black();
