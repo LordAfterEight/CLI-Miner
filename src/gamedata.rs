@@ -1,7 +1,9 @@
 pub struct Player {
     pub nickname: String,
-    pub bits: u8,
-    pub bytes: u8,
-    pub miners: u8,
-    pub converters: u8
+    pub money: f32,
+    pub bits: u32,
+    pub bytes: u32,
+    pub miners: u32,
+    pub miner_price: f32,
+    pub converters: u32
 }

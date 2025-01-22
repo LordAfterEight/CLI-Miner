@@ -10,11 +10,14 @@ use ratatui::crossterm::event::{self, KeyCode, KeyEventKind};
 fn main() -> io::Result<()> {
     let player = &mut Player {
         nickname: "player".to_string(),
+        money: 0.0,
         bits: 0,
         bytes: 0,
         miners: 1,
+        miner_price: 60.0,
         converters: 0
     };
+    let mut frame_delay = 15;
     let mut game_screen = false;
     let mut main_menu_screen = true;
     let mut settings_menu_screen = false;
@@ -45,11 +48,10 @@ fn main() -> io::Result<()> {
                 }
                 else {continue}
             }
-            definitions::sleep(10);
         }
 
         while settings_menu_screen==true {
-            render_settings_menu(&mut terminal);
+            render_settings_menu(&mut terminal, frame_delay);
 
             if let event::Event::Key(key) = event::read()? {
 
@@ -58,13 +60,28 @@ fn main() -> io::Result<()> {
                     main_menu_screen = true;
                     break;
                 }
+                
+                if key.kind == KeyEventKind::Press && key.code == KeyCode::Char('+')  {
+                    frame_delay += 1;
+                    continue;
+                }
+
+                if key.kind == KeyEventKind::Press && key.code == KeyCode::Char('-') && frame_delay>1  {
+                    frame_delay -= 1;
+                    continue;
+                }
+
+
+
                 else {continue}
             }
             definitions::sleep(10);
         }
 
         while game_screen==true {
-            render_game(&mut terminal, player.bits, player.bytes, player.miners, player.converters);
+            render_game(&mut terminal, player.bits, player.bytes, player.miners, player.converters, player.miner_price, player.money);
+
+            definitions::sleep(frame_delay);
 
             if let event::Event::Key(key) = event::read()? {
 
@@ -82,10 +99,19 @@ fn main() -> io::Result<()> {
 
                 if key.kind == KeyEventKind::Press && key.code == KeyCode::Char('1')  {
                     player.bits += 1*&player.miners;
-                    continue;
+                }
+
+                if key.kind == KeyEventKind::Press && key.code == KeyCode::Char('2')  {
+                    player.money += player.bits as f32;
+                    player.bits = 0;
+                }
+
+                if key.kind == KeyEventKind::Press && key.code == KeyCode::Char('6') && player.money >= player.miner_price {
+                    player.miners += 1;
+                    player.money -= player.miner_price;
+                    player.miner_price *= 1.5;
                 }
             }
-            definitions::sleep(10); //code runs at 100Hz
         }
     }
 }
