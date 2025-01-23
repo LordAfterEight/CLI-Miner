@@ -6,11 +6,13 @@ version = 4
 name = "CLI-Miner"
 version = "0.1.0"
 dependencies = [
+ "alsa",
  "clang",
  "clearscreen",
  "crossterm",
  "kira",
  "ratatui",
+ "soloud",
  "target",
  "windows_x86_64_gnu 0.53.0",
 ]
@@ -203,6 +205,15 @@ dependencies = [
  "thiserror 2.0.11",
  "which",
  "windows-sys 0.59.0",
+]
+
+[[package]]
+name = "cmake"
+version = "0.1.52"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "c682c223677e0e5b6b7f63a64b9351844c3f1b1678a68b7ee617e30fb082620e"
+dependencies = [
+ "cc",
 ]
 
 [[package]]
@@ -1088,6 +1099,26 @@ name = "smallvec"
 version = "1.13.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "3c5e1a9a646d36c3599cd173a41282daf47c44583ad367b8e6837255952e5c67"
+
+[[package]]
+name = "soloud"
+version = "1.0.5"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "f40cbdc64b205d53f861657923d4f94bd56ffa81e11b8ad920ac79447ececb47"
+dependencies = [
+ "bitflags 2.8.0",
+ "paste",
+ "soloud-sys",
+]
+
+[[package]]
+name = "soloud-sys"
+version = "1.0.5"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "f02ffc83bc0ae8897f7a13e975bde2126d7a9a9aa82d73d129ac8e60461f7b41"
+dependencies = [
+ "cmake",
+]
 
 [[package]]
 name = "static_assertions"
