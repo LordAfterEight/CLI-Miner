@@ -4,13 +4,11 @@ mod screens;
 use screens::*;
 mod gamedata;
 use gamedata::*;
-use soloud::*;
+
 use clearscreen;
 use ratatui::crossterm::event::{self, KeyCode, KeyEventKind};
 
 fn main() -> io::Result<()> {
-    let soloud = Soloud::default().unwrap();
-    let mut mp3 = audio::Wav::default();
     let player = &mut Player {
         nickname: "player".to_string(),
         money: 0.0,
@@ -31,8 +29,6 @@ fn main() -> io::Result<()> {
         let _ = terminal.clear();
         while main_menu_screen==true {
             render_main_menu(&mut terminal, state.state.clone());
-            mp3.load_mem(include_bytes!("../sound/music2.mp3")).unwrap();
-            soloud.play(&mp3);
 
             if let event::Event::Key(key) = event::read()? {
 
