@@ -7,6 +7,7 @@ name = "CLI-Miner"
 version = "0.1.0"
 dependencies = [
  "alsa",
+ "audio",
  "clang",
  "clearscreen",
  "cpal",
@@ -65,6 +66,21 @@ name = "atomic-arena"
 version = "0.1.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "73e8ed45f88ed32e6827a96b62d8fd4086d72defc754c5c6bd08470c1aaf648e"
+
+[[package]]
+name = "audio"
+version = "0.2.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "c2d8fdbcbaf6b6967eefcbf476d7ded6d3bd29ddfa5b141e39e25d3cd531a14f"
+dependencies = [
+ "audio-core",
+]
+
+[[package]]
+name = "audio-core"
+version = "0.2.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "db446410e749ce0157f460ef73d97f002251808aa6b6ca69f476578f36e958e0"
 
 [[package]]
 name = "autocfg"
