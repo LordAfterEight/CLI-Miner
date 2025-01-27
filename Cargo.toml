@@ -5,11 +5,15 @@ edition = "2021"
 
 [dependencies]
 alsa = "0.9.1"
+alsa-sys = "0.3.1"
 audio = "0.2.0"
 clang = "2.0.0"
 clearscreen = "4.0.1"
 cpal = "0.15.3"
+cross = "0.2.5"
 crossterm = "0.28.1"
+libc = "0.2.169"
 ratatui = { version = "0.29.0", features = ["all-widgets"] }
+rodio = "0.20.1"
 target = "2.1.0"
 windows_x86_64_gnu = "0.53.0"

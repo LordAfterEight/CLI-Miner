@@ -24,6 +24,8 @@ fn main() -> io::Result<()> {
     let mut settings_menu_screen = false;
     let mut terminal = ratatui::init();
 
+    definitions::play_mp3("music2.mp3");
+
     loop {
         let _ = terminal.clear();
         while main_menu_screen==true {
