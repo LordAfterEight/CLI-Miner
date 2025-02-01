@@ -9,6 +9,12 @@ pub struct Player {
     pub converter_price: f32
 }
 
-pub struct Gamestate {
+pub struct GameState {
     pub state: String,
+}
+
+pub struct GameSettings {
+    pub sfx_volume: f32,
+    pub music_volume: f32,
+    pub frame_delay: u8
 }
