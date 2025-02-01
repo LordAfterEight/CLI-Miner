@@ -6,8 +6,7 @@ mod screens;
 use screens::*;
 mod gamedata;
 use gamedata::*;
-use rodio::decoder::DecoderError;
-use rodio::{Decoder, OutputStream, source::Source, Sink};
+use rodio::{Decoder, OutputStream, Sink};
 use ratatui::crossterm::event::{self, KeyCode, KeyEventKind};
 
 fn get_source(filename: &str) -> Decoder<BufReader<File>> {
@@ -23,9 +22,9 @@ fn main() -> io::Result<()> {
         bytes: 0,
         miners: 1,
         miner_price: 60.0,
-        converters: 0
+        converters: 0,
+        converter_price: 5000.0
     };
-
 
     let state = &mut Gamestate {state: "Start Game".to_string()};
     let mut frame_delay = 50;
@@ -33,6 +32,8 @@ fn main() -> io::Result<()> {
     let mut main_menu_screen = true;
     let mut settings_menu_screen = false;
     let mut terminal = ratatui::init();
+    let mut sound_volume = 0.5;
+    let mut sfx_volume = 0.5;
 
     let (_stream,stream_handle) = OutputStream::try_default().unwrap();
     let sink_music = Sink::try_new(&stream_handle).unwrap();
@@ -40,7 +41,7 @@ fn main() -> io::Result<()> {
     sink_sfx.append(get_source("interact.mp3"));
     sink_music.append(get_source("music2.mp3"));
     sink_sfx.sleep_until_end();
-    
+
     loop {
         let _ = terminal.clear();
         while main_menu_screen==true {
@@ -49,7 +50,7 @@ fn main() -> io::Result<()> {
 
                 if key.kind == KeyEventKind::Press && key.code == KeyCode::Char('q')  {
                     sink_sfx.append(get_source("interact.mp3"));
-                    definitions::sleep(200);
+                    definitions::sleep(300);
                     ratatui::restore();
                     return Ok(());
                 }
@@ -75,7 +76,7 @@ fn main() -> io::Result<()> {
         }
 
         while settings_menu_screen==true {
-            render_settings_menu(&mut terminal, frame_delay);
+            render_settings_menu(&mut terminal, frame_delay, sfx_volume, sound_volume);
 
             if let event::Event::Key(key) = event::read()? {
 
@@ -137,11 +138,14 @@ fn main() -> io::Result<()> {
                 }
 
                 if key.kind == KeyEventKind::Press && key.code == KeyCode::Char('2')  {
+                    sink_sfx.append(get_source("sell.mp3"));
                     player.money += player.bits as f32;
                     player.bits = 0;
                 }
 
                 if key.kind == KeyEventKind::Press && key.code == KeyCode::Char('6') && player.money >= player.miner_price {
+                    sink_sfx.stop();
+                    sink_sfx.append(get_source("bought.mp3"));
                     player.miners += 1;
                     player.money -= player.miner_price;
                     player.miner_price *= 1.5;

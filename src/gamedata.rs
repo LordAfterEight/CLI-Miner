@@ -5,7 +5,8 @@ pub struct Player {
     pub bytes: u32,
     pub miners: u32,
     pub miner_price: f32,
-    pub converters: u32
+    pub converters: u32,
+    pub converter_price: f32
 }
 
 pub struct Gamestate {

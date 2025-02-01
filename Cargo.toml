@@ -12,6 +12,7 @@ clearscreen = "4.0.1"
 cpal = "0.15.3"
 cross = "0.2.5"
 crossterm = "0.28.1"
+gcc = "0.3.55"
 libc = "0.2.169"
 ratatui = { version = "0.29.0", features = ["all-widgets"] }
 rodio = "0.20.1"
