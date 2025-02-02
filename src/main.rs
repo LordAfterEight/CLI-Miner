@@ -9,6 +9,7 @@ use gamedata::*;
 use rust_embed::Embed;
 use rodio::{Decoder, OutputStream, Sink};
 use ratatui::crossterm::event::{self, KeyCode, KeyEventKind};
+use discord_rich_presence::{activity,activity::{Assets, Timestamps}, DiscordIpc, DiscordIpcClient};
 
 #[derive(PartialEq, Eq)]
 enum Screens {
@@ -40,49 +41,76 @@ fn main() -> io::Result<()> {
 
     let settings = &mut GameSettings {
         sfx_volume: 0.75,
-        music_volume: 0.75,
+        music_volume: 1.0,
         frame_delay: 60
     };
 
-    let state = &mut GameState {state: "Start Game".to_string()};
+    let game = &mut GameState {
+        state: "Start Game".to_string(),
+        rich_presence_state: "In Main Menu".to_string()
+    };
+
+    let mut client = DiscordIpcClient::new("1335715218851893389").expect("invalid client ID"); 
+    client.connect().expect("failed to connect to client");
+
+    let icon = Assets::new();
+    let small_image = icon.small_image("../assets/rich_presence_icon.png");
+
+    let timestamp = Timestamps::new();
+    let timer = timestamp.end(10);
+
+    client.set_activity(activity::Activity::new()
+        .state(format!("{}",game.rich_presence_state).as_str())
+        .activity_type(activity::ActivityType::Playing)
+        .assets(small_image)
+        .timestamps(timer)
+    );
+
     let mut current_screen = Screens::Start;
     let mut terminal = ratatui::init();
-    let automate = false;
+    let mut prev_was_ingame = false;
     let (_stream,stream_handle) = OutputStream::try_default().unwrap();
     let sink_music = Sink::try_new(&stream_handle).unwrap();
     let sink_sfx = Sink::try_new(&stream_handle).unwrap();
+
+    sink_sfx.set_volume(settings.sfx_volume);
+    sink_music.set_volume(settings.music_volume);
+
     sink_sfx.append(get_source("interact.mp3"));
-    sink_music.append(get_source("music2.mp3"));
+    sink_music.append(get_source("bg_scifi1.mp3"));
     sink_sfx.sleep_until_end();
 
     loop {
-        let _ = terminal.clear();
 
         while current_screen == Screens::Start {
-            render_main_menu(&mut terminal, state.state.clone());
+            render_main_menu(&mut terminal, game.state.clone());
 
             if let event::Event::Key(key) = event::read()? {
                 if key.kind == KeyEventKind::Press {
 
-                    if key.kind == KeyEventKind::Press && key.code == KeyCode::Char('q')  {
+                    if key.code == KeyCode::Char('q')  {
                         sink_sfx.append(get_source("interact.mp3"));
                         definitions::sleep(300);
                         ratatui::restore();
                         return Ok(());
                     }
 
-                    if key.kind == KeyEventKind::Press && key.code == KeyCode::Char('e')  {
+                    if key.code == KeyCode::Char('e')  {
                         sink_sfx.append(get_source("interact.mp3"));
                         current_screen = Screens::Settings;
                         break;
                     }
 
-                    if key.kind == KeyEventKind::Press && key.code == KeyCode::Enter {
+                    if key.code == KeyCode::Enter {
                         sink_sfx.append(get_source("interact.mp3"));
                         sink_music.stop();
-                        sink_music.append(get_source("music1.mp3"));
-                        state.state="Back to Game".to_string();
+                        sink_music.append(get_source("boss2.mp3"));
+                        game.state="Back to Game".to_string();
                         current_screen = Screens::Game;
+                        game.rich_presence_state = "Mining".to_string();
+                        client.set_activity(activity::Activity::new()
+                            .state(format!("{}",game.rich_presence_state).as_str())
+                        );
                         break;
                     }
                     else {continue}
@@ -96,20 +124,22 @@ fn main() -> io::Result<()> {
             if let event::Event::Key(key) = event::read()? {
                 if key.kind == KeyEventKind::Press {
 
-                    if key.kind == KeyEventKind::Press && key.code == KeyCode::Char('q')  {
+                    if key.code == KeyCode::Char('q')  {
                         sink_sfx.append(get_source("interact.mp3"));
-                        current_screen = Screens::Start;
+                        if prev_was_ingame {
+                            current_screen = Screens::Game;
+                        } else {current_screen = Screens::Start;}
                         break;
                     }
 
-                    if key.kind == KeyEventKind::Press && key.code == KeyCode::Char('+')  {
+                    if key.code == KeyCode::Char('+')  {
                         sink_sfx.stop();
                         sink_sfx.append(get_source("interact.mp3"));
                         settings.frame_delay += 1;
                         continue;
                     }
 
-                    if key.kind == KeyEventKind::Press && key.code == KeyCode::Char('-') && settings.frame_delay>1  {
+                    if key.code == KeyCode::Char('-') && settings.frame_delay>1  {
                         sink_sfx.stop();
                         sink_sfx.append(get_source("interact.mp3"));
                         settings.frame_delay -= 1;
@@ -124,7 +154,7 @@ fn main() -> io::Result<()> {
         while current_screen == Screens::Game {
             render_game(&mut terminal, player);
 
-            //definitions::sleep(settings.frame_delay);
+            definitions::sleep(settings.frame_delay);
 
             if let event::Event::Key(key) = event::read()? {
                 if key.kind == KeyEventKind::Press {
@@ -132,13 +162,19 @@ fn main() -> io::Result<()> {
                     if key.code == KeyCode::Char('q')  {
                         sink_sfx.append(get_source("interact.mp3"));
                         sink_music.stop();
-                        sink_music.append(get_source("music2.mp3"));
+                        sink_music.append(get_source("bad_end2.mp3"));
+                        prev_was_ingame = false;
                         current_screen = Screens::Start;
+                        game.rich_presence_state = "In Main Menu".to_string();
+                        client.set_activity(activity::Activity::new()
+                            .state(format!("{}",game.rich_presence_state).as_str())
+                        );
                         break;
                     }
 
                     if key.code == KeyCode::Char('e')  {
                         sink_sfx.append(get_source("interact.mp3"));
+                        prev_was_ingame = true;
                         current_screen = Screens::Settings;
                         break;
                     }

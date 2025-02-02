@@ -1,7 +1,7 @@
 use ratatui::{
-    text::Text,
+    text::{Text,Line,Span},
     layout::Alignment,
-    style::Stylize,
+    style::{Stylize,Style},
     widgets::{Paragraph,Block,BorderType,Padding},
     DefaultTerminal,
     prelude::{Constraint,Layout}
@@ -11,41 +11,64 @@ use crate::GameSettings;
 
 pub fn render_main_menu(terminal: &mut DefaultTerminal, state: String) {
     let _ = terminal.draw(|frame| {
-        let game_ui = format!("Exit [q]\n\nSettings [e]\n\n{state} [Enter]");
+
+        let empty_line = Line::from("");
+
+        let title = Line::from("CLI-Miner »«").magenta().centered().bold().underlined();
+        let exit = Line::from("Exit [q]").centered().light_red();
+        let settings = Line::from("Settings [e]").centered();
+        let start = Line::from(format!("{state} [Enter]")).centered().light_green();
+        let game_ui = Text::from(vec![title, empty_line, exit, settings, start]);
+
         let menu_ui = Paragraph::new(Text::from(game_ui))
             .block(Block::bordered()
             .border_type(BorderType::Thick)
-            .padding(Padding{left:2,right:2,top:1,bottom:1})
+            .padding(Padding::vertical(5))
             .title(" Main Menu ")
-            .title_alignment(Alignment::Center));
-        let menu_display = menu_ui
+            .title_alignment(Alignment::Center))
             .white()
             .on_black();
-        frame.render_widget(menu_display, frame.area());
+
+        frame.render_widget(menu_ui, frame.area());
     });
 }
 
 pub fn render_settings_menu(terminal: &mut DefaultTerminal, settings: &mut GameSettings) {
     let _ = terminal.draw(|frame| {
-        let game_ui = format!("Back [q]\n\nFrame Delay: {} [+]/[-]   Lower this setting to make the game faster or vice versa | 50-60 recommended\nWarning: There is a known bug that will cause keypresses to be buffered if the delay is too high!\n\nSFX Volume: {} [+]/[-]", settings.frame_delay, settings.sfx_volume);
+        let back = Line::from("Back [q]").light_red();
+        let frame_delay_setting = Line::from(format!("Frame Delay: {} [+]/[-]", settings.frame_delay));
+        let sfx_volume_setting = Line::from(format!("SFX Volume: {} [+]/[-]", settings.sfx_volume));
+        let game_ui = Text::from(vec![back, frame_delay_setting, sfx_volume_setting]);
+
         let menu_ui = Paragraph::new(Text::from(game_ui))
             .block(Block::bordered()
             .border_type(BorderType::Double)
-            .padding(Padding{left:2,right:2,top:1,bottom:1})
+            .padding(Padding::proportional(1))
             .title(" Settings ")
-            .title_alignment(Alignment::Center));
-        let menu_display = menu_ui
+            .title_alignment(Alignment::Center))
             .white()
             .on_black();
-        frame.render_widget(menu_display, frame.area());
+
+        frame.render_widget(menu_ui, frame.area());
     });
 }
 
 pub fn render_game(terminal: &mut DefaultTerminal, player: &mut Player) {
     let _ = terminal.draw(|frame| {
-        let menus = format!("Main Menu [q]\nSettings [e]\n\n");
-        let resources = format!("Money: {}$\n\nBits: {}  |  [1] to mine, [2] to convert to money\nBytes: {}", player.money, player.bits, player.bytes);
-        let devices = format!("Miners: {}  |  Price: {}$, [6] to buy\nConverters: {}  |  Price: {}$, [3] to use, [7] to buy", player.miners, player.miner_price, player.converters, player.converter_price);
+        let mainmenu = Line::from(format!("Main menu [q]")).light_red();
+        let settings = Line::from(format!("Settings [e]"));
+        let menus = Text::from(vec![mainmenu, settings]);
+
+        let money = Line::from(format!("Money: {}»«", player.money));
+        let bits = Line::from(format!("Bits:  {}", player.bits));
+        let bytes = Line::from(format!("Bytes: {}", player.bytes));
+        let bitsinfo  = Line::from("|  [1] to mine, [2] to convert to »«").right_aligned();
+        let bytesinfo = Line::from("|  [3] to convert from Bits").right_aligned();
+        let resources = Text::from(vec![money, bits, bytes, bitsinfo, bytesinfo]);
+
+        let miners = Line::from(format!("Miners: {}      |  Price: {}»«, [6] to buy", player.miners, player.miner_price));
+        let converters = Line::from(format!("Converters: {}  |  Price: {}»«, [3] to use, [7] to buy", player.converters, player.converter_price));
+        let devices = Text::from(vec![miners,converters]);
 
         let menus_ui = Paragraph::new(Text::from(menus))
             .block(Block::bordered()
@@ -56,7 +79,7 @@ pub fn render_game(terminal: &mut DefaultTerminal, player: &mut Player) {
             .white()
             .on_black();
 
-        let resources_ui = Paragraph::new(Text::from(resources))
+        let resources_ui = Paragraph::new(resources)
             .block(Block::bordered()
             .border_type(BorderType::Rounded)
             .padding(Padding::proportional(1))
@@ -65,7 +88,7 @@ pub fn render_game(terminal: &mut DefaultTerminal, player: &mut Player) {
             .white()
             .on_black();
 
-        let devices_ui = Paragraph::new(Text::from(devices))
+        let devices_ui = Paragraph::new(devices)
             .block(Block::bordered()
             .border_type(BorderType::Rounded)
             .padding(Padding::proportional(1))

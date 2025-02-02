@@ -11,10 +11,11 @@ pub struct Player {
 
 pub struct GameState {
     pub state: String,
+    pub rich_presence_state: String
 }
 
 pub struct GameSettings {
     pub sfx_volume: f32,
     pub music_volume: f32,
-    pub frame_delay: u8
+    pub frame_delay: u64
 }
