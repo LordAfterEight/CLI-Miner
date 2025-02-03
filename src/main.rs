@@ -34,8 +34,8 @@ fn main() -> io::Result<()> {
     };
 
     let settings = &mut GameSettings {
-        sfx_volume: 0.75,
-        music_volume: 1.0,
+        sfx_volume: 0.5,
+        music_volume: 0.5,
         frame_delay: 60
     };
 
@@ -44,14 +44,20 @@ fn main() -> io::Result<()> {
         rich_presence_state: "In Main Menu".to_string()
     };
 
-    let mut client = DiscordIpcClient::new("1335715218851893389").expect("invalid client ID"); 
-    client.connect().expect("failed to connect to client");
+    let mut client_state = false;
+    let mut client = DiscordIpcClient::new("1335715218851893389").expect("");
+    match client.connect() {
+        Ok(client) => client_state = true,
+        Err(..) => client_state = false
+    };
 
     let icon = Assets::new();
     let small_image = icon.small_image("../assets/rich_presence_icon.png");
 
     let timestamp = Timestamps::new();
     let timer = timestamp.end(10);
+
+    let mut setting_position = 1;
 
     client.set_activity(activity::Activity::new()
         .state(format!("{}",game.rich_presence_state).as_str())
@@ -78,7 +84,7 @@ fn main() -> io::Result<()> {
     loop {
 
         while current_screen == Screens::Start {
-            render_main_menu(&mut terminal, game.state.clone());
+            render_main_menu(&mut terminal, game.state.clone(), client_state);
 
             if let event::Event::Key(key) = event::read()? {
                 if key.kind == KeyEventKind::Press {
@@ -114,33 +120,44 @@ fn main() -> io::Result<()> {
         }
 
         while current_screen == Screens::Settings {
-            render_settings_menu(&mut terminal, settings);
+            render_settings_menu(&mut terminal, settings, setting_position);
 
             if let event::Event::Key(key) = event::read()? {
                 if key.kind == KeyEventKind::Press {
+                    sink_sfx.set_volume(settings.sfx_volume);
+                    sink_music.set_volume(settings.music_volume);
+                    sink_sfx.stop();
+                    sink_sfx.append(get_source("interact.mp3"));
 
                     if key.code == KeyCode::Char('q')  {
-                        sink_sfx.append(get_source("interact.mp3"));
                         if prev_was_ingame {
                             current_screen = Screens::Game;
                         } else {current_screen = Screens::Start;}
                         break;
                     }
 
-                    if key.code == KeyCode::Char('+')  {
-                        sink_sfx.stop();
-                        sink_sfx.append(get_source("interact.mp3"));
-                        settings.frame_delay += 1;
-                        continue;
+                    match key.code {
+                        KeyCode::Up => setting_position -= 1,
+                        KeyCode::Down => setting_position +=1,
+                        KeyCode::Char('+') =>
+                        match setting_position {
+                            1 => settings.frame_delay += 1,
+                            2 => settings.sfx_volume += 0.05,
+                            3 => settings.music_volume += 0.05,
+                            _ => sink_sfx.append(get_source("fail.mp3"))
+                        },
+                        KeyCode::Char('-') => 
+                        match setting_position {
+                            1 => match settings.frame_delay {
+                                1 => sink_sfx.append(get_source("fail.mp3")),
+                                _ => settings.frame_delay -= 1
+                            },
+                            2 => settings.sfx_volume -= 0.05,
+                            3 => settings.music_volume -= 0.05,
+                            _ => sink_sfx.append(get_source("fail.mp3"))
+                        },
+                        _ => sink_sfx.append(get_source("fail.mp3"))
                     }
-
-                    if key.code == KeyCode::Char('-') && settings.frame_delay>1  {
-                        sink_sfx.stop();
-                        sink_sfx.append(get_source("interact.mp3"));
-                        settings.frame_delay -= 1;
-                        continue;
-                    }
-                    else {continue}
                 }
             }
             definitions::sleep(10);
@@ -186,7 +203,13 @@ fn main() -> io::Result<()> {
                         player.bits = 0;
                     }
 
-                    if key.code == KeyCode::Char('3') && player.bits >= 8*player.converters {
+                    if key.code == KeyCode::Char('3') && player.bytes > 0 {
+                        sink_sfx.append(get_source("sell.mp3"));
+                        player.money += player.bytes as f32 * 10.0;
+                        player.bytes = 0;
+                    }
+
+                    if key.code == KeyCode::Char('4') && player.bits >= 8*player.converters {
                         sink_sfx.stop();
                         sink_sfx.append(get_source("interact.mp3"));
                         player.bytes += 1*player.converters;
