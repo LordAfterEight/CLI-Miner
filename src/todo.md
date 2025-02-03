@@ -21,5 +21,6 @@ Todo list is ranked by priority
 4. Extras:
     - Settings menu:
         - Keybinds []
+    - Automatic Game Updates
 
 Last updated: 18/01/2025
