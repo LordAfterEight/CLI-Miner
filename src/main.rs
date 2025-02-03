@@ -1,13 +1,12 @@
 use std::io;
-use std::io::BufReader;
-use std::fs::File;
 mod definitions;
+use definitions::*;
 mod screens;
 use screens::*;
 mod gamedata;
 use gamedata::*;
 use rust_embed::Embed;
-use rodio::{Decoder, OutputStream, Sink};
+use rodio::{OutputStream, Sink};
 use ratatui::crossterm::event::{self, KeyCode, KeyEventKind};
 use discord_rich_presence::{activity,activity::{Assets, Timestamps}, DiscordIpc, DiscordIpcClient};
 
@@ -22,11 +21,6 @@ enum Screens {
 #[folder = "$CARGO_MANIFEST_DIR/sound/"]
 struct Asset;
 
-fn get_source(filename: &str) -> Decoder<BufReader<File>> {
-    let source = Decoder::new(BufReader::new(File::open(format!("../sound/{filename}")).expect("failed to read file")));
-    return source.expect("failed to decode file")
-}
-
 fn main() -> io::Result<()> {
     let player = &mut Player {
         nickname: "player".to_string(),
@@ -35,7 +29,7 @@ fn main() -> io::Result<()> {
         bytes: 0,
         miners: 1,
         miner_price: 60.0,
-        converters: 1,
+        converters: 0,
         converter_price: 5000.0
     };
 
@@ -69,6 +63,7 @@ fn main() -> io::Result<()> {
     let mut current_screen = Screens::Start;
     let mut terminal = ratatui::init();
     let mut prev_was_ingame = false;
+
     let (_stream,stream_handle) = OutputStream::try_default().unwrap();
     let sink_music = Sink::try_new(&stream_handle).unwrap();
     let sink_sfx = Sink::try_new(&stream_handle).unwrap();
