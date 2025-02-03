@@ -14,7 +14,7 @@ pub fn render_main_menu(terminal: &mut DefaultTerminal, state: String, client: b
 
         let empty = Line::from("");
 
-        let title = Line::from("CLI-Miner »«").magenta().centered().bold().underlined();
+        let title = Line::from("CLI-Miner »«  |  V0.1.0 Dev Build").magenta().centered().bold().underlined();
         let exit = Line::from("Exit [q]").centered().light_red();
         let settings = Line::from("Settings [e]").centered();
         let start = Line::from(format!("{state} [Enter]")).centered().light_green();
