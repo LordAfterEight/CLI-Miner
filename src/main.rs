@@ -44,12 +44,8 @@ fn main() -> io::Result<()> {
         rich_presence_state: "In Main Menu".to_string()
     };
 
-    let mut client_state = false;
     let mut client = DiscordIpcClient::new("1335715218851893389").expect("");
-    match client.connect() {
-        Ok(client) => client_state = true,
-        Err(..) => client_state = false
-    };
+    let client_state = client.connect().is_ok();
 
     let icon = Assets::new();
     let small_image = icon.small_image("../assets/rich_presence_icon.png");
@@ -121,11 +117,11 @@ fn main() -> io::Result<()> {
 
         while current_screen == Screens::Settings {
             render_settings_menu(&mut terminal, settings, setting_position);
+            sink_sfx.set_volume(settings.sfx_volume);
+            sink_music.set_volume(settings.music_volume);
 
             if let event::Event::Key(key) = event::read()? {
-                if key.kind == KeyEventKind::Press {
-                    sink_sfx.set_volume(settings.sfx_volume);
-                    sink_music.set_volume(settings.music_volume);
+                if key.kind == KeyEventKind::Press { 
                     sink_sfx.stop();
                     sink_sfx.append(get_source("interact.mp3"));
 
@@ -139,25 +135,27 @@ fn main() -> io::Result<()> {
                     match key.code {
                         KeyCode::Up => setting_position -= 1,
                         KeyCode::Down => setting_position +=1,
-                        KeyCode::Char('+') =>
-                        match setting_position {
+                        KeyCode::Char('+') => match setting_position {
                             1 => settings.frame_delay += 1,
                             2 => settings.sfx_volume += 0.05,
                             3 => settings.music_volume += 0.05,
                             _ => sink_sfx.append(get_source("fail.mp3"))
                         },
-                        KeyCode::Char('-') => 
-                        match setting_position {
+                        KeyCode::Char('-') => match setting_position {
                             1 => match settings.frame_delay {
                                 1 => sink_sfx.append(get_source("fail.mp3")),
-                                _ => settings.frame_delay -= 1
-                            },
-                            2 => settings.sfx_volume -= 0.05,
-                            3 => settings.music_volume -= 0.05,
-                            _ => sink_sfx.append(get_source("fail.mp3"))
-                        },
+                                _ => settings.frame_delay -= 1},
+                            2 => match settings.sfx_volume {
+                                0.0 => settings.sfx_volume = 0.0,
+                                _ => settings.sfx_volume -= 0.05},
+                            3 => match settings.music_volume {
+                                0.0 => settings.music_volume -= 0.0,
+                                _ => settings.music_volume -= 0.05},
+                            _ => sink_sfx.append(get_source("fail.mp3"))},
                         _ => sink_sfx.append(get_source("fail.mp3"))
                     }
+                    if setting_position == 4 {setting_position = 1;}
+                    if setting_position == 0 {setting_position = 3;}
                 }
             }
             definitions::sleep(10);

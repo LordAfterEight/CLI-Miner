@@ -35,23 +35,22 @@ pub fn render_main_menu(terminal: &mut DefaultTerminal, state: String, client: b
     });
 }
 
-pub fn render_settings_menu(terminal: &mut DefaultTerminal, settings: &mut GameSettings, setting_position: u8) {
+pub fn render_settings_menu(terminal: &mut DefaultTerminal, settings: &mut GameSettings, mut setting_position: u8) {
     let _ = terminal.draw(|frame| {
         let empty = Line::from("");
         let back = Line::from("Back [q]").light_red().centered();
         let mut frame_delay = Line::from(format!("Frame Delay: {} [+]/[-]", settings.frame_delay)).centered();
         let mut sfx_volume = Line::from(format!("SFX Volume:   {:.2} [+]/[-]", settings.sfx_volume)).centered();
         let mut music_volume = Line::from(format!("Music Volume: {:.2} [+]/[-]", settings.music_volume)).centered();
-        let mut out_of_bound = Line::from("");
 
         match setting_position {
             1 => frame_delay=frame_delay.black().on_white(),
             2 => sfx_volume=sfx_volume.black().on_white(),
             3 => music_volume=music_volume.black().on_white(),
-            _ => out_of_bound = Line::from("Selection is out of bounds!").black().on_red().centered()
+            _ => ()
         }
 
-        let game_ui = Text::from(vec![back, empty.clone(), frame_delay, sfx_volume, music_volume, empty, out_of_bound]);
+        let game_ui = Text::from(vec![back, empty.clone(), frame_delay, sfx_volume, music_volume]);
 
         let menu_ui = Paragraph::new(Text::from(game_ui))
             .block(Block::bordered()
