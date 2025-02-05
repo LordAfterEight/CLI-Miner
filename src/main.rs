@@ -5,7 +5,6 @@ mod screens;
 use screens::*;
 mod gamedata;
 use gamedata::*;
-use rust_embed::Embed;
 use ratatui::crossterm::event::{self, KeyCode, KeyEventKind};
 use discord_rich_presence::{activity,activity::{Assets, Timestamps}, DiscordIpc, DiscordIpcClient};
 use rodio::{OutputStream, Sink};
@@ -16,10 +15,6 @@ enum Screens {
     Settings,
     Game
 }
-
-#[derive(Embed)]
-#[folder = "$CARGO_MANIFEST_DIR/sound/"]
-struct Asset;
 
 fn main() -> io::Result<()> {
     let player = &mut Player {
