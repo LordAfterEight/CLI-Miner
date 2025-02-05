@@ -6,9 +6,9 @@ use screens::*;
 mod gamedata;
 use gamedata::*;
 use rust_embed::Embed;
-use rodio::{OutputStream, Sink};
 use ratatui::crossterm::event::{self, KeyCode, KeyEventKind};
 use discord_rich_presence::{activity,activity::{Assets, Timestamps}, DiscordIpc, DiscordIpcClient};
+use rodio::{OutputStream, Sink};
 
 #[derive(PartialEq, Eq)]
 enum Screens {
