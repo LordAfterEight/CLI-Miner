@@ -18,11 +18,8 @@ discord-rich-presence = "0.2.5"
 gcc = "0.3.55"
 libc = "0.2.169"
 ratatui = { version = "0.29.0", features = ["all-widgets"] }
-rodio = { version = "0.20.1", default-features = true, optional = true, features = ["symphonia-all"] }
+rodio = "0.20.1"
 rust-embed = { version = "8.5.0", features = ["interpolate-folder-path"] }
 symphonia = "0.5.4"
 target = "2.1.0"
 windows_x86_64_gnu = "0.53.0"
-
-[features]
-rodio = ["dep:rodio"]
