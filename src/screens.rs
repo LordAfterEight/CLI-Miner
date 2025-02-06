@@ -14,13 +14,15 @@ pub fn render_main_menu(terminal: &mut DefaultTerminal, state: String, client: b
 
         let empty = Line::from("");
 
-        let title = Line::from("CLI-Miner »«  |  V0.1.0 Dev Build").magenta().centered().bold().underlined();
+        let title = Line::from("CLI-Miner »«  |  V0.1.0 Dev Build for Android").magenta().centered().bold().underlined();
         let exit = Line::from("Exit [q]").centered().light_red();
         let settings = Line::from("Settings [e]").centered();
         let start = Line::from(format!("{state} [Enter]")).centered().light_green();
+        let disclaimer = Line::from("This is a test build only for trying to implement audio on android").centered();
+        let disclaimer2 = Line::from("The newest features are not included").centered();
         let mut client_message = Line::from("Not connected to Discord client").centered().red();
         if client == true {client_message = Line::from("Connected to Discord client").centered().green();}
-        let game_ui = Text::from(vec![title, empty.clone(), exit, settings, start, empty, client_message]);
+        let game_ui = Text::from(vec![title, empty.clone(), exit, settings, start, empty.clone(), client_message, empty, disclaimer, disclaimer2]);
 
         let menu_ui = Paragraph::new(Text::from(game_ui))
             .block(Block::bordered()
