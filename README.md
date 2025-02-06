@@ -1,4 +1,3 @@
 ## CLI-Miner
 
-This is a cookie-clicker style mining game that runs in your CLI.
-Written in Rust and utilizing the crates Rodio for audio playback and Ratatui for the user interface, this is my first actual project using this programming language and was initially just created to practice.
+This is the Android build version of my game that I created to try implementing audio in Rust on android (specifically aarch64). This version will not receive feature updates and new content and will be removed once I found a way that I can then implement in the main branch

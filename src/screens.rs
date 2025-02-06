@@ -42,8 +42,8 @@ pub fn render_settings_menu(terminal: &mut DefaultTerminal, settings: &mut GameS
         let empty = Line::from("");
         let back = Line::from("Back [q]").light_red().centered();
         let mut frame_delay = Line::from(format!("Frame Delay: {} [+]/[-]", settings.frame_delay)).centered();
-        let mut sfx_volume = Line::from(format!("SFX Volume:   {:.2} [+]/[-]", settings.sfx_volume)).centered();
-        let mut music_volume = Line::from(format!("Music Volume: {:.2} [+]/[-]", settings.music_volume)).centered();
+        let mut sfx_volume = Line::from(format!("SFX Volume:   {:.2} [+]/[-] NOT FUNCTIONAL", settings.sfx_volume)).centered();
+        let mut music_volume = Line::from(format!("Music Volume: {:.2} [+]/[-] NOT FUNCTIONAL", settings.music_volume)).centered();
 
         match setting_position {
             1 => frame_delay=frame_delay.black().on_white(),
