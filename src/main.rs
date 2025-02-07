@@ -83,7 +83,7 @@ fn main() -> io::Result<()> {
     loop {
 
         while current_screen == Screens::Start {
-            render_main_menu(&mut terminal, game.state.clone(), client_state);
+            render_main_menu(&mut terminal, game.state.clone(), client_state, os_is_android);
 
             if let event::Event::Key(key) = event::read()? {
                 if key.kind == KeyEventKind::Press {

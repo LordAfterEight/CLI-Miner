@@ -9,7 +9,7 @@ use ratatui::{
 use crate::Player;
 use crate::GameSettings;
 
-pub fn render_main_menu(terminal: &mut DefaultTerminal, state: String, client: bool) {
+pub fn render_main_menu(terminal: &mut DefaultTerminal, state: String, client: bool, os_is_android: bool) {
     let _ = terminal.draw(|frame| {
 
         let empty = Line::from("");
@@ -20,7 +20,9 @@ pub fn render_main_menu(terminal: &mut DefaultTerminal, state: String, client: b
         let start = Line::from(format!("{state} [Enter]")).centered().light_green();
         let mut client_message = Line::from("Not connected to Discord client").centered().red();
         if client == true {client_message = Line::from("Connected to Discord client").centered().green();}
-        let game_ui = Text::from(vec![title, empty.clone(), exit, settings, start, empty, client_message]);
+        let mut os_message = Line::from("");
+        if os_is_android == true {os_message = Line::from("Due to compatibility issues with Android audio playback is not working yet").black().on_red().centered()}
+        let game_ui = Text::from(vec![title, empty.clone(), exit, settings, start, empty.clone(), client_message, empty, os_message]);
 
         let menu_ui = Paragraph::new(Text::from(game_ui))
             .block(Block::bordered()
