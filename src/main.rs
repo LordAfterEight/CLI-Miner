@@ -7,7 +7,7 @@ mod gamedata;
 use gamedata::*;
 use ratatui::crossterm::event::{self, KeyCode, KeyEventKind};
 use discord_rich_presence::{activity,activity::{Assets, Timestamps}, DiscordIpc, DiscordIpcClient};
-#[cfg(not(target_os = "android"))]
+#[cfg(not(target_arch = "aarch64"))]
 use rodio::{OutputStream, Sink};
 
 #[derive(PartialEq, Eq)]
@@ -62,7 +62,7 @@ fn main() -> io::Result<()> {
     let mut terminal = ratatui::init();
     let mut prev_was_ingame = false;
 
-    #[cfg(not(target_os = "android"))] {
+    #[cfg(not(target_arch = "aarch64"))] {
         let (_stream,stream_handle) = OutputStream::try_default().unwrap();
         let sink_music = Sink::try_new(&stream_handle).unwrap();
         let sink_sfx = Sink::try_new(&stream_handle).unwrap();
@@ -76,7 +76,7 @@ fn main() -> io::Result<()> {
     }
 
     let mut os_is_android = false;
-    #[cfg(target_os = "android")] {
+    #[cfg(target_arch = "aarch64")] {
         os_is_android = true;
     }
 
@@ -89,7 +89,7 @@ fn main() -> io::Result<()> {
                 if key.kind == KeyEventKind::Press {
 
                     if key.code == KeyCode::Char('q')  {
-                        #[cfg(not(target_os = "android"))]
+                        #[cfg(not(target_arch = "aarch64"))]
                         sink_sfx.append(get_source("interact.mp3"));
                         definitions::sleep(300);
                         ratatui::restore();
@@ -97,14 +97,14 @@ fn main() -> io::Result<()> {
                     }
 
                     if key.code == KeyCode::Char('e')  {
-                        #[cfg(not(target_os = "android"))]
+                        #[cfg(not(target_arch = "aarch64"))]
                         sink_sfx.append(get_source("interact.mp3"));
                         current_screen = Screens::Settings;
                         break;
                     }
 
                     if key.code == KeyCode::Enter {
-                        #[cfg(not(target_os = "android"))] {
+                        #[cfg(not(target_arch = "aarch64"))] {
                             sink_sfx.append(get_source("interact.mp3"));
                             sink_music.stop();
                             sink_music.append(get_source("boss2.mp3"));
@@ -124,14 +124,14 @@ fn main() -> io::Result<()> {
 
         while current_screen == Screens::Settings {
             render_settings_menu(&mut terminal, settings, setting_position);
-            #[cfg(not(target_os = "android"))] {
+            #[cfg(not(target_arch = "aarch64"))] {
                 sink_sfx.set_volume(settings.sfx_volume);
                 sink_music.set_volume(settings.music_volume);
             }
 
             if let event::Event::Key(key) = event::read()? {
                 if key.kind == KeyEventKind::Press {
-                    #[cfg(not(target_os = "android"))] {
+                    #[cfg(not(target_arch = "aarch64"))] {
                         sink_sfx.stop();
                         sink_sfx.append(get_source("interact.mp3"));
                     }
@@ -181,7 +181,7 @@ fn main() -> io::Result<()> {
                 if key.kind == KeyEventKind::Press {
 
                     if key.code == KeyCode::Char('q')  {
-                        #[cfg(not(target_os = "android"))] {
+                        #[cfg(not(target_arch = "aarch64"))] {
                             sink_sfx.append(get_source("interact.mp3"));
                             sink_music.stop();
                             sink_music.append(get_source("bad_end2.mp3"));
@@ -196,7 +196,7 @@ fn main() -> io::Result<()> {
                     }
 
                     if key.code == KeyCode::Char('e')  {
-                        #[cfg(not(target_os = "android"))]
+                        #[cfg(not(target_arch = "aarch64"))]
                         sink_sfx.append(get_source("interact.mp3"));
                         prev_was_ingame = true;
                         current_screen = Screens::Settings;
@@ -204,7 +204,7 @@ fn main() -> io::Result<()> {
                     }
 
                     if key.code == KeyCode::Char('1')  {
-                        #[cfg(not(target_os = "android"))] {
+                        #[cfg(not(target_arch = "aarch64"))] {
                             sink_sfx.stop();
                             sink_sfx.append(get_source("mining.mp3"));
                         }
@@ -212,21 +212,21 @@ fn main() -> io::Result<()> {
                     }
 
                     if key.code == KeyCode::Char('2') && player.bits > 0 {
-                        #[cfg(not(target_os = "android"))]
+                        #[cfg(not(target_arch = "aarch64"))]
                         sink_sfx.append(get_source("sell.mp3"));
                         player.money += player.bits as f32;
                         player.bits = 0;
                     }
 
                     if key.code == KeyCode::Char('3') && player.bytes > 0 {
-                        #[cfg(not(target_os = "android"))]
+                        #[cfg(not(target_arch = "aarch64"))]
                         sink_sfx.append(get_source("sell.mp3"));
                         player.money += player.bytes as f32 * 10.0;
                         player.bytes = 0;
                     }
 
                     if key.code == KeyCode::Char('4') && player.bits >= 8*player.converters {
-                        #[cfg(not(target_os = "android"))] {
+                        #[cfg(not(target_arch = "aarch64"))] {
                             sink_sfx.stop();
                             sink_sfx.append(get_source("interact.mp3"));
                         }
@@ -235,7 +235,7 @@ fn main() -> io::Result<()> {
                     }
 
                     if key.code == KeyCode::Char('6') && player.money >= player.miner_price {
-                        #[cfg(not(target_os = "android"))] {
+                        #[cfg(not(target_arch = "aarch64"))] {
                             sink_sfx.stop();
                             sink_sfx.append(get_source("bought.mp3"));
                         }
@@ -245,7 +245,7 @@ fn main() -> io::Result<()> {
                     }
 
                     if key.code == KeyCode::Char('7') && player.money >= player.converter_price {
-                        #[cfg(not(target_os = "android"))] {
+                        #[cfg(not(target_arch = "aarch64"))] {
                             sink_sfx.stop();
                             sink_sfx.append(get_source("bought.mp3"));
                         }

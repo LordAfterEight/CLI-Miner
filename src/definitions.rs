@@ -8,7 +8,7 @@ pub fn sleep(time: u64) {
     thread::sleep(time::Duration::from_millis(time));
 }
 
-#[cfg(not(target_os = "android"))]
+#[cfg(not(target_arch = "aarch64"))]
 pub fn get_source(filename: &str) -> Decoder<BufReader<File>> {
     let source = Decoder::new(BufReader::new(File::open(format!("../sound/{filename}")).expect("failed to read file")));
     return source.expect("failed to decode file")
