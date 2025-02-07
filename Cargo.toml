@@ -1,6 +1,3 @@
-[target.aarch64-linux-android]
-linker = "aarch64-linux-android29-clang"
-
 [package]
 name = "CLI-Miner"
 version = "0.1.0"

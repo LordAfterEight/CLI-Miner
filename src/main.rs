@@ -7,6 +7,7 @@ mod gamedata;
 use gamedata::*;
 use ratatui::crossterm::event::{self, KeyCode, KeyEventKind};
 use discord_rich_presence::{activity,activity::{Assets, Timestamps}, DiscordIpc, DiscordIpcClient};
+#[cfg(not(target_os = "android"))]
 use rodio::{OutputStream, Sink};
 
 #[derive(PartialEq, Eq)]
@@ -61,16 +62,23 @@ fn main() -> io::Result<()> {
     let mut terminal = ratatui::init();
     let mut prev_was_ingame = false;
 
-    let (_stream,stream_handle) = OutputStream::try_default().unwrap();
-    let sink_music = Sink::try_new(&stream_handle).unwrap();
-    let sink_sfx = Sink::try_new(&stream_handle).unwrap();
+    #[cfg(not(target_os = "android"))] {
+        let (_stream,stream_handle) = OutputStream::try_default().unwrap();
+        let sink_music = Sink::try_new(&stream_handle).unwrap();
+        let sink_sfx = Sink::try_new(&stream_handle).unwrap();
 
-    sink_sfx.set_volume(settings.sfx_volume);
-    sink_music.set_volume(settings.music_volume);
+        sink_sfx.set_volume(settings.sfx_volume);
+        sink_music.set_volume(settings.music_volume);
 
-    sink_sfx.append(get_source("interact.mp3"));
-    sink_music.append(get_source("bg_scifi1.mp3"));
-    sink_sfx.sleep_until_end();
+        sink_sfx.append(get_source("interact.mp3"));
+        sink_music.append(get_source("music2.mp3"));
+        sink_sfx.sleep_until_end();
+    }
+
+    let mut os_is_android = false;
+    #[cfg(target_os = "android")] {
+        os_is_android = true;
+    }
 
     loop {
 
@@ -81,6 +89,7 @@ fn main() -> io::Result<()> {
                 if key.kind == KeyEventKind::Press {
 
                     if key.code == KeyCode::Char('q')  {
+                        #[cfg(not(target_os = "android"))]
                         sink_sfx.append(get_source("interact.mp3"));
                         definitions::sleep(300);
                         ratatui::restore();
@@ -88,15 +97,18 @@ fn main() -> io::Result<()> {
                     }
 
                     if key.code == KeyCode::Char('e')  {
+                        #[cfg(not(target_os = "android"))]
                         sink_sfx.append(get_source("interact.mp3"));
                         current_screen = Screens::Settings;
                         break;
                     }
 
                     if key.code == KeyCode::Enter {
-                        sink_sfx.append(get_source("interact.mp3"));
-                        sink_music.stop();
-                        sink_music.append(get_source("boss2.mp3"));
+                        #[cfg(not(target_os = "android"))] {
+                            sink_sfx.append(get_source("interact.mp3"));
+                            sink_music.stop();
+                            sink_music.append(get_source("boss2.mp3"));
+                        }
                         game.state="Back to Game".to_string();
                         current_screen = Screens::Game;
                         game.rich_presence_state = "Mining".to_string();
@@ -112,13 +124,17 @@ fn main() -> io::Result<()> {
 
         while current_screen == Screens::Settings {
             render_settings_menu(&mut terminal, settings, setting_position);
-            sink_sfx.set_volume(settings.sfx_volume);
-            sink_music.set_volume(settings.music_volume);
+            #[cfg(not(target_os = "android"))] {
+                sink_sfx.set_volume(settings.sfx_volume);
+                sink_music.set_volume(settings.music_volume);
+            }
 
             if let event::Event::Key(key) = event::read()? {
-                if key.kind == KeyEventKind::Press { 
-                    sink_sfx.stop();
-                    sink_sfx.append(get_source("interact.mp3"));
+                if key.kind == KeyEventKind::Press {
+                    #[cfg(not(target_os = "android"))] {
+                        sink_sfx.stop();
+                        sink_sfx.append(get_source("interact.mp3"));
+                    }
 
                     if key.code == KeyCode::Char('q')  {
                         if prev_was_ingame {
@@ -134,11 +150,11 @@ fn main() -> io::Result<()> {
                             1 => settings.frame_delay += 1,
                             2 => settings.sfx_volume += 0.05,
                             3 => settings.music_volume += 0.05,
-                            _ => sink_sfx.append(get_source("fail.mp3"))
+                            _ => {} //sink_sfx.append(get_source("fail.mp3"))
                         },
                         KeyCode::Char('-') => match setting_position {
                             1 => match settings.frame_delay {
-                                1 => sink_sfx.append(get_source("fail.mp3")),
+                                1 => {}, //sink_sfx.append(get_source("fail.mp3")),
                                 _ => settings.frame_delay -= 1},
                             2 => match settings.sfx_volume {
                                 0.0 => settings.sfx_volume = 0.0,
@@ -146,8 +162,8 @@ fn main() -> io::Result<()> {
                             3 => match settings.music_volume {
                                 0.0 => settings.music_volume -= 0.0,
                                 _ => settings.music_volume -= 0.05},
-                            _ => sink_sfx.append(get_source("fail.mp3"))},
-                        _ => sink_sfx.append(get_source("fail.mp3"))
+                            _ => {}}, //sink_sfx.append(get_source("fail.mp3"))},
+                        _ => {} //sink_sfx.append(get_source("fail.mp3"))
                     }
                     if setting_position == 4 {setting_position = 1;}
                     if setting_position == 0 {setting_position = 3;}
@@ -165,9 +181,11 @@ fn main() -> io::Result<()> {
                 if key.kind == KeyEventKind::Press {
 
                     if key.code == KeyCode::Char('q')  {
-                        sink_sfx.append(get_source("interact.mp3"));
-                        sink_music.stop();
-                        sink_music.append(get_source("bad_end2.mp3"));
+                        #[cfg(not(target_os = "android"))] {
+                            sink_sfx.append(get_source("interact.mp3"));
+                            sink_music.stop();
+                            sink_music.append(get_source("bad_end2.mp3"));
+                        }
                         prev_was_ingame = false;
                         current_screen = Screens::Start;
                         game.rich_presence_state = "In Main Menu".to_string();
@@ -178,6 +196,7 @@ fn main() -> io::Result<()> {
                     }
 
                     if key.code == KeyCode::Char('e')  {
+                        #[cfg(not(target_os = "android"))]
                         sink_sfx.append(get_source("interact.mp3"));
                         prev_was_ingame = true;
                         current_screen = Screens::Settings;
@@ -185,41 +204,51 @@ fn main() -> io::Result<()> {
                     }
 
                     if key.code == KeyCode::Char('1')  {
-                        sink_sfx.stop();
-                        sink_sfx.append(get_source("mining.mp3"));
+                        #[cfg(not(target_os = "android"))] {
+                            sink_sfx.stop();
+                            sink_sfx.append(get_source("mining.mp3"));
+                        }
                         player.bits += 1*&player.miners;
                     }
 
                     if key.code == KeyCode::Char('2') && player.bits > 0 {
+                        #[cfg(not(target_os = "android"))]
                         sink_sfx.append(get_source("sell.mp3"));
                         player.money += player.bits as f32;
                         player.bits = 0;
                     }
 
                     if key.code == KeyCode::Char('3') && player.bytes > 0 {
+                        #[cfg(not(target_os = "android"))]
                         sink_sfx.append(get_source("sell.mp3"));
                         player.money += player.bytes as f32 * 10.0;
                         player.bytes = 0;
                     }
 
                     if key.code == KeyCode::Char('4') && player.bits >= 8*player.converters {
-                        sink_sfx.stop();
-                        sink_sfx.append(get_source("interact.mp3"));
+                        #[cfg(not(target_os = "android"))] {
+                            sink_sfx.stop();
+                            sink_sfx.append(get_source("interact.mp3"));
+                        }
                         player.bytes += 1*player.converters;
                         player.bits -= 8*player.converters;
                     }
 
                     if key.code == KeyCode::Char('6') && player.money >= player.miner_price {
-                        sink_sfx.stop();
-                        sink_sfx.append(get_source("bought.mp3"));
+                        #[cfg(not(target_os = "android"))] {
+                            sink_sfx.stop();
+                            sink_sfx.append(get_source("bought.mp3"));
+                        }
                         player.miners += 1;
                         player.money -= player.miner_price;
                         player.miner_price *= 1.5;
                     }
 
                     if key.code == KeyCode::Char('7') && player.money >= player.converter_price {
-                        sink_sfx.stop();
-                        sink_sfx.append(get_source("bought.mp3"));
+                        #[cfg(not(target_os = "android"))] {
+                            sink_sfx.stop();
+                            sink_sfx.append(get_source("bought.mp3"));
+                        }
                         player.converters += 1;
                         player.money -= player.converter_price;
                         player.converter_price *= 1.5;
