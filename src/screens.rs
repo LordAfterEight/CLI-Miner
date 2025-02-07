@@ -109,20 +109,21 @@ pub fn render_game(terminal: &mut DefaultTerminal, player: &mut Player) {
             .white()
             .on_black();
 
-        let todo_ui = Paragraph::new("")
+        let data_ui = Paragraph::new("")
             .block(Block::bordered()
             .border_type(BorderType::Rounded)
             .padding(Padding::proportional(1))
-            .title(" Todo ")
+            .title(" Bytes | Data Strings ")
             .title_alignment(Alignment::Center))
-            .light_red()
+            .light_green()
             .on_black();
 
         let [left, right] = Layout::horizontal([Constraint::Fill(1); 2]).areas(frame.area());
         let [top, middle, bottom] = Layout::vertical([Constraint::Fill(1); 3]).areas(left);
+
         frame.render_widget(menus_ui, top);
         frame.render_widget(resources_ui, middle);
         frame.render_widget(devices_ui, bottom);
-        frame.render_widget(todo_ui, right);
+        frame.render_widget(data_ui, right);
     });
 }
