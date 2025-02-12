@@ -21,7 +21,7 @@ pub fn render_main_menu(terminal: &mut DefaultTerminal, state: String, client: b
 
         let empty = Line::from("");
 
-        let title = Line::from("CLI-Miner »«  |  V0.1.0 Dev Build")
+        let title = Line::from("CLI-Miner »«  |  V0.1.3 Dev Build")
             .magenta()
             .centered()
             .bold()

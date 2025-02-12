@@ -11,7 +11,8 @@ pub struct Player {
 
 pub struct GameState {
     pub state: String,
-    pub rich_presence_state: String
+    pub rich_presence_state: String,
+    pub progress_level: u8
 }
 
 pub struct GameSettings {

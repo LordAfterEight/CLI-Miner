@@ -45,12 +45,13 @@ fn main() -> io::Result<()> {
     let settings = &mut GameSettings {
         sfx_volume: 0.5,
         music_volume: 0.5,
-        frame_delay: 60
+        frame_delay: 65
     };
 
     let game = &mut GameState {
         state: "Start Game".to_string(),
-        rich_presence_state: "In Main Menu".to_string()
+        rich_presence_state: "In Main Menu".to_string(),
+        progress_level: 0
     };
 
     let mut client = DiscordIpcClient::new("1335715218851893389").expect("");
@@ -64,7 +65,7 @@ fn main() -> io::Result<()> {
 
     let mut setting_position = 1;
 
-    client.set_activity(activity::Activity::new()
+    _ = client.set_activity(activity::Activity::new()
         .state(format!("{}",game.rich_presence_state).as_str())
         .activity_type(activity::ActivityType::Playing)
         .assets(small_image)
@@ -75,18 +76,18 @@ fn main() -> io::Result<()> {
     let mut terminal = ratatui::init();
     let mut prev_was_ingame = false;
 
-    #[cfg(not(target_arch = "aarch64"))] {
-        let (_stream,stream_handle) = OutputStream::try_default().unwrap();
-        let sink_music = Sink::try_new(&stream_handle).unwrap();
-        let sink_sfx = Sink::try_new(&stream_handle).unwrap();
+    //#[cfg(target_arch = "x86_64")] {
+    let (_stream,stream_handle) = OutputStream::try_default().unwrap();
+    let sink_music = Sink::try_new(&stream_handle).unwrap();
+    let sink_sfx = Sink::try_new(&stream_handle).unwrap();
 
-        sink_sfx.set_volume(settings.sfx_volume);
-        sink_music.set_volume(settings.music_volume);
+    sink_sfx.set_volume(settings.sfx_volume);
+    sink_music.set_volume(settings.music_volume);
 
-        sink_sfx.append(get_source("interact.mp3"));
-        sink_music.append(get_source("music2.mp3"));
-        sink_sfx.sleep_until_end();
-    }
+    sink_sfx.append(get_source("interact.mp3"));
+    sink_music.append(get_source("music2.mp3"));
+    sink_sfx.sleep_until_end();
+    //}
 
     let mut os_is_android = false;
     #[cfg(target_arch = "aarch64")] {
@@ -120,18 +121,23 @@ fn main() -> io::Result<()> {
                         #[cfg(not(target_arch = "aarch64"))] {
                             sink_sfx.append(get_source("interact.mp3"));
                             sink_music.stop();
-                            sink_music.append(get_source("boss2.mp3"));
+                            sink_music.append(get_source("music1.mp3"));
                         }
                         game.state="Back to Game".to_string();
                         current_screen = Screens::Game;
                         game.rich_presence_state = "Mining".to_string();
-                        client.set_activity(activity::Activity::new()
+                        _ = client.set_activity(activity::Activity::new()
                             .state(format!("{}",game.rich_presence_state).as_str())
                         );
                         break;
                     }
                     else {continue}
                 }
+            }
+
+            #[cfg(not(target_arch = "aarch64"))]
+            if sink_music.len() == 0 {
+                sink_music.append(get_source("music2.mp3"));
             }
         }
 
@@ -182,7 +188,11 @@ fn main() -> io::Result<()> {
                     if setting_position == 0 {setting_position = 3;}
                 }
             }
-            definitions::sleep(10);
+
+            #[cfg(not(target_arch = "aarch64"))]
+            if sink_music.len() == 0 {
+                sink_music.append(get_source("music2.mp3"));
+            }
         }
 
         while current_screen == Screens::Game {
@@ -190,83 +200,95 @@ fn main() -> io::Result<()> {
 
             definitions::sleep(settings.frame_delay);
 
-            if let event::Event::Key(key) = event::read()? {
-                if key.kind == KeyEventKind::Press {
+            if game.progress_level == 1 {
+                if let event::Event::Key(key) = event::read()? {
+                    if key.kind == KeyEventKind::Press {
 
-                    if key.code == KeyCode::Char('q')  {
-                        #[cfg(not(target_arch = "aarch64"))] {
+                        if key.code == KeyCode::Char('q')  {
+                            #[cfg(not(target_arch = "aarch64"))] {
+                                sink_sfx.append(get_source("interact.mp3"));
+                                sink_music.stop();
+                                sink_music.append(get_source("music2.mp3"));
+                            }
+                            prev_was_ingame = false;
+                            current_screen = Screens::Start;
+                            game.rich_presence_state = "In Main Menu".to_string();
+                            _ = client.set_activity(activity::Activity::new()
+                                .state(format!("{}",game.rich_presence_state).as_str())
+                            );
+                            break;
+                        }
+
+                        if key.code == KeyCode::Char('e')  {
+                            #[cfg(not(target_arch = "aarch64"))]
                             sink_sfx.append(get_source("interact.mp3"));
-                            sink_music.stop();
-                            sink_music.append(get_source("bad_end2.mp3"));
+                            prev_was_ingame = true;
+                            current_screen = Screens::Settings;
+                            break;
                         }
-                        prev_was_ingame = false;
-                        current_screen = Screens::Start;
-                        game.rich_presence_state = "In Main Menu".to_string();
-                        client.set_activity(activity::Activity::new()
-                            .state(format!("{}",game.rich_presence_state).as_str())
-                        );
-                        break;
-                    }
 
-                    if key.code == KeyCode::Char('e')  {
-                        #[cfg(not(target_arch = "aarch64"))]
-                        sink_sfx.append(get_source("interact.mp3"));
-                        prev_was_ingame = true;
-                        current_screen = Screens::Settings;
-                        break;
-                    }
-
-                    if key.code == KeyCode::Char('1')  {
-                        #[cfg(not(target_arch = "aarch64"))] {
-                            sink_sfx.stop();
-                            sink_sfx.append(get_source("mining.mp3"));
+                        if key.code == KeyCode::Char('1')  {
+                            #[cfg(not(target_arch = "aarch64"))] {
+                                sink_sfx.stop();
+                                sink_sfx.append(get_source("mining.mp3"));
+                            }
+                            player.bits += 1*&player.miners;
                         }
-                        player.bits += 1*&player.miners;
-                    }
 
-                    if key.code == KeyCode::Char('2') && player.bits > 0 {
-                        #[cfg(not(target_arch = "aarch64"))]
-                        sink_sfx.append(get_source("sell.mp3"));
-                        player.money += player.bits as f32;
-                        player.bits = 0;
-                    }
-
-                    if key.code == KeyCode::Char('3') && player.bytes > 0 {
-                        #[cfg(not(target_arch = "aarch64"))]
-                        sink_sfx.append(get_source("sell.mp3"));
-                        player.money += player.bytes as f32 * 10.0;
-                        player.bytes = 0;
-                    }
-
-                    if key.code == KeyCode::Char('4') && player.bits >= 8*player.converters {
-                        #[cfg(not(target_arch = "aarch64"))] {
-                            sink_sfx.stop();
-                            sink_sfx.append(get_source("interact.mp3"));
+                        if key.code == KeyCode::Char('2') && player.bits > 0 {
+                            #[cfg(not(target_arch = "aarch64"))]
+                            sink_sfx.append(get_source("sell.mp3"));
+                            player.money += player.bits as f32;
+                            player.bits = 0;
                         }
-                        player.bytes += 1*player.converters;
-                        player.bits -= 8*player.converters;
-                    }
 
-                    if key.code == KeyCode::Char('6') && player.money >= player.miner_price {
-                        #[cfg(not(target_arch = "aarch64"))] {
-                            sink_sfx.stop();
-                            sink_sfx.append(get_source("bought.mp3"));
+                        if key.code == KeyCode::Char('3') && player.bytes > 0 {
+                            #[cfg(not(target_arch = "aarch64"))]
+                            sink_sfx.append(get_source("sell.mp3"));
+                            player.money += player.bytes as f32 * 10.0;
+                            player.bytes = 0;
                         }
-                        player.miners += 1;
-                        player.money -= player.miner_price;
-                        player.miner_price *= 1.5;
-                    }
 
-                    if key.code == KeyCode::Char('7') && player.money >= player.converter_price {
-                        #[cfg(not(target_arch = "aarch64"))] {
-                            sink_sfx.stop();
-                            sink_sfx.append(get_source("bought.mp3"));
+                        if key.code == KeyCode::Char('4') && player.bits >= 8*player.converters {
+                            #[cfg(not(target_arch = "aarch64"))] {
+                                sink_sfx.stop();
+                                sink_sfx.append(get_source("interact.mp3"));
+                            }
+                            player.bytes += 1*player.converters;
+                            player.bits -= 8*player.converters;
                         }
-                        player.converters += 1;
-                        player.money -= player.converter_price;
-                        player.converter_price *= 1.5;
+
+                        if key.code == KeyCode::Char('6') && player.money >= player.miner_price {
+                            #[cfg(not(target_arch = "aarch64"))] {
+                                sink_sfx.stop();
+                                sink_sfx.append(get_source("bought.mp3"));
+                            }
+                            player.miners += 1;
+                            player.money -= player.miner_price;
+                            player.miner_price *= 1.5;
+                        }
+
+                        if key.code == KeyCode::Char('7') && player.money >= player.converter_price {
+                            #[cfg(not(target_arch = "aarch64"))] {
+                                sink_sfx.stop();
+                                sink_sfx.append(get_source("bought.mp3"));
+                            }
+                            player.converters += 1;
+                            player.money -= player.converter_price;
+                            player.converter_price *= 1.5;
+                        }
+
+                        else {
+                            #[cfg(not(target_arch = "aarch64"))]
+                            sink_sfx.append(get_source("fail.mp3"));
+                        }
                     }
                 }
+            }
+
+            #[cfg(not(target_arch = "aarch64"))]
+            if sink_music.len() == 0 {
+                sink_music.append(get_source("music1.mp3"));
             }
         }
     }
