@@ -29,6 +29,19 @@ fn main() -> io::Result<()> {
         converter_price: 5000.0
     };
 
+    let bytestrings =&mut Bytestrings {
+        bytestring_1: 0b0100_0001u8,
+        bytestring_2: 0b0100_0010u8,
+        bytestring_3: 0b0100_0011u8,
+        bytestring_4: 0b0100_0100u8,
+        bytestring_5: 0b0100_0101u8,
+        bytestring_6: 0b0100_0110u8,
+        bytestring_7: 0b0100_0111u8,
+        bytestring_8: 0b0100_1000u8
+    };
+
+
+
     let settings = &mut GameSettings {
         sfx_volume: 0.5,
         music_volume: 0.5,
@@ -173,7 +186,7 @@ fn main() -> io::Result<()> {
         }
 
         while current_screen == Screens::Game {
-            render_game(&mut terminal, player);
+            render_game(&mut terminal, player, bytestrings);
 
             definitions::sleep(settings.frame_delay);
 

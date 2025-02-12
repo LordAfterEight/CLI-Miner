@@ -19,3 +19,14 @@ pub struct GameSettings {
     pub music_volume: f32,
     pub frame_delay: u64
 }
+
+pub struct Bytestrings {
+    pub bytestring_1: u8,
+    pub bytestring_2: u8,
+    pub bytestring_3: u8,
+    pub bytestring_4: u8,
+    pub bytestring_5: u8,
+    pub bytestring_6: u8,
+    pub bytestring_7: u8,
+    pub bytestring_8: u8
+}

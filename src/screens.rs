@@ -1,28 +1,71 @@
 use ratatui::{
-    text::{Text,Line},
+    text::{Text,Line,Span},
     layout::Alignment,
     style::Stylize,
     widgets::{Paragraph,Block,BorderType,Padding},
     DefaultTerminal,
     prelude::{Constraint,Layout}
 };
-use crate::Player;
-use crate::GameSettings;
+use crate::{Player, GameSettings, Bytestrings, sleep, binary_to_string};
+
+fn draw_data(byte: u8) -> Line<'static> {
+    let data = Line::from(format!("0{:b} | {}",
+        byte,
+        Span::from(binary_to_string(byte))
+    ));
+    return data
+}
 
 pub fn render_main_menu(terminal: &mut DefaultTerminal, state: String, client: bool, os_is_android: bool) {
     let _ = terminal.draw(|frame| {
 
         let empty = Line::from("");
 
-        let title = Line::from("CLI-Miner »«  |  V0.1.0 Dev Build").magenta().centered().bold().underlined();
-        let exit = Line::from("Exit [q]").centered().light_red();
-        let settings = Line::from("Settings [e]").centered();
-        let start = Line::from(format!("{state} [Enter]")).centered().light_green();
-        let mut client_message = Line::from("Not connected to Discord client").centered().red();
-        if client == true {client_message = Line::from("Connected to Discord client").centered().green();}
+        let title = Line::from("CLI-Miner »«  |  V0.1.0 Dev Build")
+            .magenta()
+            .centered()
+            .bold()
+            .underlined();
+
+        let exit = Line::from("Exit [q]")
+            .centered()
+            .light_red();
+
+        let settings = Line::from("Settings [e]")
+            .centered();
+
+        let start = Line::from(format!("{state} [Enter]"))
+            .centered()
+            .light_green();
+
+        let mut client_message = Line::from("Not connected to Discord client")
+            .centered()
+            .red();
+
+        if client == true {client_message = Line::from("Connected to Discord client")
+            .centered()
+            .green();
+        }
+
         let mut os_message = Line::from("");
-        if os_is_android == true {os_message = Line::from("Due to compatibility issues with Android audio playback is not working yet").white().on_red().centered()}
-        let game_ui = Text::from(vec![title, empty.clone(), exit, settings, start, empty.clone(), client_message, empty, os_message]);
+
+        if os_is_android == true {os_message = Line::from("Due to compatibility issues with Android audio playback is not working yet")
+            .white()
+            .on_red()
+            .centered()
+        }
+
+        let game_ui = Text::from(vec![
+            title,
+            empty.clone(),
+            exit,
+            settings,
+            start,
+            empty.clone(),
+            client_message,
+            empty,
+            os_message
+        ]);
 
         let menu_ui = Paragraph::new(Text::from(game_ui))
             .block(Block::bordered()
@@ -40,10 +83,19 @@ pub fn render_main_menu(terminal: &mut DefaultTerminal, state: String, client: b
 pub fn render_settings_menu(terminal: &mut DefaultTerminal, settings: &mut GameSettings, mut setting_position: u8) {
     let _ = terminal.draw(|frame| {
         let empty = Line::from("");
-        let back = Line::from("Back [q]").light_red().centered();
-        let mut frame_delay = Line::from(format!("Frame Delay: {} [+]/[-]", settings.frame_delay)).centered();
-        let mut sfx_volume = Line::from(format!("SFX Volume:   {:.2} [+]/[-]", settings.sfx_volume)).centered();
-        let mut music_volume = Line::from(format!("Music Volume: {:.2} [+]/[-]", settings.music_volume)).centered();
+
+        let back = Line::from("Back [q]")
+            .light_red()
+            .centered();
+
+        let mut frame_delay = Line::from(format!("Frame Delay: {} [+]/[-]", settings.frame_delay))
+            .centered();
+
+        let mut sfx_volume = Line::from(format!("SFX Volume:   {:.2} [+]/[-]", settings.sfx_volume))
+            .centered();
+
+        let mut music_volume = Line::from(format!("Music Volume: {:.2} [+]/[-]", settings.music_volume))
+            .centered();
 
         match setting_position {
             1 => frame_delay=frame_delay.black().on_white(),
@@ -52,7 +104,13 @@ pub fn render_settings_menu(terminal: &mut DefaultTerminal, settings: &mut GameS
             _ => ()
         }
 
-        let game_ui = Text::from(vec![back, empty.clone(), frame_delay, sfx_volume, music_volume]);
+        let game_ui = Text::from(vec![
+            back,
+            empty.clone(),
+            frame_delay,
+            sfx_volume,
+            music_volume
+        ]);
 
         let menu_ui = Paragraph::new(Text::from(game_ui))
             .block(Block::bordered()
@@ -67,10 +125,13 @@ pub fn render_settings_menu(terminal: &mut DefaultTerminal, settings: &mut GameS
     });
 }
 
-pub fn render_game(terminal: &mut DefaultTerminal, player: &mut Player) {
+pub fn render_game(terminal: &mut DefaultTerminal, player: &mut Player, bytestrings: &mut Bytestrings) {
     let _ = terminal.draw(|frame| {
-        let mainmenu = Line::from(format!("Main menu [q]")).light_red();
+        let mainmenu = Line::from(format!("Main menu [q]"))
+            .light_red();
+
         let settings = Line::from(format!("Settings [e]"));
+
         let menus = Text::from(vec![mainmenu, settings]);
 
         let money = Line::from(format!("Money: {}»«", player.money));
@@ -109,7 +170,27 @@ pub fn render_game(terminal: &mut DefaultTerminal, player: &mut Player) {
             .white()
             .on_black();
 
-        let data_ui = Paragraph::new("")
+        let bytestring1 = draw_data(bytestrings.bytestring_1);
+        let bytestring2 = draw_data(bytestrings.bytestring_2);
+        let bytestring3 = draw_data(bytestrings.bytestring_3);
+        let bytestring4 = draw_data(bytestrings.bytestring_4);
+        let bytestring5 = draw_data(bytestrings.bytestring_5);
+        let bytestring6 = draw_data(bytestrings.bytestring_6);
+        let bytestring7 = draw_data(bytestrings.bytestring_7);
+        let bytestring8 = draw_data(bytestrings.bytestring_8);
+
+        let data = Text::from(vec![
+            bytestring1,
+            bytestring2,
+            bytestring3,
+            bytestring4,
+            bytestring5,
+            bytestring6,
+            bytestring7,
+            bytestring8
+        ]);
+
+        let data_ui = Paragraph::new(data)
             .block(Block::bordered()
             .border_type(BorderType::Rounded)
             .padding(Padding::proportional(1))
