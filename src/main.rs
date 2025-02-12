@@ -51,7 +51,7 @@ fn main() -> io::Result<()> {
     let game = &mut GameState {
         state: "Start Game".to_string(),
         rich_presence_state: "In Main Menu".to_string(),
-        progress_level: 0
+        progress_level: 1
     };
 
     let mut client = DiscordIpcClient::new("1335715218851893389").expect("");
