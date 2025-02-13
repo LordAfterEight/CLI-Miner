@@ -1,4 +1,6 @@
 use std::io;
+use std::io::Write;
+use std::fs::File;
 mod definitions;
 use definitions::*;
 mod screens;
@@ -17,7 +19,14 @@ enum Screens {
     Game
 }
 
+
 fn main() -> io::Result<()> {
+    println!("[i] Attempting to read saves.json...");
+    sleep(250);
+
+    println!("[i] Creating objects...\n");
+    sleep(250);
+
     let player = &mut Player {
         nickname: "player".to_string(),
         money: 0.0,
@@ -28,18 +37,21 @@ fn main() -> io::Result<()> {
         converters: 0,
         converter_price: 5000.0
     };
+    println!("[✓] Player object created");
+    sleep(100);
 
-    let bytestrings =&mut Bytestrings {
-        bytestring_1: 0b0100_0001u8,
-        bytestring_2: 0b0100_0010u8,
-        bytestring_3: 0b0100_0011u8,
-        bytestring_4: 0b0100_0100u8,
-        bytestring_5: 0b0100_0101u8,
-        bytestring_6: 0b0100_0110u8,
-        bytestring_7: 0b0100_0111u8,
+    let bytestrings = &mut Bytestrings {
+        bytestring_1: 0b0101_1100u8,
+        bytestring_2: 0b0101_1111u8,
+        bytestring_3: 0b0110_0000u8,
+        bytestring_4: 0b0110_0100u8,
+        bytestring_5: 0b0110_0101u8,
+        bytestring_6: 0b0101_0110u8,
+        bytestring_7: 0b0110_0111u8,
         bytestring_8: 0b0100_1000u8
     };
-
+    println!("[✓] Bytestrings object created");
+    sleep(100);
 
 
     let settings = &mut GameSettings {
@@ -47,36 +59,42 @@ fn main() -> io::Result<()> {
         music_volume: 0.5,
         frame_delay: 65
     };
+    println!("[✓] Settings object created");
+    sleep(100);
 
     let game = &mut GameState {
         state: "Start Game".to_string(),
         rich_presence_state: "In Main Menu".to_string(),
         progress_level: 1
     };
+    println!("[✓] Game object created\n");
+    sleep(100);
+
+    println!("[i] Attempting to connect to Discord client...");
+    sleep(250);
 
     let mut client = DiscordIpcClient::new("1335715218851893389").expect("");
+    if client.connect().is_ok() {
+        println!("[✓] Connected successfully");
+    } if client.connect().is_err() {
+        println!("[!] Connection failed\n");
+    }
     let client_state = client.connect().is_ok();
-
+    sleep(500);
     let icon = Assets::new();
     let small_image = icon.small_image("../assets/rich_presence_icon.png");
-
-    let timestamp = Timestamps::new();
-    let timer = timestamp.end(10);
-
-    let mut setting_position = 1;
 
     _ = client.set_activity(activity::Activity::new()
         .state(format!("{}",game.rich_presence_state).as_str())
         .activity_type(activity::ActivityType::Playing)
         .assets(small_image)
-        .timestamps(timer)
     );
 
+    let mut setting_position = 1;
     let mut current_screen = Screens::Start;
-    let mut terminal = ratatui::init();
     let mut prev_was_ingame = false;
 
-    //#[cfg(target_arch = "x86_64")] {
+    #[cfg(target_arch = "x86_64")] {
     let (_stream,stream_handle) = OutputStream::try_default().unwrap();
     let sink_music = Sink::try_new(&stream_handle).unwrap();
     let sink_sfx = Sink::try_new(&stream_handle).unwrap();
@@ -87,13 +105,19 @@ fn main() -> io::Result<()> {
     sink_sfx.append(get_source("interact.mp3"));
     sink_music.append(get_source("music2.mp3"));
     sink_sfx.sleep_until_end();
-    //}
+    }
 
     let mut os_is_android = false;
     #[cfg(target_arch = "aarch64")] {
+        println!("\n[!] target architecture doesn't support audio");
         os_is_android = true;
+        sleep(250);
     }
 
+    println!("[i] Starting game...");
+    sleep(500);
+
+    let mut terminal = ratatui::init();
     loop {
 
         while current_screen == Screens::Start {
