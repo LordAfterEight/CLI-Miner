@@ -15,7 +15,7 @@ use crate::{
 };
 
 fn draw_data(byte: u8) -> Line<'static> {
-    let data = Line::from(format!("0{:b} | {}",
+    let data = Line::from(format!("{:08b} | {}",
         byte,
         Span::from(binary_to_string(byte))
     ));

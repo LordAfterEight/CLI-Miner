@@ -9,6 +9,8 @@ mod gamedata;
 use gamedata::*;
 use ratatui::crossterm::event::{self, KeyCode, KeyEventKind};
 use discord_rich_presence::{activity,activity::{Assets, Timestamps}, DiscordIpc, DiscordIpcClient};
+use rand;
+use rand::Rng;
 #[cfg(not(target_arch = "aarch64"))]
 use rodio::{OutputStream, Sink};
 
@@ -41,15 +43,17 @@ fn main() -> io::Result<()> {
     sleep(100);
 
     let bytestrings = &mut Bytestrings {
-        bytestring_1: 0b0101_1100u8,
-        bytestring_2: 0b0101_1111u8,
-        bytestring_3: 0b0110_0000u8,
-        bytestring_4: 0b0110_0100u8,
-        bytestring_5: 0b0110_0101u8,
-        bytestring_6: 0b0101_0110u8,
-        bytestring_7: 0b0110_0111u8,
-        bytestring_8: 0b0100_1000u8
+        bytestring_1: 0b0000_0000u8,
+        bytestring_2: 0b0000_0000u8,
+        bytestring_3: 0b0000_0000u8,
+        bytestring_4: 0b0000_0000u8,
+        bytestring_5: 0b0000_0000u8,
+        bytestring_6: 0b0000_0000u8,
+        bytestring_7: 0b0000_0000u8,
+        bytestring_8: 0b0000_0000u8,
     };
+    generate_bytes(bytestrings);
+
     println!("[✓] Bytestrings object created");
     sleep(100);
 

@@ -3,7 +3,7 @@ use std::fs::File;
 use std::io::{BufReader, BufWriter, Read};
 #[cfg(not(target_os = "android"))]
 use rodio::Decoder;
-use crate::{Bytestrings, Player};
+use crate::{Bytestrings, Player, rand, rand::Rng};
 
 pub fn sleep(time: u64) {
     thread::sleep(time::Duration::from_millis(time));
@@ -20,7 +20,7 @@ pub fn binary_to_string(byte: u8) -> String {
     return string
 }
 
-fn save_data(data: Player) {
+pub fn save_data(data: Player) {
     let file = match File::open("../data/saves.json") {
         Ok(file) => file,
         Err(error) => panic!("[Err] Couldn't open save file: {error:?}")
@@ -28,10 +28,22 @@ fn save_data(data: Player) {
     let writer = BufWriter::new(file);
 }
 
-fn read_data(player: Player) {
+pub fn read_data(player: Player) {
     let file = match File::open("../data/saves.json") {
         Ok(file) => file,
         Err(error) => panic!("[Err] Couldn't open save file: {error:?}")
     };
     let reader = BufReader::new(file);
+}
+
+pub fn generate_bytes(object: &mut Bytestrings) -> &mut Bytestrings{
+    object.bytestring_1 = rand::rng().random();
+    object.bytestring_2 = rand::rng().random();
+    object.bytestring_3 = rand::rng().random();
+    object.bytestring_4 = rand::rng().random();
+    object.bytestring_5 = rand::rng().random();
+    object.bytestring_6 = rand::rng().random();
+    object.bytestring_7 = rand::rng().random();
+    object.bytestring_8 = rand::rng().random();
+    return object;
 }
