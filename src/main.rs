@@ -94,7 +94,7 @@ fn main() -> io::Result<()> {
     let mut current_screen = Screens::Start;
     let mut prev_was_ingame = false;
 
-    #[cfg(target_arch = "x86_64")] {
+    /*{
     let (_stream,stream_handle) = OutputStream::try_default().unwrap();
     let sink_music = Sink::try_new(&stream_handle).unwrap();
     let sink_sfx = Sink::try_new(&stream_handle).unwrap();
@@ -105,7 +105,7 @@ fn main() -> io::Result<()> {
     sink_sfx.append(get_source("interact.mp3"));
     sink_music.append(get_source("music2.mp3"));
     sink_sfx.sleep_until_end();
-    }
+    }*/
 
     let mut os_is_android = false;
     #[cfg(target_arch = "aarch64")] {
@@ -121,7 +121,12 @@ fn main() -> io::Result<()> {
     loop {
 
         while current_screen == Screens::Start {
-            render_main_menu(&mut terminal, game.state.clone(), client_state, os_is_android);
+            render_main_menu(
+                &mut terminal,
+                game.state.clone(), 
+                client_state, 
+                os_is_android
+            );
 
             if let event::Event::Key(key) = event::read()? {
                 if key.kind == KeyEventKind::Press {
@@ -227,7 +232,6 @@ fn main() -> io::Result<()> {
             if game.progress_level == 1 {
                 if let event::Event::Key(key) = event::read()? {
                     if key.kind == KeyEventKind::Press {
-
                         if key.code == KeyCode::Char('q')  {
                             #[cfg(not(target_arch = "aarch64"))] {
                                 sink_sfx.append(get_source("interact.mp3"));

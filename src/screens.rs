@@ -6,7 +6,13 @@ use ratatui::{
     DefaultTerminal,
     prelude::{Constraint,Layout}
 };
-use crate::{Player, GameSettings, Bytestrings, sleep, binary_to_string};
+use crate::{
+    Player,
+    GameSettings,
+    Bytestrings,
+    sleep,
+    binary_to_string
+};
 
 fn draw_data(byte: u8) -> Line<'static> {
     let data = Line::from(format!("0{:b} | {}",
@@ -16,7 +22,12 @@ fn draw_data(byte: u8) -> Line<'static> {
     return data
 }
 
-pub fn render_main_menu(terminal: &mut DefaultTerminal, state: String, client: bool, os_is_android: bool) {
+pub fn render_main_menu(
+    terminal: &mut DefaultTerminal,
+    state: String,
+    client: bool,
+    os_is_android: bool
+) {
     let _ = terminal.draw(|frame| {
 
         let empty = Line::from("");
@@ -42,14 +53,16 @@ pub fn render_main_menu(terminal: &mut DefaultTerminal, state: String, client: b
             .centered()
             .red();
 
-        if client == true {client_message = Line::from("Connected to Discord client")
+        if client == true {
+            client_message = Line::from("Connected to Discord client")
             .centered()
             .green();
         }
 
         let mut os_message = Line::from("");
 
-        if os_is_android == true {os_message = Line::from("Due to compatibility issues with Android audio playback is not working yet")
+        if os_is_android == true {
+            os_message = Line::from("Due to compatibility issues with Android audio playback is not working yet")
             .white()
             .on_red()
             .centered()
@@ -80,7 +93,11 @@ pub fn render_main_menu(terminal: &mut DefaultTerminal, state: String, client: b
     });
 }
 
-pub fn render_settings_menu(terminal: &mut DefaultTerminal, settings: &mut GameSettings, mut setting_position: u8) {
+pub fn render_settings_menu(
+    terminal: &mut DefaultTerminal,
+    settings: &mut GameSettings,
+    mut setting_position: u8
+) {
     let _ = terminal.draw(|frame| {
         let empty = Line::from("");
 
@@ -88,13 +105,16 @@ pub fn render_settings_menu(terminal: &mut DefaultTerminal, settings: &mut GameS
             .light_red()
             .centered();
 
-        let mut frame_delay = Line::from(format!("Frame Delay: {} [+]/[-]", settings.frame_delay))
+        let mut frame_delay = Line::from(
+            format!("Frame Delay: {} [+]/[-]", settings.frame_delay))
             .centered();
 
-        let mut sfx_volume = Line::from(format!("SFX Volume:   {:.2} [+]/[-]", settings.sfx_volume))
+        let mut sfx_volume = Line::from(
+            format!("SFX Volume:   {:.2} [+]/[-]", settings.sfx_volume))
             .centered();
 
-        let mut music_volume = Line::from(format!("Music Volume: {:.2} [+]/[-]", settings.music_volume))
+        let mut music_volume = Line::from(
+            format!("Music Volume: {:.2} [+]/[-]", settings.music_volume))
             .centered();
 
         match setting_position {
@@ -125,7 +145,11 @@ pub fn render_settings_menu(terminal: &mut DefaultTerminal, settings: &mut GameS
     });
 }
 
-pub fn render_game(terminal: &mut DefaultTerminal, player: &mut Player, bytestrings: &mut Bytestrings) {
+pub fn render_game(
+    terminal: &mut DefaultTerminal,
+    player: &mut Player,
+    bytestrings: &mut Bytestrings
+) {
     let _ = terminal.draw(|frame| {
         let mainmenu = Line::from(format!("Main menu [q]"))
             .light_red();
