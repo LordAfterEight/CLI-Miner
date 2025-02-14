@@ -52,7 +52,6 @@ fn main() -> io::Result<()> {
         bytestring_7: 0b0000_0000u8,
         bytestring_8: 0b0000_0000u8,
     };
-    generate_bytes(bytestrings);
 
     println!("[✓] Bytestrings object created");
     sleep(100);
@@ -264,6 +263,7 @@ fn main() -> io::Result<()> {
                                 sink_sfx.stop();
                                 sink_sfx.append(get_source("mining.mp3"));
                             }
+                            generate_bytes(bytestrings); //Just for testing purposes
                             player.bits += 1*&player.miners;
                         }
 
