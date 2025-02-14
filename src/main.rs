@@ -258,7 +258,7 @@ fn main() -> io::Result<()> {
                             break;
                         }
 
-                        if key.code == KeyCode::Char('1')  {
+                        if key.code == KeyCode::Char(' ')  {
                             #[cfg(not(target_arch = "aarch64"))] {
                                 sink_sfx.stop();
                                 sink_sfx.append(get_source("mining.mp3"));

@@ -159,7 +159,7 @@ pub fn render_game(
         let menus = Text::from(vec![mainmenu, settings]);
 
         let money = Line::from(format!("Money: {}»«", player.money));
-        let bits = Line::from(format!("Bits:  {}  |  [1] to mine, [2] to convert to »«", player.bits));
+        let bits = Line::from(format!("Bits:  {}  |  [Space] to mine, [2] to convert to »«", player.bits));
         let bytes = Line::from(format!("Bytes: {}  |  [4] to convert from Bits, [3] to convert to »«", player.bytes));
         let resources = Text::from(vec![money, bits, bytes]);
 
