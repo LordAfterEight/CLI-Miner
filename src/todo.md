@@ -23,5 +23,6 @@ Todo list is ranked by priority
         - Keybinds [ ]
     - Discord Rich Presence integration for Android [ ]
     - Automatic Game Updates [ ]
+    - Background sounds (weather)
 
 Last updated: 18/01/2025
