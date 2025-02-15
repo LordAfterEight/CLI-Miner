@@ -78,11 +78,13 @@ fn main() -> io::Result<()> {
 
     let mut client = DiscordIpcClient::new("1335715218851893389").expect("");
     if client.connect().is_ok() {
-        println!("[✓] Connected successfully");
-    } if client.connect().is_err() {
+        println!("[✓] Connected successfully\n");
+    }
+    if client.connect().is_err() {
         println!("[!] Connection failed\n");
     }
     let client_state = client.connect().is_ok();
+
     sleep(500);
     let icon = Assets::new();
     let small_image = icon.small_image("../assets/rich_presence_icon.png");
@@ -97,7 +99,7 @@ fn main() -> io::Result<()> {
     let mut current_screen = Screens::Start;
     let mut prev_was_ingame = false;
 
-    /*{
+
     let (_stream,stream_handle) = OutputStream::try_default().unwrap();
     let sink_music = Sink::try_new(&stream_handle).unwrap();
     let sink_sfx = Sink::try_new(&stream_handle).unwrap();
@@ -108,7 +110,7 @@ fn main() -> io::Result<()> {
     sink_sfx.append(get_source("interact.mp3"));
     sink_music.append(get_source("music2.mp3"));
     sink_sfx.sleep_until_end();
-    }*/
+
 
     let mut os_is_android = false;
     #[cfg(target_arch = "aarch64")] {
@@ -265,6 +267,7 @@ fn main() -> io::Result<()> {
                             }
                             generate_bytes(bytestrings); //Just for testing purposes
                             player.bits += 1*&player.miners;
+                            continue;
                         }
 
                         if key.code == KeyCode::Char('2') && player.bits > 0 {
@@ -272,6 +275,7 @@ fn main() -> io::Result<()> {
                             sink_sfx.append(get_source("sell.mp3"));
                             player.money += player.bits as f32;
                             player.bits = 0;
+                            continue;
                         }
 
                         if key.code == KeyCode::Char('3') && player.bytes > 0 {
@@ -279,6 +283,7 @@ fn main() -> io::Result<()> {
                             sink_sfx.append(get_source("sell.mp3"));
                             player.money += player.bytes as f32 * 10.0;
                             player.bytes = 0;
+                            continue;
                         }
 
                         if key.code == KeyCode::Char('4') && player.bits >= 8*player.converters {
@@ -288,6 +293,7 @@ fn main() -> io::Result<()> {
                             }
                             player.bytes += 1*player.converters;
                             player.bits -= 8*player.converters;
+                            continue;
                         }
 
                         if key.code == KeyCode::Char('6') && player.money >= player.miner_price {
@@ -298,6 +304,7 @@ fn main() -> io::Result<()> {
                             player.miners += 1;
                             player.money -= player.miner_price;
                             player.miner_price *= 1.5;
+                            continue;
                         }
 
                         if key.code == KeyCode::Char('7') && player.money >= player.converter_price {
@@ -308,6 +315,7 @@ fn main() -> io::Result<()> {
                             player.converters += 1;
                             player.money -= player.converter_price;
                             player.converter_price *= 1.5;
+                            continue;
                         }
 
                         else {
