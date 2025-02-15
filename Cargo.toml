@@ -1,6 +1,6 @@
 [package]
 name = "CLI-Miner"
-version = "0.1.3"
+version = "0.1.4"
 edition = "2021"
 
 [dependencies]
@@ -8,4 +8,3 @@ discord-rich-presence = "0.2.5"
 rand = "0.9.0"
 ratatui = { version = "0.29.0", features = ["all-widgets"] }
 rodio = "0.20.1"
-windows_x86_64_gnu = "0.53.0"

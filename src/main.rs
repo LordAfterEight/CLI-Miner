@@ -316,11 +316,11 @@ fn main() -> io::Result<()> {
                         }
                     }
                 }
-            }
 
-            #[cfg(not(target_arch = "aarch64"))]
-            if sink_music.len() == 0 {
-                sink_music.append(get_source("music1.mp3"));
+                #[cfg(not(target_arch = "aarch64"))]
+                if sink_music.len() == 0 {
+                    sink_music.append(get_source("music1.mp3"));
+                }
             }
         }
     }
