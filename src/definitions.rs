@@ -1,6 +1,6 @@
 use std::{thread,time};
-use std::fs;
-use std::io::{BufReader, BufWriter, Read};
+use std::fs::File;
+use std::io::{BufReader, BufWriter, Read, Write};
 #[cfg(not(target_os = "android"))]
 use rodio::Decoder;
 use crate::{Bytestrings, Player, rand, rand::Rng};
@@ -11,7 +11,12 @@ pub fn sleep(time: u64) {
 
 #[cfg(not(target_arch = "aarch64"))]
 pub fn get_source(filename: &str) -> Decoder<BufReader<File>> {
-    let source = Decoder::new(BufReader::new(File::open(format!("../sound/{filename}")).expect("failed to read file")));
+    let source = Decoder::new(
+        BufReader::new(
+            File::open(format!("../sound/{filename}"))
+                .expect("failed to read file")
+        )
+    );
     return source.expect("failed to decode file")
 }
 
@@ -21,13 +26,19 @@ pub fn binary_to_string(byte: u8) -> String {
 }
 
 pub fn save_data(data: &mut Player) {
-    fs::write("../data/saves.json", data.nickname.clone()).expect("Could not write to file");
+    let filepath = "../data/saves.txt";
+    let file = File::open(filepath).expect("[X] Could not open file");
 }
 
 pub fn read_data(player: &mut Player) -> &mut Player {
-    println!("[i] Attempting to read saves.json...");
+    let filepath = "../data/saves.txt";
+    let mut file = File::open(filepath).expect("[X] Could not open file");
+    let mut content = String::new();
+    println!("[i] Attempting to read saves file...");
     sleep(250);
-    player.nickname = fs::read_to_string("../data/saves.json").expect("Could not read File");
+    player.nickname = file.read_to_string(&mut content)
+        .expect("[X] Could not read file")
+        .to_string();
     return player
 }
 
