@@ -1,5 +1,5 @@
 use std::{thread,time};
-use std::fs::File;
+use std::fs;
 use std::io::{BufReader, BufWriter, Read};
 #[cfg(not(target_os = "android"))]
 use rodio::Decoder;
@@ -20,20 +20,14 @@ pub fn binary_to_string(byte: u8) -> String {
     return string
 }
 
-pub fn save_data(data: Player) {
-    let file = match File::open("../data/saves.json") {
-        Ok(file) => file,
-        Err(error) => panic!("[Err] Couldn't open save file: {error:?}")
-    };
-    let writer = BufWriter::new(file);
+pub fn save_data(data: &mut Player) {
+    fs::write_to_string("../data/saves.json", data).expect("Could not write to file");
 }
 
-pub fn read_data(player: Player) {
-    let file = match File::open("../data/saves.json") {
-        Ok(file) => file,
-        Err(error) => panic!("[Err] Couldn't open save file: {error:?}")
-    };
-    let reader = BufReader::new(file);
+pub fn read_data(player: &mut Player) {
+    println!("[i] Attempting to read saves.json...");
+    sleep(250);
+    println!("{}", fs::read("../data/saves.json").expect("Could not read File").len());
 }
 
 pub fn generate_bytes(object: &mut Bytestrings) -> &mut Bytestrings{

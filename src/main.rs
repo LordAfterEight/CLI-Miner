@@ -1,6 +1,4 @@
 use std::io;
-use std::io::Write;
-use std::fs::File;
 mod definitions;
 use definitions::*;
 mod screens;
@@ -8,9 +6,12 @@ use screens::*;
 mod gamedata;
 use gamedata::*;
 use ratatui::crossterm::event::{self, KeyCode, KeyEventKind};
-use discord_rich_presence::{activity,activity::{Assets, Timestamps}, DiscordIpc, DiscordIpcClient};
+use discord_rich_presence::{
+    activity,
+    activity::Assets,
+    DiscordIpc, 
+    DiscordIpcClient};
 use rand;
-use rand::Rng;
 #[cfg(not(target_arch = "aarch64"))]
 use rodio::{OutputStream, Sink};
 
@@ -23,8 +24,6 @@ enum Screens {
 
 
 fn main() -> io::Result<()> {
-    println!("[i] Attempting to read saves.json...");
-    sleep(250);
 
     println!("[i] Creating objects...\n");
     sleep(250);
@@ -41,6 +40,7 @@ fn main() -> io::Result<()> {
     };
     println!("[✓] Player object created");
     sleep(100);
+    read_data(player);
 
     let bytestrings = &mut Bytestrings {
         bytestring_1: 0b0000_0000u8,
@@ -99,7 +99,7 @@ fn main() -> io::Result<()> {
     let mut current_screen = Screens::Start;
     let mut prev_was_ingame = false;
 
-
+    /*
     let (_stream,stream_handle) = OutputStream::try_default().unwrap();
     let sink_music = Sink::try_new(&stream_handle).unwrap();
     let sink_sfx = Sink::try_new(&stream_handle).unwrap();
@@ -109,7 +109,7 @@ fn main() -> io::Result<()> {
 
     sink_sfx.append(get_source("interact.mp3"));
     sink_music.append(get_source("music2.mp3"));
-    sink_sfx.sleep_until_end();
+    sink_sfx.sleep_until_end();*/
 
 
     let mut os_is_android = false;
