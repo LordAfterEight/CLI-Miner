@@ -36,9 +36,12 @@ pub fn read_data(player: &mut Player) -> &mut Player {
     let mut content = String::new();
     println!("[i] Attempting to read saves file...");
     sleep(250);
-    player.nickname = file.read_to_string(&mut content)
+    file.read_to_string(&mut content)
         .expect("[X] Could not read file")
         .to_string();
+
+
+
     return player
 }
 
