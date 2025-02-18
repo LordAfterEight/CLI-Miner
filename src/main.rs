@@ -29,7 +29,7 @@ fn main() -> io::Result<()> {
     sleep(250);
 
     let player = &mut Player {
-        nickname: "player".to_string(),
+        nickname: "".to_string(),
         money: 0.0,
         bits: 0,
         bytes: 0,
@@ -41,6 +41,8 @@ fn main() -> io::Result<()> {
     println!("[✓] Player object created");
     sleep(100);
     read_data(player);
+    println!("Loaded player: {}", player.nickname);
+    sleep(250);
 
     let bytestrings = &mut Bytestrings {
         bytestring_1: 0b0000_0000u8,

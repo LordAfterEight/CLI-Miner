@@ -21,13 +21,14 @@ pub fn binary_to_string(byte: u8) -> String {
 }
 
 pub fn save_data(data: &mut Player) {
-    fs::write_to_string("../data/saves.json", data).expect("Could not write to file");
+    fs::write("../data/saves.json", data.nickname.clone()).expect("Could not write to file");
 }
 
-pub fn read_data(player: &mut Player) {
+pub fn read_data(player: &mut Player) -> &mut Player {
     println!("[i] Attempting to read saves.json...");
     sleep(250);
-    println!("{}", fs::read("../data/saves.json").expect("Could not read File").len());
+    player.nickname = fs::read_to_string("../data/saves.json").expect("Could not read File");
+    return player
 }
 
 pub fn generate_bytes(object: &mut Bytestrings) -> &mut Bytestrings{
