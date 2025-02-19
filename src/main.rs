@@ -29,7 +29,7 @@ fn main() -> io::Result<()> {
     sleep(250);
 
     let player = &mut Player {
-        nickname: "".to_string(),
+        nickname: "default".to_string(),
         money: 0.0,
         bits: 0,
         bytes: 0,

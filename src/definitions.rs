@@ -37,15 +37,7 @@ pub fn save_data(data: &mut Player) {
         .expect("[X] Could not open file");
 
     file.seek(SeekFrom::Start(0)).unwrap();
-    /*let nick = serde_json::to_writer(&file, &data.nickname.to_string().to_owned());
-    let money = serde_json::to_writer(&file, &data.money.to_owned());
-    let bits = serde_json::to_writer(&file, &data.bits.to_owned());
-    let bytes = serde_json::to_writer(&file, &data.bytes.to_owned());
-    let miners = serde_json::to_writer(&file, &data.miners.to_owned());
-    let conver = serde_json::to_writer(&file, &data.converters.to_owned());
-    let min_pr = serde_json::to_writer(&file, &data.miner_price.to_owned());
-    let con_pr = serde_json::to_writer(file, &data.converter_price.to_owned());*/
-    
+
     let datastruct = json!({
         "nickname" : &data.nickname.to_owned(),
         "money" : &data.money.to_owned(),
