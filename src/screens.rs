@@ -32,7 +32,7 @@ pub fn render_main_menu(
 
         let empty = Line::from("");
 
-        let title = Line::from("CLI-Miner »«  |  V0.1.4 Dev Build")
+        let title = Line::from("CLI-Miner »«  |  V0.2.0 Dev Build")
             .magenta()
             .centered()
             .bold()
