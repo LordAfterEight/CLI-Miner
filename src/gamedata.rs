@@ -1,12 +1,14 @@
+use serde_derive::{Serialize, Deserialize};
+#[derive(Serialize, Deserialize)]
 pub struct Player {
     pub nickname: String,
-    pub money: f32,
-    pub bits: u32,
-    pub bytes: u32,
-    pub miners: u32,
-    pub miner_price: f32,
-    pub converters: u32,
-    pub converter_price: f32
+    pub money: f64,
+    pub bits: u64,
+    pub bytes: u64,
+    pub miners: u64,
+    pub miner_price: f64,
+    pub converters: u64,
+    pub converter_price: f64
 }
 
 pub struct GameState {

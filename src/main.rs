@@ -245,6 +245,7 @@ fn main() -> io::Result<()> {
                                 sink_music.stop();
                                 sink_music.append(get_source("music2.mp3"));
                             }
+                            save_data(player);
                             prev_was_ingame = false;
                             current_screen = Screens::Start;
                             game.rich_presence_state = "In Main Menu".to_string();
@@ -275,7 +276,7 @@ fn main() -> io::Result<()> {
                         if key.code == KeyCode::Char('2') && player.bits > 0 {
                             #[cfg(not(target_arch = "aarch64"))]
                             sink_sfx.append(get_source("sell.mp3"));
-                            player.money += player.bits as f32;
+                            player.money += player.bits as f64;
                             player.bits = 0;
                             continue;
                         }
@@ -283,7 +284,7 @@ fn main() -> io::Result<()> {
                         if key.code == KeyCode::Char('3') && player.bytes > 0 {
                             #[cfg(not(target_arch = "aarch64"))]
                             sink_sfx.append(get_source("sell.mp3"));
-                            player.money += player.bytes as f32 * 10.0;
+                            player.money += player.bytes as f64 * 10.0;
                             player.bytes = 0;
                             continue;
                         }
