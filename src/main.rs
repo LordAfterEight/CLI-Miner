@@ -12,6 +12,7 @@ use discord_rich_presence::{
     DiscordIpc, 
     DiscordIpcClient};
 use rand;
+use clearscreen;
 #[cfg(not(target_arch = "aarch64"))]
 use rodio::{OutputStream, Sink};
 
@@ -24,6 +25,7 @@ enum Screens {
 
 
 fn main() -> io::Result<()> {
+    clearscreen::clear();
 
     println!("[i] Creating objects...\n");
     sleep(250);
@@ -41,7 +43,7 @@ fn main() -> io::Result<()> {
     println!("[✓] Player object created");
     sleep(100);
     read_data(player);
-    println!("Loaded player: {}", player.nickname);
+    println!("[i] Loaded player: {}", player.nickname);
     sleep(250);
 
     let bytestrings = &mut Bytestrings {
@@ -72,6 +74,7 @@ fn main() -> io::Result<()> {
         rich_presence_state: "In Main Menu".to_string(),
         progress_level: 1
     };
+
     println!("[✓] Game object created\n");
     sleep(100);
 
@@ -121,7 +124,7 @@ fn main() -> io::Result<()> {
         sleep(250);
     }
 
-    println!("[i] Starting game...");
+    println!("\n[i] Starting game...");
     sleep(500);
 
     let mut terminal = ratatui::init();
@@ -237,6 +240,8 @@ fn main() -> io::Result<()> {
             definitions::sleep(settings.frame_delay);
 
             if game.progress_level == 1 {
+
+
                 if let event::Event::Key(key) = event::read()? {
                     if key.kind == KeyEventKind::Press {
                         if key.code == KeyCode::Char('q')  {
@@ -332,6 +337,8 @@ fn main() -> io::Result<()> {
                 if sink_music.len() == 0 {
                     sink_music.append(get_source("music1.mp3"));
                 }
+
+
             }
         }
     }
