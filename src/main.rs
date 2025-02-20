@@ -101,6 +101,7 @@ fn main() -> io::Result<()> {
     );
 
     let mut setting_position = 1;
+    let mut menu_selection = 1;
     let mut current_screen = Screens::Start;
     let mut prev_was_ingame = false;
 
@@ -181,7 +182,12 @@ fn main() -> io::Result<()> {
         }
 
         while current_screen == Screens::Settings {
-            render_settings_menu(&mut terminal, settings, setting_position);
+            render_settings_menu(
+                &mut terminal,
+                settings,
+                setting_position,
+            );
+
             #[cfg(not(target_arch = "aarch64"))] {
                 sink_sfx.set_volume(settings.sfx_volume);
                 sink_music.set_volume(settings.music_volume);
@@ -235,7 +241,7 @@ fn main() -> io::Result<()> {
         }
 
         while current_screen == Screens::Game {
-            render_game(&mut terminal, player, bytestrings);
+            render_game(&mut terminal, player, bytestrings, menu_selection);
 
             definitions::sleep(settings.frame_delay);
 
@@ -244,7 +250,19 @@ fn main() -> io::Result<()> {
 
                 if let event::Event::Key(key) = event::read()? {
                     if key.kind == KeyEventKind::Press {
-                        if key.code == KeyCode::Char('q')  {
+                        if key.code == KeyCode::Esc {break;}
+
+                        if key.code == KeyCode::Up {menu_selection-=1};
+                        if key.code == KeyCode::Down && menu_selection >= 1 {
+                            menu_selection += 1;
+                        }
+                        match menu_selection {
+                            0 => menu_selection = 1,
+                            3 => menu_selection = 2,
+                            _ => {}
+                        }
+
+                        if key.code == KeyCode::Enter && menu_selection == 1  {
                             #[cfg(not(target_arch = "aarch64"))] {
                                 sink_sfx.append(get_source("interact.mp3"));
                                 sink_music.stop();
@@ -260,7 +278,7 @@ fn main() -> io::Result<()> {
                             break;
                         }
 
-                        if key.code == KeyCode::Char('e')  {
+                        if key.code == KeyCode::Enter && menu_selection == 2 {
                             #[cfg(not(target_arch = "aarch64"))]
                             sink_sfx.append(get_source("interact.mp3"));
                             prev_was_ingame = true;

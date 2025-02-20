@@ -148,23 +148,31 @@ pub fn render_settings_menu(
 pub fn render_game(
     terminal: &mut DefaultTerminal,
     player: &mut Player,
-    bytestrings: &mut Bytestrings
+    bytestrings: &mut Bytestrings,
+    menu_selection: u8
 ) {
     let _ = terminal.draw(|frame| {
-        let mainmenu = Line::from(format!("Main menu [q]"))
+        let mut nav_info = Line::from("Navigate with arrow keys");
+        let empty = Line::from("");
+        let mut mainmenu = Line::from(format!("Main menu"))
             .light_red();
+        let mut settings = Line::from(format!("Settings"));
 
-        let settings = Line::from(format!("Settings [e]"));
+        match menu_selection {
+            1 => mainmenu = mainmenu.black().on_light_red(),
+            2 => settings = settings.black().on_white(),
+            _ => {}
+        }
 
-        let menus = Text::from(vec![mainmenu, settings]);
+        let menus = Text::from(vec![nav_info, empty, mainmenu, settings]);
 
-        let money = Line::from(format!("Money: {}»«", player.money));
+        let money = Line::from(format!("Money: {:.2}»«", player.money));
         let bits = Line::from(format!("Bits:  {}  |  [Space] to mine, [2] to convert to »«", player.bits));
         let bytes = Line::from(format!("Bytes: {}  |  [4] to convert from Bits, [3] to convert to »«", player.bytes));
         let resources = Text::from(vec![money, bits, bytes]);
 
-        let miners = Line::from(format!("Miners: {}      |  Price: {}»«, [6] to buy", player.miners, player.miner_price));
-        let converters = Line::from(format!("Converters: {}  |  Price: {}»«, [3] to use, [7] to buy", player.converters, player.converter_price));
+        let miners = Line::from(format!("Miners: {}      |  Price: {:.2}»«, [6] to buy", player.miners, player.miner_price));
+        let converters = Line::from(format!("Converters: {}  |  Price: {:.2}»«, [3] to use, [7] to buy", player.converters, player.converter_price));
         let devices = Text::from(vec![miners,converters]);
 
         let menus_ui = Paragraph::new(Text::from(menus))
