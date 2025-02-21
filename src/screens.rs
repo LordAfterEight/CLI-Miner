@@ -156,7 +156,7 @@ pub fn render_game(
         let empty = Line::from("");
         let mut mainmenu = Line::from(format!("Main menu"))
             .light_red();
-        let mut settings = Line::from(format!("Settings"));
+        let mut settings = Line::from(format!("Settings "));
 
         match menu_selection {
             1 => mainmenu = mainmenu.black().on_light_red(),

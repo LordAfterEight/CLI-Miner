@@ -13,8 +13,11 @@ use discord_rich_presence::{
     DiscordIpcClient};
 use rand;
 use clearscreen;
+use colored::Colorize;
+
 #[cfg(not(target_arch = "aarch64"))]
 use rodio::{OutputStream, Sink};
+
 
 #[derive(PartialEq, Eq)]
 enum Screens {
@@ -27,11 +30,11 @@ enum Screens {
 fn main() -> io::Result<()> {
     clearscreen::clear();
 
-    println!("[i] Creating objects...\n");
+    println!("{}", "[i] Creating objects...\n".blue());
     sleep(250);
 
     let player = &mut Player {
-        nickname: "default".to_string(),
+        nickname: "default".bold().underline().cyan().to_string(),
         money: 0.0,
         bits: 0,
         bytes: 0,
@@ -40,10 +43,10 @@ fn main() -> io::Result<()> {
         converters: 0,
         converter_price: 5000.0
     };
-    println!("[✓] Player object created");
+    println!("{}", "[✓] Player object created".green());
     sleep(100);
     read_data(player);
-    println!("[i] Loaded player: {}", player.nickname);
+    println!("{} {}", "  ┗━[i] Loaded player: ".blue(), player.nickname);
     sleep(250);
 
     let bytestrings = &mut Bytestrings {
@@ -57,7 +60,7 @@ fn main() -> io::Result<()> {
         bytestring_8: 0b0000_0000u8,
     };
 
-    println!("[✓] Bytestrings object created");
+    println!("{}", "[✓] Bytestrings object created".green());
     sleep(100);
 
 
@@ -66,7 +69,7 @@ fn main() -> io::Result<()> {
         music_volume: 0.5,
         frame_delay: 65
     };
-    println!("[✓] Settings object created");
+    println!("{}", "[✓] Settings object created".green());
     sleep(100);
 
     let game = &mut GameState {
@@ -75,18 +78,18 @@ fn main() -> io::Result<()> {
         progress_level: 1
     };
 
-    println!("[✓] Game object created\n");
+    println!("{}", "[✓] Game object created\n".green());
     sleep(100);
 
-    println!("[i] Attempting to connect to Discord client...");
+    println!("{}", "[i] Attempting to connect to Discord client...".blue());
     sleep(250);
 
     let mut client = DiscordIpcClient::new("1335715218851893389").expect("");
     if client.connect().is_ok() {
-        println!("[✓] Connected successfully\n");
+        println!("{}", "[✓] Connected successfully\n".green());
     }
     if client.connect().is_err() {
-        println!("[!] Connection failed\n");
+        println!("{}", "[!] Connection failed\n".truecolor(200,100,0));
     }
     let client_state = client.connect().is_ok();
 
@@ -120,12 +123,12 @@ fn main() -> io::Result<()> {
 
     let mut os_is_android = false;
     #[cfg(target_arch = "aarch64")] {
-        println!("\n[!] target architecture doesn't support audio");
+        println!("{}", "\n[!] target architecture doesn't support audio".truecolor(200,100,0));
         os_is_android = true;
         sleep(250);
     }
 
-    println!("\n[i] Starting game...");
+    println!("{}", "\n[i] Starting game...".bold().cyan());
     sleep(500);
 
     let mut terminal = ratatui::init();

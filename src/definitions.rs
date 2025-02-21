@@ -6,6 +6,7 @@ use rodio::Decoder;
 use crate::{Bytestrings, Player, rand, rand::Rng};
 use serde_json;
 use serde_json::json;
+use colored::Colorize;
 
 pub fn sleep(time: u64) {
     thread::sleep(time::Duration::from_millis(time));
@@ -56,13 +57,20 @@ pub fn save_data(data: &mut Player) {
 
 pub fn read_data(player: &mut Player) -> &mut Player {
     let filepath = "../data/save.json";
-    println!("[i] Attempting to read data...");
+    println!("{}", "  ┣━[i] Attempting to read data...".blue());
     sleep(250);
 
-    let file = File::open(filepath).expect("[X] Could not open file");
-    let data: serde_json::Value = serde_json::from_reader(&file).expect("[X] Save file must exist");
+    let file = match File::open(filepath) {
+        Ok(file) => file,
+        Err(error) => panic!("{} {}",
+            "    [X] Cannot read file: ".bold().red(),
+            error
+        )
+    };
 
-    println!("[i] Applying values...");
+    let data: serde_json::Value = serde_json::from_reader(&file).expect(&"    [X] Save file must exist".bold().red());
+
+    println!("{}", "  ┣━[i] Applying values...".blue());
     sleep(250);
 
     player.nickname = data.get("nickname").expect("Value must exist").to_string();
