@@ -20,7 +20,7 @@ Todo list is ranked by priority
 
 4. Extras:
     - Settings menu:
-        - [ ] Keybinds
+        - [X] Keybinds
     - [ ] Automatic Game Updates
     - [ ] Background sounds (weather)
 

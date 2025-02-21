@@ -10,6 +10,7 @@ use crate::{
     Player,
     GameSettings,
     Bytestrings,
+    Keybinds,
     sleep,
     binary_to_string
 };
@@ -32,7 +33,13 @@ pub fn render_main_menu(
 
         let empty = Line::from("");
 
-        let title = Line::from("CLI-Miner »«  |  V0.2.0 Dev Build")
+        let info = Line::from("Build date: 21.02.2025").centered();
+
+        let news = Line::from("What's new?                  ").centered().underlined();
+        let news1 = Line::from("- Keybinds menu in settings").centered();
+        let news2 = Line::from("- Progress saving          ").centered();
+
+        let title = Line::from("CLI-Miner »«  |  V0.2.1 Dev Build")
             .magenta()
             .centered()
             .bold()
@@ -69,6 +76,8 @@ pub fn render_main_menu(
         }
 
         let game_ui = Text::from(vec![
+            info,
+            empty.clone(),
             title,
             empty.clone(),
             exit,
@@ -76,6 +85,11 @@ pub fn render_main_menu(
             start,
             empty.clone(),
             client_message,
+            empty.clone(),
+            news,
+            news1,
+            news2,
+            empty.clone(),
             empty,
             os_message
         ]);
@@ -83,7 +97,7 @@ pub fn render_main_menu(
         let menu_ui = Paragraph::new(Text::from(game_ui))
             .block(Block::bordered()
             .border_type(BorderType::Thick)
-            .padding(Padding::vertical(5))
+            .padding(Padding::vertical(1))
             .title(" Main Menu ")
             .title_alignment(Alignment::Center))
             .white()
@@ -106,7 +120,7 @@ pub fn render_settings_menu(
             .centered();
 
         let mut frame_delay = Line::from(
-            format!("Frame Delay: {} [+]/[-]", settings.frame_delay))
+            format!("Frame Delay:  {}ms [+]/[-]", settings.frame_delay))
             .centered();
 
         let mut sfx_volume = Line::from(
@@ -117,10 +131,13 @@ pub fn render_settings_menu(
             format!("Music Volume: {:.2} [+]/[-]", settings.music_volume))
             .centered();
 
+        let mut keybind_menu = Line::from("Keybinds").centered();
+
         match setting_position {
             1 => frame_delay=frame_delay.black().on_white(),
             2 => sfx_volume=sfx_volume.black().on_white(),
             3 => music_volume=music_volume.black().on_white(),
+            4 => keybind_menu=keybind_menu.black().on_white(),
             _ => ()
         }
 
@@ -129,7 +146,9 @@ pub fn render_settings_menu(
             empty.clone(),
             frame_delay,
             sfx_volume,
-            music_volume
+            music_volume,
+            empty,
+            keybind_menu
         ]);
 
         let menu_ui = Paragraph::new(Text::from(game_ui))
@@ -144,6 +163,52 @@ pub fn render_settings_menu(
         frame.render_widget(menu_ui, frame.area());
     });
 }
+
+pub fn render_keybinds_menu(
+    terminal: &mut DefaultTerminal,
+    keybinds: &mut Keybinds,
+    //mut keybind_position: u8
+) {
+    let _ = terminal.draw(|frame| {
+        let empty = Line::from("");
+
+        let back = Line::from("Back [q]")
+            .light_red()
+            .centered();
+
+
+        let mut key_back = Line::from(format!("Back:              [{}]", keybinds.back))
+            .centered();
+        let mut key_enter = Line::from(format!("Confirm:        [{}]", keybinds.enter))
+            .centered();
+        let mut key_nav_up = Line::from(format!("Navigate up:       [{}]", keybinds.nav_up))
+            .centered();
+        let mut key_nav_down = Line::from(format!("Navigate down:   [{}]", keybinds.nav_down))
+            .centered();
+
+
+        let game_ui = Text::from(vec![
+            back,
+            empty.clone(),
+            key_back,
+            key_enter,
+            key_nav_up,
+            key_nav_down
+        ]);
+
+        let menu_ui = Paragraph::new(Text::from(game_ui))
+            .block(Block::bordered()
+            .border_type(BorderType::Double)
+            .padding(Padding::proportional(1))
+            .title(" Settings >> Keybinds ")
+            .title_alignment(Alignment::Center))
+            .white()
+            .on_black();
+
+        frame.render_widget(menu_ui, frame.area());
+    });
+}
+
 
 pub fn render_game(
     terminal: &mut DefaultTerminal,

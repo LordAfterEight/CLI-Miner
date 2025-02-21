@@ -1,4 +1,5 @@
 use serde_derive::{Serialize, Deserialize};
+use ratatui::crossterm::event::{self, KeyCode, KeyEventKind};
 #[derive(Serialize, Deserialize)]
 pub struct Player {
     pub nickname: String,
@@ -32,4 +33,17 @@ pub struct Bytestrings {
     pub bytestring_6: u8,
     pub bytestring_7: u8,
     pub bytestring_8: u8
+}
+
+pub struct Keybinds {
+    pub back: KeyCode,
+    pub enter: KeyCode,
+    pub nav_up : KeyCode,
+    pub nav_down : KeyCode,
+    pub use_miner: KeyCode,
+    pub use_converter: KeyCode,
+    pub sell_bits: KeyCode,
+    pub sell_bytes: KeyCode,
+    pub buy_miner: KeyCode,
+    pub buy_converter: KeyCode,
 }

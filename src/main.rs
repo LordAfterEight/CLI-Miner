@@ -23,12 +23,26 @@ use rodio::{OutputStream, Sink};
 enum Screens {
     Start,
     Settings,
+    KeybindSettings,
     Game
 }
 
 
 fn main() -> io::Result<()> {
     clearscreen::clear();
+
+    let keybinds = &mut Keybinds {
+        back: KeyCode::Char('q'),
+        enter: KeyCode::Enter,
+        nav_up: KeyCode::Up,
+        nav_down: KeyCode::Down,
+        use_miner: KeyCode::Char(' '),
+        use_converter: KeyCode::Char('4'),
+        sell_bits: KeyCode::Char('2'),
+        sell_bytes: KeyCode::Char('3'),
+        buy_miner: KeyCode::Char('6'),
+        buy_converter: KeyCode::Char('7')
+    };
 
     println!("{}", "[i] Creating objects...\n".blue());
     sleep(250);
@@ -134,7 +148,7 @@ fn main() -> io::Result<()> {
     let mut terminal = ratatui::init();
     loop {
 
-        while current_screen == Screens::Start {
+        while current_screen == Screens::Start {    //MAIN MENU
             render_main_menu(
                 &mut terminal,
                 game.state.clone(), 
@@ -145,7 +159,7 @@ fn main() -> io::Result<()> {
             if let event::Event::Key(key) = event::read()? {
                 if key.kind == KeyEventKind::Press {
 
-                    if key.code == KeyCode::Char('q')  {
+                    if key.code == keybinds.back  {
                         #[cfg(not(target_arch = "aarch64"))]
                         sink_sfx.append(get_source("interact.mp3"));
                         definitions::sleep(300);
@@ -160,7 +174,7 @@ fn main() -> io::Result<()> {
                         break;
                     }
 
-                    if key.code == KeyCode::Enter {
+                    if key.code == keybinds.enter {
                         #[cfg(not(target_arch = "aarch64"))] {
                             sink_sfx.append(get_source("interact.mp3"));
                             sink_music.stop();
@@ -184,7 +198,7 @@ fn main() -> io::Result<()> {
             }
         }
 
-        while current_screen == Screens::Settings {
+        while current_screen == Screens::Settings {     //SETTINGS
             render_settings_menu(
                 &mut terminal,
                 settings,
@@ -203,7 +217,7 @@ fn main() -> io::Result<()> {
                         sink_sfx.append(get_source("interact.mp3"));
                     }
 
-                    if key.code == KeyCode::Char('q')  {
+                    if key.code == keybinds.back  {
                         if prev_was_ingame {
                             current_screen = Screens::Game;
                         } else {current_screen = Screens::Start;}
@@ -230,20 +244,35 @@ fn main() -> io::Result<()> {
                                 0.0 => settings.music_volume -= 0.0,
                                 _ => settings.music_volume -= 0.05},
                             _ => {}}, //sink_sfx.append(get_source("fail.mp3"))},
+                        KeyCode::Enter => match setting_position {
+                            4 => current_screen = Screens::KeybindSettings,
+                            _ => {}},
                         _ => {} //sink_sfx.append(get_source("fail.mp3"))
                     }
-                    if setting_position == 4 {setting_position = 1;}
+                    if setting_position == 5 {setting_position = 1;}
                     if setting_position == 0 {setting_position = 3;}
                 }
             }
 
-            #[cfg(not(target_arch = "aarch64"))]
-            if sink_music.len() == 0 {
-                sink_music.append(get_source("music2.mp3"));
+            while current_screen == Screens::KeybindSettings {
+                render_keybinds_menu(&mut terminal, keybinds);
+
+                if let event::Event::Key(key) = event::read()? {
+                    if key.kind == KeyEventKind::Press {
+                        if key.code == keybinds.back {
+                            current_screen = Screens::Settings;
+                        }
+                    }
+                }
             }
         }
 
-        while current_screen == Screens::Game {
+        #[cfg(not(target_arch = "aarch64"))]
+        if sink_music.len() == 0 {
+            sink_music.append(get_source("music2.mp3"));
+        }
+
+        while current_screen == Screens::Game {     //GAME
             render_game(&mut terminal, player, bytestrings, menu_selection);
 
             definitions::sleep(settings.frame_delay);
@@ -253,10 +282,10 @@ fn main() -> io::Result<()> {
 
                 if let event::Event::Key(key) = event::read()? {
                     if key.kind == KeyEventKind::Press {
-                        if key.code == KeyCode::Esc {break;}
+                        if key.code == keybinds.back {break;}
 
-                        if key.code == KeyCode::Up {menu_selection-=1};
-                        if key.code == KeyCode::Down && menu_selection >= 1 {
+                        if key.code == keybinds.nav_up {menu_selection-=1};
+                        if key.code == keybinds.nav_down && menu_selection >= 1 {
                             menu_selection += 1;
                         }
                         match menu_selection {
@@ -265,7 +294,7 @@ fn main() -> io::Result<()> {
                             _ => {}
                         }
 
-                        if key.code == KeyCode::Enter && menu_selection == 1  {
+                        if key.code == keybinds.enter && menu_selection == 1  {
                             #[cfg(not(target_arch = "aarch64"))] {
                                 sink_sfx.append(get_source("interact.mp3"));
                                 sink_music.stop();
@@ -281,7 +310,7 @@ fn main() -> io::Result<()> {
                             break;
                         }
 
-                        if key.code == KeyCode::Enter && menu_selection == 2 {
+                        if key.code == keybinds.enter && menu_selection == 2 {
                             #[cfg(not(target_arch = "aarch64"))]
                             sink_sfx.append(get_source("interact.mp3"));
                             prev_was_ingame = true;
@@ -289,7 +318,7 @@ fn main() -> io::Result<()> {
                             break;
                         }
 
-                        if key.code == KeyCode::Char(' ')  {
+                        if key.code == keybinds.use_miner  {
                             #[cfg(not(target_arch = "aarch64"))] {
                                 sink_sfx.stop();
                                 sink_sfx.append(get_source("mining.mp3"));
@@ -299,7 +328,7 @@ fn main() -> io::Result<()> {
                             continue;
                         }
 
-                        if key.code == KeyCode::Char('2') && player.bits > 0 {
+                        if key.code == keybinds.sell_bits && player.bits > 0 {
                             #[cfg(not(target_arch = "aarch64"))]
                             sink_sfx.append(get_source("sell.mp3"));
                             player.money += player.bits as f64;
@@ -307,7 +336,7 @@ fn main() -> io::Result<()> {
                             continue;
                         }
 
-                        if key.code == KeyCode::Char('3') && player.bytes > 0 {
+                        if key.code == keybinds.sell_bytes && player.bytes > 0 {
                             #[cfg(not(target_arch = "aarch64"))]
                             sink_sfx.append(get_source("sell.mp3"));
                             player.money += player.bytes as f64 * 10.0;
@@ -315,7 +344,7 @@ fn main() -> io::Result<()> {
                             continue;
                         }
 
-                        if key.code == KeyCode::Char('4') && player.bits >= 8*player.converters {
+                        if key.code == keybinds.use_converter && player.bits >= 8*player.converters {
                             #[cfg(not(target_arch = "aarch64"))] {
                                 sink_sfx.stop();
                                 sink_sfx.append(get_source("interact.mp3"));
@@ -325,7 +354,7 @@ fn main() -> io::Result<()> {
                             continue;
                         }
 
-                        if key.code == KeyCode::Char('6') && player.money >= player.miner_price {
+                        if key.code == keybinds.buy_miner && player.money >= player.miner_price {
                             #[cfg(not(target_arch = "aarch64"))] {
                                 sink_sfx.stop();
                                 sink_sfx.append(get_source("bought.mp3"));
@@ -336,7 +365,7 @@ fn main() -> io::Result<()> {
                             continue;
                         }
 
-                        if key.code == KeyCode::Char('7') && player.money >= player.converter_price {
+                        if key.code == keybinds.buy_converter && player.money >= player.converter_price {
                             #[cfg(not(target_arch = "aarch64"))] {
                                 sink_sfx.stop();
                                 sink_sfx.append(get_source("bought.mp3"));
