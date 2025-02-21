@@ -24,4 +24,4 @@ Todo list is ranked by priority
     - [ ] Automatic Game Updates
     - [ ] Background sounds (weather)
 
-Last updated: 19/02/2025
+Last updated: 21/02/2025
