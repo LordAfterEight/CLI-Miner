@@ -57,7 +57,7 @@ pub fn save_data(data: &mut Player) {
 
 pub fn read_data(player: &mut Player) -> &mut Player {
     let filepath = "../data/save.json";
-    println!("{}", "  ┣━[i] Attempting to read data...".blue());
+    println!("{}", "  ┣━[i] Attempting to read data...".cyan());
     sleep(250);
 
     let file = match File::open(filepath) {
@@ -70,7 +70,7 @@ pub fn read_data(player: &mut Player) -> &mut Player {
 
     let data: serde_json::Value = serde_json::from_reader(&file).expect(&"    [X] Save file must exist".bold().red());
 
-    println!("{}", "  ┣━[i] Applying values...".blue());
+    println!("{}", "  ┣━[i] Applying values...".cyan());
     sleep(250);
 
     player.nickname = data.get("nickname").expect("Value must exist").to_string();
@@ -95,7 +95,7 @@ pub fn read_data(player: &mut Player) -> &mut Player {
 
     player.converters = data.get("converters").expect("Value must exist")
         .as_u64().expect("Could not convert value");
-    
+
     drop(file);
     return player
 }

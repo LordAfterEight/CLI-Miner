@@ -27,7 +27,8 @@ pub fn render_main_menu(
     terminal: &mut DefaultTerminal,
     state: String,
     client: bool,
-    os_is_android: bool
+    os_is_android: bool,
+    keybinds: &mut Keybinds
 ) {
     let _ = terminal.draw(|frame| {
 
@@ -45,14 +46,14 @@ pub fn render_main_menu(
             .bold()
             .underlined();
 
-        let exit = Line::from("Exit [q]")
+        let exit = Line::from(format!("Exit [{}]",keybinds.back))
             .centered()
             .light_red();
 
         let settings = Line::from("Settings [e]")
             .centered();
 
-        let start = Line::from(format!("{state} [Enter]"))
+        let start = Line::from(format!("{} [{}]", state, keybinds.enter))
             .centered()
             .light_green();
 
@@ -110,12 +111,13 @@ pub fn render_main_menu(
 pub fn render_settings_menu(
     terminal: &mut DefaultTerminal,
     settings: &mut GameSettings,
-    mut setting_position: u8
+    setting_position: u8,
+    keybinds: &mut Keybinds
 ) {
     let _ = terminal.draw(|frame| {
         let empty = Line::from("");
 
-        let back = Line::from("Back [q]")
+        let back = Line::from(format!("Back [{}]", keybinds.back))
             .light_red()
             .centered();
 
@@ -167,25 +169,60 @@ pub fn render_settings_menu(
 pub fn render_keybinds_menu(
     terminal: &mut DefaultTerminal,
     keybinds: &mut Keybinds,
-    //mut keybind_position: u8
+    keybind_selection: u8,
+    is_selected: bool
 ) {
     let _ = terminal.draw(|frame| {
         let empty = Line::from("");
 
-        let back = Line::from("Back [q]")
+        let back = Line::from(format!("Back [{}]", keybinds.back))
             .light_red()
             .centered();
 
 
-        let mut key_back = Line::from(format!("Back:              [{}]", keybinds.back))
+        let mut key_back = Line::from(format!("Back: [{}]", keybinds.back))
             .centered();
-        let mut key_enter = Line::from(format!("Confirm:        [{}]", keybinds.enter))
+        let mut key_enter = Line::from(format!("Confirm: [{}]", keybinds.enter))
             .centered();
-        let mut key_nav_up = Line::from(format!("Navigate up:       [{}]", keybinds.nav_up))
+        let mut key_nav_up = Line::from(format!("Navigate up: [{}]", keybinds.nav_up))
             .centered();
-        let mut key_nav_down = Line::from(format!("Navigate down:   [{}]", keybinds.nav_down))
+        let mut key_nav_down = Line::from(format!("Navigate down: [{}]", keybinds.nav_down))
+            .centered();
+        let mut key_use_miner = Line::from(format!("Use Miner: [{}]", keybinds.use_miner))
+            .centered();
+        let mut key_use_converter = Line::from(format!("Use Converter: [{}]", keybinds.use_converter))
+            .centered();
+        let mut key_sell_bits = Line::from(format!("Sell Bits: [{}]", keybinds.sell_bits))
+            .centered();
+        let mut key_sell_bytes = Line::from(format!("Sell Bytes: [{}]", keybinds.sell_bytes))
             .centered();
 
+        match keybind_selection {
+            1 => key_back=key_back.black().on_white(),
+            2 => key_enter=key_enter.black().on_white(),
+            3 => key_nav_up=key_nav_up.black().on_white(),
+            4 => key_nav_down=key_nav_down.black().on_white(),
+            5 => key_use_miner=key_use_miner.black().on_white(),
+            6 => key_use_converter=key_use_converter.black().on_white(),
+            7 => key_sell_bits=key_sell_bits.black().on_white(),
+            8 => key_sell_bytes=key_sell_bytes.black().on_white(),
+            _ => {}
+        }
+
+        match is_selected {
+            true => match keybind_selection {
+                1 => key_back=key_back.black().on_cyan(),
+                2 => key_enter=key_enter.black().on_cyan(),
+                3 => key_nav_up=key_nav_up.black().on_cyan(),
+                4 => key_nav_down=key_nav_down.black().on_cyan(),
+                5 => key_use_miner=key_use_miner.black().on_white(),
+                6 => key_use_converter=key_use_converter.black().on_white(),
+                7 => key_sell_bits=key_sell_bits.black().on_white(),
+                8 => key_sell_bytes=key_sell_bytes.black().on_white(),
+                _ => {}
+            },
+            _ => {}
+        }
 
         let game_ui = Text::from(vec![
             back,
@@ -193,7 +230,11 @@ pub fn render_keybinds_menu(
             key_back,
             key_enter,
             key_nav_up,
-            key_nav_down
+            key_nav_down,
+            key_use_miner,
+            key_use_converter,
+            key_sell_bits,
+            key_sell_bytes
         ]);
 
         let menu_ui = Paragraph::new(Text::from(game_ui))
@@ -214,7 +255,8 @@ pub fn render_game(
     terminal: &mut DefaultTerminal,
     player: &mut Player,
     bytestrings: &mut Bytestrings,
-    menu_selection: u8
+    menu_selection: u8,
+    keybinds: &mut Keybinds
 ) {
     let _ = terminal.draw(|frame| {
         let mut nav_info = Line::from("Navigate with arrow keys");
@@ -232,12 +274,25 @@ pub fn render_game(
         let menus = Text::from(vec![nav_info, empty, mainmenu, settings]);
 
         let money = Line::from(format!("Money: {:.2}»«", player.money));
-        let bits = Line::from(format!("Bits:  {}  |  [Space] to mine, [2] to convert to »«", player.bits));
-        let bytes = Line::from(format!("Bytes: {}  |  [4] to convert from Bits, [3] to convert to »«", player.bytes));
+        let bits = Line::from(format!("Bits:  {}  |  [{}] to mine, [{}] to convert to »«",
+            player.bits,
+            keybinds.use_miner,
+            keybinds.sell_bits
+        ));
+        let bytes = Line::from(format!("Bytes: {}  |  [{}] to convert from Bits, [{}] to convert to »«",
+            player.bytes,
+            keybinds.use_converter,
+            keybinds.sell_bytes
+        ));
         let resources = Text::from(vec![money, bits, bytes]);
 
-        let miners = Line::from(format!("Miners: {}      |  Price: {:.2}»«, [6] to buy", player.miners, player.miner_price));
-        let converters = Line::from(format!("Converters: {}  |  Price: {:.2}»«, [3] to use, [7] to buy", player.converters, player.converter_price));
+        let miners = Line::from(format!("Miners: {}      |  Price: {:.2}»«, [{}] to buy", player.miners, player.miner_price, keybinds.buy_miner));
+        let converters = Line::from(format!("Converters: {}  |  Price: {:.2}»«, [{}] to use, [{}] to buy",
+            player.converters,
+            player.converter_price,
+            keybinds.use_converter,
+            keybinds.buy_converter
+        ));
         let devices = Text::from(vec![miners,converters]);
 
         let menus_ui = Paragraph::new(Text::from(menus))

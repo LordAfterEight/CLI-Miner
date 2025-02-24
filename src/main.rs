@@ -44,7 +44,7 @@ fn main() -> io::Result<()> {
         buy_converter: KeyCode::Char('7')
     };
 
-    println!("{}", "[i] Creating objects...\n".blue());
+    println!("{}", "[i] Creating objects...\n".cyan());
     sleep(250);
 
     let player = &mut Player {
@@ -60,7 +60,7 @@ fn main() -> io::Result<()> {
     println!("{}", "[✓] Player object created".green());
     sleep(100);
     read_data(player);
-    println!("{} {}", "  ┗━[i] Loaded player: ".blue(), player.nickname);
+    println!("{} {}", "  ┗━[i] Loaded player: ".cyan(), player.nickname);
     sleep(250);
 
     let bytestrings = &mut Bytestrings {
@@ -95,7 +95,7 @@ fn main() -> io::Result<()> {
     println!("{}", "[✓] Game object created\n".green());
     sleep(100);
 
-    println!("{}", "[i] Attempting to connect to Discord client...".blue());
+    println!("{}", "[i] Attempting to connect to Discord client...".cyan());
     sleep(250);
 
     let mut client = DiscordIpcClient::new("1335715218851893389").expect("");
@@ -119,8 +119,10 @@ fn main() -> io::Result<()> {
 
     let mut setting_position = 1;
     let mut menu_selection = 1;
+    let mut keybind_selection = 1;
     let mut current_screen = Screens::Start;
     let mut prev_was_ingame = false;
+    let mut key_is_selected = false;
 
     /*
     let (_stream,stream_handle) = OutputStream::try_default().unwrap();
@@ -151,9 +153,10 @@ fn main() -> io::Result<()> {
         while current_screen == Screens::Start {    //MAIN MENU
             render_main_menu(
                 &mut terminal,
-                game.state.clone(), 
-                client_state, 
-                os_is_android
+                game.state.clone(),
+                client_state,
+                os_is_android,
+                keybinds
             );
 
             if let event::Event::Key(key) = event::read()? {
@@ -203,6 +206,7 @@ fn main() -> io::Result<()> {
                 &mut terminal,
                 settings,
                 setting_position,
+                keybinds
             );
 
             #[cfg(not(target_arch = "aarch64"))] {
@@ -253,14 +257,60 @@ fn main() -> io::Result<()> {
                     if setting_position == 0 {setting_position = 3;}
                 }
             }
+        }
 
-            while current_screen == Screens::KeybindSettings {
-                render_keybinds_menu(&mut terminal, keybinds);
+        while current_screen == Screens::KeybindSettings {
+            render_keybinds_menu(
+                &mut terminal,
+                keybinds,
+                keybind_selection,
+                key_is_selected
+            );
 
-                if let event::Event::Key(key) = event::read()? {
-                    if key.kind == KeyEventKind::Press {
-                        if key.code == keybinds.back {
-                            current_screen = Screens::Settings;
+            if let event::Event::Key(key) = event::read()? {
+                if key.kind == KeyEventKind::Press {
+                    if key.code == keybinds.back {
+                        current_screen = Screens::Settings;
+                    }
+
+                    if key.code == keybinds.nav_up && keybind_selection >= 1 {
+                        keybind_selection-=1
+                    };
+                    if key.code == keybinds.nav_down {
+                        keybind_selection += 1;
+                    }
+                    match keybind_selection {
+                        0 => keybind_selection = 8,
+                        9 => keybind_selection = 1,
+                        _ => {}
+                    }
+
+                    if key.code == keybinds.enter && key_is_selected == false {
+                        key_is_selected=true;
+                    };
+
+                    while key_is_selected {
+                        render_keybinds_menu(
+                            &mut terminal,
+                            keybinds,
+                            keybind_selection,
+                            key_is_selected
+                        );
+
+                        if let event::Event::Key(input) = event::read()? {
+                            match keybind_selection {
+                                1 => keybinds.back = input.code,
+                                2 => keybinds.enter = input.code,
+                                3 => keybinds.nav_up = input.code,
+                                4 => keybinds.nav_down = input.code,
+                                5 => keybinds.use_miner = input.code,
+                                6 => keybinds.use_converter = input.code,
+                                7 => keybinds.sell_bits = input.code,
+                                8 => keybinds.sell_bytes = input.code,
+                                _ => {}
+                            }
+                            key_is_selected = false;
+                            break;
                         }
                     }
                 }
@@ -273,7 +323,13 @@ fn main() -> io::Result<()> {
         }
 
         while current_screen == Screens::Game {     //GAME
-            render_game(&mut terminal, player, bytestrings, menu_selection);
+            render_game(
+                &mut terminal,
+                player,
+                bytestrings,
+                menu_selection,
+                keybinds
+            );
 
             definitions::sleep(settings.frame_delay);
 
