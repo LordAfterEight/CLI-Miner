@@ -47,3 +47,21 @@ pub struct Keybinds {
     pub buy_miner: KeyCode,
     pub buy_converter: KeyCode,
 }
+
+pub struct Miner {
+    pub id: u8,
+    pub integrity: u8,
+    pub efficiency: u8
+}
+
+pub struct Converter {
+    pub id: u8,
+    pub integrity: u8,
+    pub efficiency: u8
+}
+
+pub struct Extractor {
+    pub id: u8,
+    pub integrity: u8,
+    pub efficiency: u8
+}

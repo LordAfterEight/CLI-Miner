@@ -14,6 +14,7 @@ use discord_rich_presence::{
 use rand;
 use clearscreen;
 use colored::Colorize;
+use hecs::World;
 
 #[cfg(not(target_arch = "aarch64"))]
 use rodio::{OutputStream, Sink};
@@ -29,6 +30,7 @@ enum Screens {
 
 
 fn main() -> io::Result<()> {
+    let mut world = World::new();
     clearscreen::clear();
 
     let keybinds = &mut Keybinds {
@@ -287,6 +289,7 @@ fn main() -> io::Result<()> {
 
                     if key.code == keybinds.enter && key_is_selected == false {
                         key_is_selected=true;
+                        sleep(250);
                     };
 
                     while key_is_selected {
@@ -310,6 +313,7 @@ fn main() -> io::Result<()> {
                                 _ => {}
                             }
                             key_is_selected = false;
+                            sleep(250);
                             break;
                         }
                     }

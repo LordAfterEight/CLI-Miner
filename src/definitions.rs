@@ -62,9 +62,10 @@ pub fn read_data(player: &mut Player) -> &mut Player {
 
     let file = match File::open(filepath) {
         Ok(file) => file,
-        Err(error) => panic!("{} {}",
-            "    [X] Cannot read file: ".bold().red(),
-            error
+        Err(error) => panic!("{} {}\n{}",
+            "    [X] Error while opening file: ".bold().red(),
+            error,
+            "Check if 'save.json' is at CLI-Miner/data/".yellow()
         )
     };
 
