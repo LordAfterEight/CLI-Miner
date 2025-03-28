@@ -1,9 +1,9 @@
 use std::{thread,time};
 use std::fs::File;
 use std::io::{BufReader, BufWriter, Read, Write, Seek, SeekFrom};
-use crate::{Bytestrings, Player, Keybinds, GameSettings, rand, rand::Rng};
+use crate::{Bytestrings, Player, Keybinds, GameSettings, Miner, rand, rand::Rng};
 use serde_json;
-use serde_json::json;
+use serde_json::{json, Value};
 use colored::Colorize;
 #[cfg(not(target_os = "android"))]
 use rodio::Decoder;
@@ -56,11 +56,10 @@ pub fn save_player_data(data: &mut Player) {
 
 
 pub fn read_player_data(player: &mut Player) -> &mut Player {
-    let filepath = "../data/save.json";
     println!("{}", "  ┣━[i] Attempting to read data...".cyan());
     sleep(250);
 
-    let file = match File::open(filepath) {
+    let playerdata = match File::open("../data/save.json") {
         Ok(file) => file,
         Err(error) => panic!("{} {}\n{}",
             "    [X] Error while opening file: ".bold().red(),
@@ -69,7 +68,7 @@ pub fn read_player_data(player: &mut Player) -> &mut Player {
         )
     };
 
-    let data: serde_json::Value = serde_json::from_reader(&file).expect(&"    [X] Save file must exist".bold().red());
+    let data: serde_json::Value = serde_json::from_reader(&playerdata).expect(&"    [X] Save file must exist".bold().red());
 
     println!("{}", "  ┣━[i] Applying values...".cyan());
     sleep(250);
@@ -97,7 +96,7 @@ pub fn read_player_data(player: &mut Player) -> &mut Player {
     player.converters = data.get("converters").expect("Value must exist")
         .as_u64().expect("Could not convert value");
 
-    drop(file);
+    drop(playerdata);
     return player
 }
 
@@ -155,6 +154,49 @@ pub fn read_settings_data(
 
     drop(file);
     return settings
+}
+
+pub fn save_gamedata(miner_list: &mut Vec<Miner>) {
+    let filepath = "../data/gamedata.json";
+    let mut file = File::options()
+        .read(true)
+        .write(true)
+        .open(filepath)
+        .expect("[X] Could not open file");
+
+    file.seek(SeekFrom::Start(0)).unwrap();
+
+    let mut datastruct: Vec<Value> = Vec::new();
+    for i in 0..miner_list.len() {
+        datastruct.push(json!({
+            format!("miner{i}") : {
+                "ID" : miner_list[i].id.to_owned()
+            }
+        }))
+    }
+
+    serde_json::to_writer(&file, &datastruct).unwrap();
+    drop(file);
+}
+
+pub fn read_gamedata(miner_list: &mut Vec<Miner>) -> &mut Vec<Miner> {
+    let file = match File::open("../data/gamedata.json") {
+        Ok(file) => file,
+        Err(error) => panic!("{} {}\n{}",
+            "    [X] Error while opening file: ".bold().red(),
+            error,
+            "Check if 'keybinds.json' is at CLI-Miner/data/".yellow()
+        )
+    };
+
+    let miner: serde_json::Value = serde_json::from_reader(&file).expect(&"    [X] Keybinds file must exist".bold().red());
+
+    for i in 0..50 {
+        miner_list[i].id = miner.get("ID").expect("Value must exist");
+    }
+
+    drop(file);
+    return miner_list
 }
 /*
 pub fn save_keybinds_data(keybinds: &mut Keybinds) {

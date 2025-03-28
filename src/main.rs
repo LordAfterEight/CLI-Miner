@@ -26,7 +26,8 @@ enum Screens {
     Start,
     Settings,
     KeybindSettings,
-    Game
+    Game,
+    DeviceManagement
 }
 
 
@@ -355,7 +356,7 @@ fn main() -> io::Result<()> {
                         }
                         match menu_selection {
                             0 => menu_selection = 1,
-                            3 => menu_selection = 2,
+                            4 => menu_selection = 3,
                             _ => {}
                         }
 
@@ -366,6 +367,7 @@ fn main() -> io::Result<()> {
                                 sink_music.append(get_source("music2.mp3"));
                             }
                             save_player_data(player);
+                            save_gamedata(&mut miner_list);
                             prev_was_ingame = false;
                             current_screen = Screens::Start;
                             game.rich_presence_state = "In Main Menu".to_string();
@@ -380,6 +382,14 @@ fn main() -> io::Result<()> {
                             sink_sfx.append(get_source("interact.mp3"));
                             prev_was_ingame = true;
                             current_screen = Screens::Settings;
+                            break;
+                        }
+
+                        if key.code == keybinds.enter && menu_selection == 3 {
+                            #[cfg(not(target_arch = "aarch64"))]
+                            sink_sfx.append(get_source("interact.mp3"));
+                            prev_was_ingame = true;
+                            current_screen = Screens::DeviceManagement;
                             break;
                         }
 
@@ -459,6 +469,23 @@ fn main() -> io::Result<()> {
                 }
 
 
+            }
+        }
+
+        while current_screen == Screens::DeviceManagement {
+            render_device_management(
+                &mut terminal,
+                player,
+                &mut miner_list
+            );
+
+            if let event::Event::Key(key) = event::read()? {
+                if key.kind == KeyEventKind::Press {
+                    if key.code == keybinds.back {
+                        current_screen = Screens::Game;
+                    }
+
+                }
             }
         }
     }

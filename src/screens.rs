@@ -11,6 +11,7 @@ use crate::{
     GameSettings,
     Bytestrings,
     Keybinds,
+    Miner,
     sleep,
     binary_to_string
 };
@@ -264,14 +265,22 @@ pub fn render_game(
         let mut mainmenu = Line::from(format!("Main menu"))
             .light_red();
         let mut settings = Line::from(format!("Settings "));
+        let mut management = Line::from(format!("Device Management"));
 
         match menu_selection {
             1 => mainmenu = mainmenu.black().on_light_red(),
             2 => settings = settings.black().on_white(),
+            3 => management = management.black().on_white(),
             _ => {}
         }
 
-        let menus = Text::from(vec![nav_info, empty, mainmenu, settings]);
+        let menus = Text::from(vec![
+            nav_info,
+            empty,
+            mainmenu,
+            settings,
+            management
+        ]);
 
         let money = Line::from(format!("Money: {:.2}»«", player.money));
         let bits = Line::from(format!("Bits:  {}  |  [{}] to mine, [{}] to convert to »«",
@@ -358,5 +367,32 @@ pub fn render_game(
         frame.render_widget(resources_ui, middle);
         frame.render_widget(devices_ui, bottom);
         frame.render_widget(data_ui, right);
+    });
+}
+
+
+pub fn render_device_management(
+    terminal: &mut DefaultTerminal,
+    player: &mut Player,
+    miner_list: &mut Vec<Miner>
+) {
+    let _ = terminal.draw(|frame| {
+
+        let mut devices: Vec<Line> = Vec::new();
+        for i in 0..miner_list.len() {
+            devices.push(Line::from(format!("Miner {}  |  ID={}", i, miner_list[i].id)));
+        };
+
+        let devices_ui = Paragraph::new(devices)
+            .block(Block::bordered()
+            .border_type(BorderType::Rounded)
+            .padding(Padding::proportional(1))
+            .title(" Device Management ")
+            .title_alignment(Alignment::Center))
+            .white()
+            .on_black();
+
+
+        frame.render_widget(devices_ui, frame.area());
     });
 }
