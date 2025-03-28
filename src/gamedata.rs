@@ -12,18 +12,21 @@ pub struct Player {
     pub converter_price: f64
 }
 
+#[derive(Serialize, Deserialize)]
 pub struct GameState {
     pub state: String,
     pub rich_presence_state: String,
     pub progress_level: u8
 }
 
+#[derive(Serialize, Deserialize)]
 pub struct GameSettings {
-    pub sfx_volume: f32,
-    pub music_volume: f32,
+    pub sfx_volume: f64,
+    pub music_volume: f64,
     pub frame_delay: u64
 }
 
+#[derive(Serialize, Deserialize)]
 pub struct Bytestrings {
     pub bytestring_1: u8,
     pub bytestring_2: u8,
@@ -48,20 +51,23 @@ pub struct Keybinds {
     pub buy_converter: KeyCode,
 }
 
+#[derive(Serialize, Deserialize)]
 pub struct Miner {
-    pub id: u8,
+    pub id: u32,
     pub integrity: u8,
     pub efficiency: u8
 }
 
+#[derive(Serialize, Deserialize)]
 pub struct Converter {
-    pub id: u8,
+    pub id: u32,
     pub integrity: u8,
     pub efficiency: u8
 }
 
+#[derive(Serialize, Deserialize)]
 pub struct Extractor {
-    pub id: u8,
+    pub id: u32,
     pub integrity: u8,
     pub efficiency: u8
 }

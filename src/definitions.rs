@@ -1,12 +1,12 @@
 use std::{thread,time};
 use std::fs::File;
 use std::io::{BufReader, BufWriter, Read, Write, Seek, SeekFrom};
-#[cfg(not(target_os = "android"))]
-use rodio::Decoder;
-use crate::{Bytestrings, Player, rand, rand::Rng};
+use crate::{Bytestrings, Player, Keybinds, GameSettings, rand, rand::Rng};
 use serde_json;
 use serde_json::json;
 use colored::Colorize;
+#[cfg(not(target_os = "android"))]
+use rodio::Decoder;
 
 pub fn sleep(time: u64) {
     thread::sleep(time::Duration::from_millis(time));
@@ -29,7 +29,7 @@ pub fn binary_to_string(byte: u8) -> String {
 }
 
 
-pub fn save_data(data: &mut Player) {
+pub fn save_player_data(data: &mut Player) {
     let filepath = "../data/save.json";
     let mut file = File::options()
         .read(true)
@@ -55,7 +55,7 @@ pub fn save_data(data: &mut Player) {
 }
 
 
-pub fn read_data(player: &mut Player) -> &mut Player {
+pub fn read_player_data(player: &mut Player) -> &mut Player {
     let filepath = "../data/save.json";
     println!("{}", "  ┣━[i] Attempting to read data...".cyan());
     sleep(250);
@@ -101,6 +101,117 @@ pub fn read_data(player: &mut Player) -> &mut Player {
     return player
 }
 
+
+pub fn save_settings_data(settings: &mut GameSettings) {
+    let filepath = "../data/settings.json";
+    let mut file = File::options()
+        .read(true)
+        .write(true)
+        .open(filepath)
+        .expect("[X] Could not open file");
+
+    file.seek(SeekFrom::Start(0)).unwrap();
+
+    let datastruct = json!({
+        "sfx_volume" : &settings.sfx_volume.to_owned(),
+        "music_volume" : &settings.music_volume.to_owned(),
+        "frame_delay" : &settings.frame_delay.to_owned()
+    });
+
+    serde_json::to_writer(&file, &datastruct).unwrap();
+    drop(file);
+}
+
+pub fn read_settings_data(
+    settings: &mut GameSettings
+) -> &mut GameSettings {
+    let filepath = "../data/settings.json";
+    println!("{}", "  ┣━[i] Attempting to read settings file...".cyan());
+    sleep(250);
+
+    let file = match File::open(filepath) {
+        Ok(file) => file,
+        Err(error) => panic!("{} {}\n{}",
+            "    [X] Error while opening file: ".bold().red(),
+            error,
+            "Check if 'settings.json' is at CLI-Miner/data/".yellow()
+        )
+    };
+
+    let data: serde_json::Value = serde_json::from_reader(&file).expect(&"    [X] Settings file must exist".bold().red());
+
+    println!("{}", "  ┗━[i] Applying values...".cyan());
+    sleep(250);
+
+    settings.sfx_volume = data.get("sfx_volume").expect("Value must exist")
+        .as_f64().expect("Could not convert value");
+
+    settings.music_volume = data.get("music_volume").expect("Value must exist")
+        .as_f64().expect("Could not convert value");
+
+    settings.frame_delay = data.get("frame_delay").expect("Value must exist")
+        .as_u64().expect("Could not convert value");
+
+
+    drop(file);
+    return settings
+}
+/*
+pub fn save_keybinds_data(keybinds: &mut Keybinds) {
+    let filepath = "../data/keybinds.json";
+    let mut file = File::options()
+        .read(true)
+        .write(true)
+        .open(filepath)
+        .expect("[X] Could not open file");
+
+    file.seek(SeekFrom::Start(0)).unwrap();
+
+    let datastruct = json!({
+        "back" : &keybinds.back.to_owned(),
+        "enter" : &keybinds.enter.to_owned(),
+        "nav_up" : &keybinds.nav_up.to_owned()
+    });
+
+    serde_json::to_writer(&file, &datastruct).unwrap();
+    drop(file);
+}
+
+pub fn read_keybinds_data(
+    keybinds: &mut Keybinds
+) -> &mut Keybinds {
+    let filepath = "../data/keybinds.json";
+    println!("{}", "  ┣━[i] Attempting to read keybinds file...".cyan());
+    sleep(250);
+
+    let file = match File::open(filepath) {
+        Ok(file) => file,
+        Err(error) => panic!("{} {}\n{}",
+            "    [X] Error while opening file: ".bold().red(),
+            error,
+            "Check if 'keybinds.json' is at CLI-Miner/data/".yellow()
+        )
+    };
+
+    let data: serde_json::Value = serde_json::from_reader(&file).expect(&"    [X] Keybinds file must exist".bold().red());
+
+    println!("{}", "  ┗━[i] Applying values...".cyan());
+    sleep(250);
+
+    keybinds.back = data.get("back").expect("Value must exist")
+        .as_char().expect("Could not convert value");
+
+    keybinds.enter = data.get("enter").expect("Value must exist")
+        .as_char().expect("Could not convert value");
+
+    keybinds.nav_up = data.get("nav_up").expect("Value must exist")
+        .as_char().expect("Could not convert value");
+
+
+    drop(file);
+    return keybinds
+}
+*/
 
 pub fn generate_bytes(object: &mut Bytestrings) -> &mut Bytestrings{
     object.bytestring_1 = rand::rng().random();

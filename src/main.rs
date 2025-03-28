@@ -12,6 +12,7 @@ use discord_rich_presence::{
     DiscordIpc, 
     DiscordIpcClient};
 use rand;
+use rand::Rng;
 use clearscreen;
 use colored::Colorize;
 use hecs::World;
@@ -46,7 +47,7 @@ fn main() -> io::Result<()> {
         buy_converter: KeyCode::Char('7')
     };
 
-    println!("{}", "[i] Creating objects...\n".cyan());
+    println!("{}", "[i] Creating instances...\n".cyan());
     sleep(250);
 
     let player = &mut Player {
@@ -59,9 +60,9 @@ fn main() -> io::Result<()> {
         converters: 0,
         converter_price: 5000.0
     };
-    println!("{}", "[✓] Player object created".green());
+    println!("{}", "[✓] Player instance created".green());
     sleep(100);
-    read_data(player);
+    read_player_data(player);
     println!("{} {}", "  ┗━[i] Loaded player: ".cyan(), player.nickname);
     sleep(250);
 
@@ -76,7 +77,7 @@ fn main() -> io::Result<()> {
         bytestring_8: 0b0000_0000u8,
     };
 
-    println!("{}", "[✓] Bytestrings object created".green());
+    println!("{}", "[✓] Bytestrings instance created".green());
     sleep(100);
 
 
@@ -85,7 +86,8 @@ fn main() -> io::Result<()> {
         music_volume: 0.5,
         frame_delay: 65
     };
-    println!("{}", "[✓] Settings object created".green());
+    println!("{}", "[✓] Settings instance created".green());
+    read_settings_data(settings);
     sleep(100);
 
     let game = &mut GameState {
@@ -94,7 +96,7 @@ fn main() -> io::Result<()> {
         progress_level: 1
     };
 
-    println!("{}", "[✓] Game object created\n".green());
+    println!("{}", "[✓] GameState instance created\n".green());
     sleep(100);
 
     println!("{}", "[i] Attempting to connect to Discord client...".cyan());
@@ -105,7 +107,7 @@ fn main() -> io::Result<()> {
         println!("{}", "[✓] Connected successfully\n".green());
     }
     if client.connect().is_err() {
-        println!("{}", "[!] Connection failed\n".truecolor(200,100,0));
+        println!("{}", "[!] Connection failed\n".truecolor(250,125,0));
     }
     let client_state = client.connect().is_ok();
 
@@ -125,6 +127,7 @@ fn main() -> io::Result<()> {
     let mut current_screen = Screens::Start;
     let mut prev_was_ingame = false;
     let mut key_is_selected = false;
+    let mut miner_list: Vec<Miner> = Vec::new();
 
     /*
     let (_stream,stream_handle) = OutputStream::try_default().unwrap();
@@ -141,7 +144,7 @@ fn main() -> io::Result<()> {
 
     let mut os_is_android = false;
     #[cfg(target_arch = "aarch64")] {
-        println!("{}", "\n[!] target architecture doesn't support audio".truecolor(200,100,0));
+        println!("{}", "\n[!] target architecture doesn't support audio".truecolor(250,125,0));
         os_is_android = true;
         sleep(250);
     }
@@ -169,6 +172,9 @@ fn main() -> io::Result<()> {
                         sink_sfx.append(get_source("interact.mp3"));
                         definitions::sleep(300);
                         ratatui::restore();
+                        for i in 0..miner_list.len() {
+                            println!("Miner {} ID: {}", i, miner_list[i].id);
+                        }
                         return Ok(());
                     }
 
@@ -224,6 +230,7 @@ fn main() -> io::Result<()> {
                     }
 
                     if key.code == keybinds.back  {
+                        save_settings_data(settings);
                         if prev_was_ingame {
                             current_screen = Screens::Game;
                         } else {current_screen = Screens::Start;}
@@ -342,8 +349,6 @@ fn main() -> io::Result<()> {
 
                 if let event::Event::Key(key) = event::read()? {
                     if key.kind == KeyEventKind::Press {
-                        if key.code == keybinds.back {break;}
-
                         if key.code == keybinds.nav_up {menu_selection-=1};
                         if key.code == keybinds.nav_down && menu_selection >= 1 {
                             menu_selection += 1;
@@ -360,7 +365,7 @@ fn main() -> io::Result<()> {
                                 sink_music.stop();
                                 sink_music.append(get_source("music2.mp3"));
                             }
-                            save_data(player);
+                            save_player_data(player);
                             prev_was_ingame = false;
                             current_screen = Screens::Start;
                             game.rich_presence_state = "In Main Menu".to_string();
@@ -422,6 +427,11 @@ fn main() -> io::Result<()> {
                             player.miners += 1;
                             player.money -= player.miner_price;
                             player.miner_price *= 1.5;
+                            miner_list.push(Miner {
+                                id: rand::random_range(10000..99999),
+                                integrity: 100,
+                                efficiency: 1
+                            });
                             continue;
                         }
 
