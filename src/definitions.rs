@@ -143,10 +143,10 @@ pub fn read_settings_data(
     sleep(250);
 
     settings.sfx_volume = data.get("sfx_volume").expect("Value must exist")
-        .as_f64().expect("Could not convert value");
+        .as_f64().expect("Could not convert value") as f32;
 
     settings.music_volume = data.get("music_volume").expect("Value must exist")
-        .as_f64().expect("Could not convert value");
+        .as_f64().expect("Could not convert value") as f32;
 
     settings.frame_delay = data.get("frame_delay").expect("Value must exist")
         .as_u64().expect("Could not convert value");
@@ -192,7 +192,8 @@ pub fn read_gamedata(miner_list: &mut Vec<Miner>) -> &mut Vec<Miner> {
     let miner: serde_json::Value = serde_json::from_reader(&file).expect(&"    [X] Keybinds file must exist".bold().red());
 
     for i in 0..50 {
-        miner_list[i].id = miner.get("ID").expect("Value must exist");
+        miner_list[i].id = miner.get("ID").expect("Value must exist")
+            .as_u64().expect("Could not convert Value") as u32;
     }
 
     drop(file);

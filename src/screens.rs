@@ -35,13 +35,13 @@ pub fn render_main_menu(
 
         let empty = Line::from("");
 
-        let info = Line::from("Build date: 28.03.2025").centered();
+        let info  = Line::from("Build date: 01.04.2025").centered();
 
         let news  = Line::from("What's new?                       ").centered().underlined();
         let news1 = Line::from("- Fixed bug occuring when changing").centered();
         let news2 = Line::from("  a keybind on desktop systems    ").centered();
 
-        let title = Line::from("CLI-Miner »«  |  V0.2.3 Dev Build")
+        let title = Line::from("CLI-Miner »«  |  V0.2.4 Dev Build")
             .magenta()
             .centered()
             .bold()
@@ -62,7 +62,7 @@ pub fn render_main_menu(
             .centered()
             .red();
 
-        if client == true {
+        if client {
             client_message = Line::from("Connected to Discord client")
             .centered()
             .green();
@@ -70,7 +70,7 @@ pub fn render_main_menu(
 
         let mut os_message = Line::from("");
 
-        if os_is_android == true {
+        if os_is_android {
             os_message = Line::from("Due to compatibility issues with Android audio playback is not working yet")
             .white()
             .on_red()

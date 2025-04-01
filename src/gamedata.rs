@@ -21,8 +21,8 @@ pub struct GameState {
 
 #[derive(Serialize, Deserialize)]
 pub struct GameSettings {
-    pub sfx_volume: f64,
-    pub music_volume: f64,
+    pub sfx_volume: f32,
+    pub music_volume: f32,
     pub frame_delay: u64
 }
 

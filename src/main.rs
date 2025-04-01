@@ -130,7 +130,7 @@ fn main() -> io::Result<()> {
     let mut key_is_selected = false;
     let mut miner_list: Vec<Miner> = Vec::new();
 
-    /*
+    
     let (_stream,stream_handle) = OutputStream::try_default().unwrap();
     let sink_music = Sink::try_new(&stream_handle).unwrap();
     let sink_sfx = Sink::try_new(&stream_handle).unwrap();
@@ -140,7 +140,7 @@ fn main() -> io::Result<()> {
 
     sink_sfx.append(get_source("interact.mp3"));
     sink_music.append(get_source("music2.mp3"));
-    sink_sfx.sleep_until_end();*/
+    sink_sfx.sleep_until_end();
 
 
     let mut os_is_android = false;
@@ -350,9 +350,15 @@ fn main() -> io::Result<()> {
 
                 if let event::Event::Key(key) = event::read()? {
                     if key.kind == KeyEventKind::Press {
-                        if key.code == keybinds.nav_up {menu_selection-=1};
+                        if key.code == keybinds.nav_up {
+                            menu_selection-=1;
+                            #[cfg(not(target_arch = "aarch64"))]
+                            sink_sfx.append(get_source("interact.mp3"));
+                        };
                         if key.code == keybinds.nav_down && menu_selection >= 1 {
                             menu_selection += 1;
+                            #[cfg(not(target_arch = "aarch64"))]
+                            sink_sfx.append(get_source("interact.mp3"));
                         }
                         match menu_selection {
                             0 => menu_selection = 1,
