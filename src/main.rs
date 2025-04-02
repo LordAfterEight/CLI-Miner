@@ -130,7 +130,7 @@ fn main() -> io::Result<()> {
     let mut key_is_selected = false;
     let mut miner_list: Vec<Miner> = Vec::new();
 
-    
+    /*
     let (_stream,stream_handle) = OutputStream::try_default().unwrap();
     let sink_music = Sink::try_new(&stream_handle).unwrap();
     let sink_sfx = Sink::try_new(&stream_handle).unwrap();
@@ -141,6 +141,7 @@ fn main() -> io::Result<()> {
     sink_sfx.append(get_source("interact.mp3"));
     sink_music.append(get_source("music2.mp3"));
     sink_sfx.sleep_until_end();
+    */
 
 
     let mut os_is_android = false;
@@ -245,11 +246,17 @@ fn main() -> io::Result<()> {
                             1 => settings.frame_delay += 1,
                             2 => settings.sfx_volume += 0.05,
                             3 => settings.music_volume += 0.05,
-                            _ => {} //sink_sfx.append(get_source("fail.mp3"))
+                            _ => {
+                                #[cfg(not(target_arch = "aarch64"))]
+                                sink_sfx.append(get_source("fail.mp3"));
+                            }
                         },
                         KeyCode::Char('-') => match setting_position {
                             1 => match settings.frame_delay {
-                                1 => {}, //sink_sfx.append(get_source("fail.mp3")),
+                                1 => {
+                                    #[cfg(not(target_arch = "aarch64"))]
+                                    sink_sfx.append(get_source("fail.mp3"));
+                                },
                                 _ => settings.frame_delay -= 1},
                             2 => match settings.sfx_volume {
                                 0.0 => settings.sfx_volume = 0.0,
@@ -281,13 +288,19 @@ fn main() -> io::Result<()> {
                 if key.kind == KeyEventKind::Press {
                     if key.code == keybinds.back {
                         current_screen = Screens::Settings;
+                        #[cfg(not(target_arch = "aarch64"))]
+                        sink_sfx.append(get_source("fail.mp3"));
                     }
 
                     if key.code == keybinds.nav_up && keybind_selection >= 1 {
-                        keybind_selection-=1
+                        keybind_selection -= 1;
+                        #[cfg(not(target_arch = "aarch64"))]
+                        sink_sfx.append(get_source("fail.mp3"));
                     };
                     if key.code == keybinds.nav_down {
                         keybind_selection += 1;
+                        #[cfg(not(target_arch = "aarch64"))]
+                        sink_sfx.append(get_source("fail.mp3"));
                     }
                     match keybind_selection {
                         0 => keybind_selection = 8,
@@ -297,7 +310,8 @@ fn main() -> io::Result<()> {
 
                     if key.code == keybinds.enter && key_is_selected == false {
                         key_is_selected=true;
-                        sleep(250);
+                        #[cfg(not(target_arch = "aarch64"))]
+                        sink_sfx.append(get_source("fail.mp3"));
                     };
 
                     while key_is_selected {
@@ -309,20 +323,22 @@ fn main() -> io::Result<()> {
                         );
 
                         if let event::Event::Key(input) = event::read()? {
-                            match keybind_selection {
-                                1 => keybinds.back = input.code,
-                                2 => keybinds.enter = input.code,
-                                3 => keybinds.nav_up = input.code,
-                                4 => keybinds.nav_down = input.code,
-                                5 => keybinds.use_miner = input.code,
-                                6 => keybinds.use_converter = input.code,
-                                7 => keybinds.sell_bits = input.code,
-                                8 => keybinds.sell_bytes = input.code,
-                                _ => {}
+                            if input.kind == KeyEventKind::Press {
+                                match keybind_selection {
+                                    1 => keybinds.back = input.code,
+                                    2 => keybinds.enter = input.code,
+                                    3 => keybinds.nav_up = input.code,
+                                    4 => keybinds.nav_down = input.code,
+                                    5 => keybinds.use_miner = input.code,
+                                    6 => keybinds.use_converter = input.code,
+                                    7 => keybinds.sell_bits = input.code,
+                                    8 => keybinds.sell_bytes = input.code,
+                                    _ => {}
+                                }
+                                key_is_selected = false;
+                                sleep(250);
+                                break;
                             }
-                            key_is_selected = false;
-                            sleep(250);
-                            break;
                         }
                     }
                 }
@@ -354,11 +370,13 @@ fn main() -> io::Result<()> {
                             menu_selection-=1;
                             #[cfg(not(target_arch = "aarch64"))]
                             sink_sfx.append(get_source("interact.mp3"));
+                            continue;
                         };
                         if key.code == keybinds.nav_down && menu_selection >= 1 {
                             menu_selection += 1;
                             #[cfg(not(target_arch = "aarch64"))]
                             sink_sfx.append(get_source("interact.mp3"));
+                            continue;
                         }
                         match menu_selection {
                             0 => menu_selection = 1,
@@ -488,6 +506,8 @@ fn main() -> io::Result<()> {
             if let event::Event::Key(key) = event::read()? {
                 if key.kind == KeyEventKind::Press {
                     if key.code == keybinds.back {
+                        #[cfg(not(target_arch = "aarch64"))]
+                        sink_sfx.append(get_source("interact.mp3"));
                         current_screen = Screens::Game;
                     }
 
