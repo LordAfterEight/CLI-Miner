@@ -1,9 +1,9 @@
 Todo list is ranked by priority
 
 1. Menus/Windows (and functional switching between them):
-  - [X] Main menu
-  - [X] Settings menu (WIP)
-  - [X] Game (WIP)
+    - [X] Main menu
+    - [X] Settings menu (WIP)
+    - [X] Game (WIP)
 
 2. Game mechanics:
     1. [X] Basics (mining, selling, buying)
