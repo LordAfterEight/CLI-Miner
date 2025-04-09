@@ -7,7 +7,7 @@ Todo list is ranked by priority
 
 2. Game mechanics:
     1. [X] Basics (mining, selling, buying)
-    2. [X] Game saving (? [ ] autosave)
+    2. [X] Game saving ([ ] ? autosave)
     3. [X] Expanded basics (converting, etc.)
     4. [ ] Intermediate Processing (i.e. data strings)
     5. [ ] QoL: Automation
@@ -17,7 +17,7 @@ Todo list is ranked by priority
         - [ ] Defenses: Firewall, Antivirus, etc.
         - [ ] Security scans, corruption of data
         - [ ] Extra hard viruses ("Bosses") to defend from
-        - ? [ ] Attacking sources of viruses
+        - [ ] ? Attacking sources of viruses
     8. [ ] Advanced Tech (e.g. ?)
 
 3. Sound:
