@@ -11,7 +11,7 @@ use crate::{
     GameSettings,
     Bytestrings,
     Keybinds,
-    Miner,
+    Device,
     sleep,
     binary_to_string
 };
@@ -35,13 +35,14 @@ pub fn render_main_menu(
 
         let empty = Line::from("");
 
-        let info  = Line::from("Build date: 01.04.2025").centered();
+        let info  = Line::from("Build date: 11.04.2025").centered();
 
-        let news  = Line::from("What's new?                       ").centered().underlined();
-        let news1 = Line::from("- Fixed bug occuring when changing").centered();
-        let news2 = Line::from("  a keybind on desktop systems    ").centered();
+        let news  = Line::from("What's new?                              ").centered().underlined();
+        let news1 = Line::from("- Added volume warning for sound settings").centered();
+        let news2 = Line::from("- Replaced game soundtrack               ").centered();
+        let news3 = Line::from("- ").centered();
 
-        let title = Line::from("CLI-Miner »«  |  V0.2.4 Dev Build")
+        let title = Line::from("CLI-Miner »«  |  V0.2.5 Dev Build")
             .magenta()
             .centered()
             .bold()
@@ -143,6 +144,9 @@ pub fn render_settings_menu(
             4 => keybind_menu=keybind_menu.black().on_white(),
             _ => ()
         }
+
+        if settings.sfx_volume > 1.0 {sfx_volume = sfx_volume.light_red()}
+        if settings.music_volume > 1.0 {music_volume = music_volume.light_red()}
 
         let game_ui = Text::from(vec![
             back,
@@ -374,7 +378,7 @@ pub fn render_game(
 pub fn render_device_management(
     terminal: &mut DefaultTerminal,
     player: &mut Player,
-    miner_list: &mut Vec<Miner>
+    miner_list: &mut Vec<Device>
 ) {
     let _ = terminal.draw(|frame| {
 

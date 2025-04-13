@@ -1,7 +1,7 @@
 use std::{thread,time};
 use std::fs::File;
 use std::io::{BufReader, BufWriter, Read, Write, Seek, SeekFrom};
-use crate::{Bytestrings, Player, Keybinds, GameSettings, Miner, rand, rand::Rng};
+use crate::{Bytestrings, Player, Keybinds, GameSettings, Device, rand, rand::Rng};
 use serde_json;
 use serde_json::{json, Value};
 use colored::Colorize;
@@ -156,7 +156,7 @@ pub fn read_settings_data(
     return settings
 }
 
-pub fn save_gamedata(miner_list: &mut Vec<Miner>) {
+pub fn save_gamedata(miner_list: &mut Vec<Device>) {
     let filepath = "../data/gamedata.json";
     let mut file = File::options()
         .read(true)
@@ -179,17 +179,17 @@ pub fn save_gamedata(miner_list: &mut Vec<Miner>) {
     drop(file);
 }
 
-pub fn read_gamedata(miner_list: &mut Vec<Miner>) -> &mut Vec<Miner> {
+pub fn read_gamedata(miner_list: &mut Vec<Device>) -> &mut Vec<Device> {
     let file = match File::open("../data/gamedata.json") {
         Ok(file) => file,
         Err(error) => panic!("{} {}\n{}",
             "    [X] Error while opening file: ".bold().red(),
             error,
-            "Check if 'keybinds.json' is at CLI-Miner/data/".yellow()
+            "Check if 'gamedata.json' is at CLI-Miner/data/".yellow()
         )
     };
 
-    let miner: serde_json::Value = serde_json::from_reader(&file).expect(&"    [X] Keybinds file must exist".bold().red());
+    let miner: serde_json::Value = serde_json::from_reader(&file).expect(&"    [X] gamedata file must exist".bold().red());
 
     for i in 0..50 {
         miner_list[i].id = miner.get("ID").expect("Value must exist")

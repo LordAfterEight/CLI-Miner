@@ -32,7 +32,21 @@ enum Screens {
 
 
 fn main() -> io::Result<()> {
+
+    let mut setting_position = 1;
+    let mut menu_selection = 1;
+    let mut keybind_selection = 1;
+    let mut current_screen = Screens::Start;
+    let mut prev_was_ingame = false;
+    let mut key_is_selected = false;
+    let mut miner_list: Vec<Device> = Vec::new();
+
+    let (_stream,stream_handle) = OutputStream::try_default().unwrap();
+    let sink_music = Sink::try_new(&stream_handle).unwrap();
+    let sink_sfx = Sink::try_new(&stream_handle).unwrap();
     let mut world = World::new();
+
+
     clearscreen::clear();
 
     let keybinds = &mut Keybinds {
@@ -122,27 +136,12 @@ fn main() -> io::Result<()> {
         .assets(small_image)
     );
 
-    let mut setting_position = 1;
-    let mut menu_selection = 1;
-    let mut keybind_selection = 1;
-    let mut current_screen = Screens::Start;
-    let mut prev_was_ingame = false;
-    let mut key_is_selected = false;
-    let mut miner_list: Vec<Miner> = Vec::new();
-
-    /*
-    let (_stream,stream_handle) = OutputStream::try_default().unwrap();
-    let sink_music = Sink::try_new(&stream_handle).unwrap();
-    let sink_sfx = Sink::try_new(&stream_handle).unwrap();
-
     sink_sfx.set_volume(settings.sfx_volume);
     sink_music.set_volume(settings.music_volume);
 
     sink_sfx.append(get_source("interact.mp3"));
     sink_music.append(get_source("music2.mp3"));
     sink_sfx.sleep_until_end();
-    */
-
 
     let mut os_is_android = false;
     #[cfg(target_arch = "aarch64")] {
@@ -461,7 +460,7 @@ fn main() -> io::Result<()> {
                             player.miners += 1;
                             player.money -= player.miner_price;
                             player.miner_price *= 1.5;
-                            miner_list.push(Miner {
+                            miner_list.push(Device {
                                 id: rand::random_range(10000..99999),
                                 integrity: 100,
                                 efficiency: 1

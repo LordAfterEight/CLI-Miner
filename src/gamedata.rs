@@ -52,21 +52,7 @@ pub struct Keybinds {
 }
 
 #[derive(Serialize, Deserialize)]
-pub struct Miner {
-    pub id: u32,
-    pub integrity: u8,
-    pub efficiency: u8
-}
-
-#[derive(Serialize, Deserialize)]
-pub struct Converter {
-    pub id: u32,
-    pub integrity: u8,
-    pub efficiency: u8
-}
-
-#[derive(Serialize, Deserialize)]
-pub struct Extractor {
+pub struct Device {
     pub id: u32,
     pub integrity: u8,
     pub efficiency: u8
