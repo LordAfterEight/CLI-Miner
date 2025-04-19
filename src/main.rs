@@ -12,10 +12,8 @@ use discord_rich_presence::{
     DiscordIpc, 
     DiscordIpcClient};
 use rand;
-use rand::Rng;
 use clearscreen;
 use colored::Colorize;
-use hecs::World;
 
 #[cfg(not(target_arch = "aarch64"))]
 use rodio::{OutputStream, Sink};
@@ -44,10 +42,9 @@ fn main() -> io::Result<()> {
     let (_stream,stream_handle) = OutputStream::try_default().unwrap();
     let sink_music = Sink::try_new(&stream_handle).unwrap();
     let sink_sfx = Sink::try_new(&stream_handle).unwrap();
-    let mut world = World::new();
 
 
-    clearscreen::clear();
+    _ = clearscreen::clear();
 
     let keybinds = &mut Keybinds {
         back: KeyCode::Char('q'),
@@ -143,7 +140,8 @@ fn main() -> io::Result<()> {
     sink_music.append(get_source("music2.mp3"));
     sink_sfx.sleep_until_end();
 
-    let mut os_is_android = false;
+    #[cfg(target_arch = "x86_64")]
+    let os_is_android = false;
     #[cfg(target_arch = "aarch64")] {
         println!("{}", "\n[!] target architecture doesn't support audio".truecolor(250,125,0));
         os_is_android = true;
@@ -164,6 +162,11 @@ fn main() -> io::Result<()> {
                 os_is_android,
                 keybinds
             );
+
+            #[cfg(not(target_arch = "aarch64"))]
+            if sink_music.len() < 1 {
+                sink_music.append(get_source("music2.mp3"));
+            }
 
             if let event::Event::Key(key) = event::read()? {
                 if key.kind == KeyEventKind::Press {
@@ -202,11 +205,6 @@ fn main() -> io::Result<()> {
                     }
                     else {continue}
                 }
-            }
-
-            #[cfg(not(target_arch = "aarch64"))]
-            if sink_music.len() == 0 {
-                sink_music.append(get_source("music2.mp3"));
             }
         }
 
@@ -344,12 +342,10 @@ fn main() -> io::Result<()> {
             }
         }
 
-        #[cfg(not(target_arch = "aarch64"))]
-        if sink_music.len() == 0 {
-            sink_music.append(get_source("music2.mp3"));
-        }
-
         while current_screen == Screens::Game {     //GAME
+            #[cfg(not(target_arch = "aarch64"))]
+            if sink_music.len() < 1 {sink_music.append(get_source("music1.mp3"));}
+
             render_game(
                 &mut terminal,
                 player,
@@ -361,7 +357,6 @@ fn main() -> io::Result<()> {
             definitions::sleep(settings.frame_delay);
 
             if game.progress_level == 1 {
-
 
                 if let event::Event::Key(key) = event::read()? {
                     if key.kind == KeyEventKind::Press {
@@ -485,13 +480,6 @@ fn main() -> io::Result<()> {
                         }
                     }
                 }
-
-                #[cfg(not(target_arch = "aarch64"))]
-                if sink_music.len() == 0 {
-                    sink_music.append(get_source("music1.mp3"));
-                }
-
-
             }
         }
 

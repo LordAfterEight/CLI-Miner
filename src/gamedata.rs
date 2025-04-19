@@ -1,5 +1,5 @@
 use serde_derive::{Serialize, Deserialize};
-use ratatui::crossterm::event::{self, KeyCode, KeyEventKind};
+use ratatui::crossterm::event::KeyCode;
 #[derive(Serialize, Deserialize)]
 pub struct Player {
     pub nickname: String,

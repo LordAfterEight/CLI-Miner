@@ -12,7 +12,6 @@ use crate::{
     Bytestrings,
     Keybinds,
     Device,
-    sleep,
     binary_to_string
 };
 
@@ -40,7 +39,7 @@ pub fn render_main_menu(
         let news  = Line::from("What's new?                              ").centered().underlined();
         let news1 = Line::from("- Added volume warning for sound settings").centered();
         let news2 = Line::from("- Replaced game soundtrack               ").centered();
-        let news3 = Line::from("- ").centered();
+        let _news3 = Line::from("- ").centered();
 
         let title = Line::from("CLI-Miner »«  |  V0.2.5 Dev Build")
             .magenta()
@@ -264,7 +263,7 @@ pub fn render_game(
     keybinds: &mut Keybinds
 ) {
     let _ = terminal.draw(|frame| {
-        let mut nav_info = Line::from("Navigate with arrow keys");
+        let nav_info = Line::from("Navigate with arrow keys");
         let empty = Line::from("");
         let mut mainmenu = Line::from(format!("Main menu"))
             .light_red();
@@ -377,7 +376,7 @@ pub fn render_game(
 
 pub fn render_device_management(
     terminal: &mut DefaultTerminal,
-    player: &mut Player,
+    _player: &mut Player,
     miner_list: &mut Vec<Device>
 ) {
     let _ = terminal.draw(|frame| {

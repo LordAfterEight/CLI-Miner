@@ -1,7 +1,7 @@
 use std::{thread,time};
 use std::fs::File;
-use std::io::{BufReader, BufWriter, Read, Write, Seek, SeekFrom};
-use crate::{Bytestrings, Player, Keybinds, GameSettings, Device, rand, rand::Rng};
+use std::io::{BufReader, Seek, SeekFrom};
+use crate::{Bytestrings, Player, GameSettings, Device, rand, rand::Rng};
 use serde_json;
 use serde_json::{json, Value};
 use colored::Colorize;
@@ -178,7 +178,7 @@ pub fn save_gamedata(miner_list: &mut Vec<Device>) {
     serde_json::to_writer(&file, &datastruct).unwrap();
     drop(file);
 }
-
+/*
 pub fn read_gamedata(miner_list: &mut Vec<Device>) -> &mut Vec<Device> {
     let file = match File::open("../data/gamedata.json") {
         Ok(file) => file,
@@ -199,7 +199,7 @@ pub fn read_gamedata(miner_list: &mut Vec<Device>) -> &mut Vec<Device> {
     drop(file);
     return miner_list
 }
-/*
+
 pub fn save_keybinds_data(keybinds: &mut Keybinds) {
     let filepath = "../data/keybinds.json";
     let mut file = File::options()
