@@ -1,14 +1,14 @@
 use serde_derive::{Serialize, Deserialize};
-use ratatui::crossterm::event::{self, KeyCode, KeyEventKind};
+use ratatui::crossterm::event::{KeyCode};
 #[derive(Serialize, Deserialize)]
 pub struct Player {
     pub nickname: String,
     pub money: f64,
-    pub bits: u64,
-    pub bytes: u64,
-    pub miners: u64,
+    pub bits: usize,
+    pub bytes: usize,
+    pub miners: usize,
     pub miner_price: f64,
-    pub converters: u64,
+    pub converters: usize,
     pub converter_price: f64
 }
 

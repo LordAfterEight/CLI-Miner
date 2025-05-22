@@ -1,7 +1,7 @@
 use std::{thread,time};
 use std::fs::File;
-use std::io::{BufReader, BufWriter, Read, Write, Seek, SeekFrom};
-use crate::{Bytestrings, Player, Keybinds, GameSettings, Device, rand, rand::Rng};
+use std::io::{Seek, SeekFrom};
+use crate::{Bytestrings, Player, GameSettings, Device, rand, rand::Rng};
 use serde_json;
 use serde_json::{json, Value};
 use colored::Colorize;
@@ -62,7 +62,7 @@ pub fn read_player_data(player: &mut Player) -> &mut Player {
     let playerdata = match File::open("../data/save.json") {
         Ok(file) => file,
         Err(error) => panic!("{} {}\n{}",
-            "    [X] Error while opening file: ".bold().red(),
+            "    [X] Error while opening file".bold().red(),
             error,
             "Check if 'save.json' is at CLI-Miner/data/".yellow()
         )
@@ -85,16 +85,16 @@ pub fn read_player_data(player: &mut Player) -> &mut Player {
         .as_f64().expect("Could not convert value");
 
     player.bits = data.get("bits").expect("Value must exist")
-        .as_u64().expect("Could not convert value");
+        .as_u64().expect("Could not convert value") as usize;
 
     player.bytes = data.get("bytes").expect("Value must exist")
-        .as_u64().expect("Could not convert value");
+        .as_u64().expect("Could not convert value") as usize;
 
     player.miners = data.get("miners").expect("Value must exist")
-        .as_u64().expect("Could not convert value");
+        .as_u64().expect("Could not convert value") as usize;
 
     player.converters = data.get("converters").expect("Value must exist")
-        .as_u64().expect("Could not convert value");
+        .as_u64().expect("Could not convert value") as usize;
 
     drop(playerdata);
     return player
@@ -131,13 +131,13 @@ pub fn read_settings_data(
     let file = match File::open(filepath) {
         Ok(file) => file,
         Err(error) => panic!("{} {}\n{}",
-            "    [X] Error while opening file: ".bold().red(),
+            "    [X] Error while opening file".bold().red(),
             error,
             "Check if 'settings.json' is at CLI-Miner/data/".yellow()
         )
     };
 
-    let data: serde_json::Value = serde_json::from_reader(&file).expect(&"    [X] Settings file must exist".bold().red());
+    let data: serde_json::Value = serde_json::from_reader(&file).expect(&"    [X] Settings file error".bold().red());
 
     println!("{}", "  ┗━[i] Applying values...".cyan());
     sleep(250);
@@ -189,10 +189,10 @@ pub fn read_gamedata(miner_list: &mut Vec<Device>) -> &mut Vec<Device> {
         )
     };
 
-    let miner: serde_json::Value = serde_json::from_reader(&file).expect(&"    [X] gamedata file must exist".bold().red());
+    let miner: serde_json::Value = serde_json::from_reader(&file).expect(&"    [X] Gamedata file error".bold().red());
 
     for i in 0..50 {
-        miner_list[i].id = miner.get("ID").expect("Value must exist")
+        miner_list[i].id = miner.get(format!("miner{i}")).expect("Value must exist")
             .as_u64().expect("Could not convert Value") as u32;
     }
 

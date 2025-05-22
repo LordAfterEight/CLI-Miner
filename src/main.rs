@@ -11,14 +11,12 @@ use discord_rich_presence::{
     activity::Assets,
     DiscordIpc, 
     DiscordIpcClient};
-use rand;
-use rand::Rng;
 use clearscreen;
 use colored::Colorize;
-use hecs::World;
+use rand;
 
 #[cfg(not(target_arch = "aarch64"))]
-use rodio::{OutputStream, Sink};
+use rotilities::*;
 
 
 #[derive(PartialEq, Eq)]
@@ -39,15 +37,18 @@ fn main() -> io::Result<()> {
     let mut current_screen = Screens::Start;
     let mut prev_was_ingame = false;
     let mut key_is_selected = false;
-    let mut miner_list: Vec<Device> = Vec::new();
-
-    let (_stream,stream_handle) = OutputStream::try_default().unwrap();
-    let sink_music = Sink::try_new(&stream_handle).unwrap();
-    let sink_sfx = Sink::try_new(&stream_handle).unwrap();
-    let mut world = World::new();
+    let mut miner_list = &mut Vec::new();
+    let mut miner_list = read_gamedata(&mut miner_list);
 
 
-    clearscreen::clear();
+    #[cfg(not(target_arch = "aarch64"))] {
+        let (_stream,stream_handle) = init();
+        let sink_music = new_sink(&stream_handle);
+        let sink_sfx = new_sink(&stream_handle);
+    }
+
+
+    _ = clearscreen::clear();
 
     let keybinds = &mut Keybinds {
         back: KeyCode::Char('q'),
@@ -70,7 +71,7 @@ fn main() -> io::Result<()> {
         money: 0.0,
         bits: 0,
         bytes: 0,
-        miners: 1,
+        miners: miner_list.len(),
         miner_price: 60.0,
         converters: 0,
         converter_price: 5000.0
@@ -136,12 +137,12 @@ fn main() -> io::Result<()> {
         .assets(small_image)
     );
 
-    sink_sfx.set_volume(settings.sfx_volume);
-    sink_music.set_volume(settings.music_volume);
-
-    sink_sfx.append(get_source("interact.mp3"));
-    sink_music.append(get_source("music2.mp3"));
-    sink_sfx.sleep_until_end();
+    #[cfg(not(target_arch = "aarch64"))] {
+        sink_sfx.set_volume(settings.sfx_volume);
+        sink_music.set_volume(settings.music_volume);
+        play_audio(&sink_sfx, "../sound/interact.mp3");
+        play_audio(&sink_music, "../sound/music2.mp3");
+    }
 
     let mut os_is_android = false;
     #[cfg(target_arch = "aarch64")] {
