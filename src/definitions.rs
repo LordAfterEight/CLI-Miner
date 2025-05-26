@@ -5,22 +5,9 @@ use crate::{Bytestrings, Player, GameSettings, Device, rand, rand::Rng};
 use serde_json;
 use serde_json::{json, Value};
 use colored::Colorize;
-#[cfg(not(target_os = "android"))]
-use rodio::Decoder;
 
 pub fn sleep(time: u64) {
     thread::sleep(time::Duration::from_millis(time));
-}
-
-#[cfg(not(target_arch = "aarch64"))]
-pub fn get_source(filename: &str) -> Decoder<BufReader<File>> {
-    let source = Decoder::new(
-        BufReader::new(
-            File::open(format!("../sound/{filename}"))
-                .expect("failed to read file")
-        )
-    );
-    return source.expect("failed to decode file")
 }
 
 pub fn binary_to_string(byte: u8) -> String {

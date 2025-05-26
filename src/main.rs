@@ -41,11 +41,11 @@ fn main() -> io::Result<()> {
     let mut miner_list = read_gamedata(&mut miner_list);
 
 
-    #[cfg(not(target_arch = "aarch64"))] {
+    //#[cfg(not(target_arch = "aarch64"))] {
         let (_stream,stream_handle) = init();
         let sink_music = new_sink(&stream_handle);
         let sink_sfx = new_sink(&stream_handle);
-    }
+    //}
 
 
     _ = clearscreen::clear();
@@ -171,7 +171,7 @@ fn main() -> io::Result<()> {
 
                     if key.code == keybinds.back  {
                         #[cfg(not(target_arch = "aarch64"))]
-                        sink_sfx.append(get_source("interact.mp3"));
+                        play_audio(&sink_sfx, "../sound/interact.mp3");
                         definitions::sleep(300);
                         ratatui::restore();
                         for i in 0..miner_list.len() {
@@ -182,16 +182,16 @@ fn main() -> io::Result<()> {
 
                     if key.code == KeyCode::Char('e')  {
                         #[cfg(not(target_arch = "aarch64"))]
-                        sink_sfx.append(get_source("interact.mp3"));
+                        play_audio(&sink_sfx, "../sound/interact.mp3");
                         current_screen = Screens::Settings;
                         break;
                     }
 
                     if key.code == keybinds.enter {
                         #[cfg(not(target_arch = "aarch64"))] {
-                            sink_sfx.append(get_source("interact.mp3"));
-                            sink_music.stop();
-                            sink_music.append(get_source("music1.mp3"));
+                            play_audio(&sink_sfx, "../sound/interact.mp3");
+                            stop_audio(&sink_music);
+                            play_audio(&sink_music, "../sound/music1.mp3");
                         }
                         game.state="Back to Game".to_string();
                         current_screen = Screens::Game;
@@ -207,7 +207,7 @@ fn main() -> io::Result<()> {
 
             #[cfg(not(target_arch = "aarch64"))]
             if sink_music.len() == 0 {
-                sink_music.append(get_source("music2.mp3"));
+                play_audio(&sink_music, "../sound/music2.mp3");
             }
         }
 
@@ -228,7 +228,7 @@ fn main() -> io::Result<()> {
                 if key.kind == KeyEventKind::Press {
                     #[cfg(not(target_arch = "aarch64"))] {
                         sink_sfx.stop();
-                        sink_sfx.append(get_source("interact.mp3"));
+                        play_audio(&sink_sfx, "../sound/interact.mp3");
                     }
 
                     if key.code == keybinds.back  {
@@ -248,14 +248,14 @@ fn main() -> io::Result<()> {
                             3 => settings.music_volume += 0.05,
                             _ => {
                                 #[cfg(not(target_arch = "aarch64"))]
-                                sink_sfx.append(get_source("fail.mp3"));
+                                play_audio(&sink_sfx, "../sound/fail.mp3");
                             }
                         },
                         KeyCode::Char('-') => match setting_position {
                             1 => match settings.frame_delay {
                                 1 => {
                                     #[cfg(not(target_arch = "aarch64"))]
-                                    sink_sfx.append(get_source("fail.mp3"));
+                                    play_audio(&sink_sfx, "../sound/fail.mp3");
                                 },
                                 _ => settings.frame_delay -= 1},
                             2 => match settings.sfx_volume {
@@ -289,18 +289,18 @@ fn main() -> io::Result<()> {
                     if key.code == keybinds.back {
                         current_screen = Screens::Settings;
                         #[cfg(not(target_arch = "aarch64"))]
-                        sink_sfx.append(get_source("fail.mp3"));
+                        play_audio(&sink_sfx, "../sound/fail.mp3");
                     }
 
                     if key.code == keybinds.nav_up && keybind_selection >= 1 {
                         keybind_selection -= 1;
                         #[cfg(not(target_arch = "aarch64"))]
-                        sink_sfx.append(get_source("fail.mp3"));
+                        play_audio(&sink_sfx, "../sound/fail.mp3");
                     };
                     if key.code == keybinds.nav_down {
                         keybind_selection += 1;
                         #[cfg(not(target_arch = "aarch64"))]
-                        sink_sfx.append(get_source("fail.mp3"));
+                        play_audio(&sink_sfx, "../sound/fail.mp3");
                     }
                     match keybind_selection {
                         0 => keybind_selection = 8,
@@ -311,7 +311,7 @@ fn main() -> io::Result<()> {
                     if key.code == keybinds.enter && key_is_selected == false {
                         key_is_selected=true;
                         #[cfg(not(target_arch = "aarch64"))]
-                        sink_sfx.append(get_source("fail.mp3"));
+                        play_audio(&sink_sfx, "../sound/fail.mp3");
                     };
 
                     while key_is_selected {
@@ -347,7 +347,7 @@ fn main() -> io::Result<()> {
 
         #[cfg(not(target_arch = "aarch64"))]
         if sink_music.len() == 0 {
-            sink_music.append(get_source("music2.mp3"));
+            play_audio(&sink_music, "../sound/music2.mp3");
         }
 
         while current_screen == Screens::Game {     //GAME
@@ -369,13 +369,13 @@ fn main() -> io::Result<()> {
                         if key.code == keybinds.nav_up {
                             menu_selection-=1;
                             #[cfg(not(target_arch = "aarch64"))]
-                            sink_sfx.append(get_source("interact.mp3"));
+                            play_audio(&sink_sfx, "../sound/interact.mp3");
                             continue;
                         };
                         if key.code == keybinds.nav_down && menu_selection >= 1 {
                             menu_selection += 1;
                             #[cfg(not(target_arch = "aarch64"))]
-                            sink_sfx.append(get_source("interact.mp3"));
+                            play_audio(&sink_sfx, "../sound/interact.mp3");
                             continue;
                         }
                         match menu_selection {
@@ -386,9 +386,9 @@ fn main() -> io::Result<()> {
 
                         if key.code == keybinds.enter && menu_selection == 1  {
                             #[cfg(not(target_arch = "aarch64"))] {
-                                sink_sfx.append(get_source("interact.mp3"));
+                                play_audio(&sink_sfx, "../sound/interact.mp3");
                                 sink_music.stop();
-                                sink_music.append(get_source("music2.mp3"));
+                                play_audio(&sink_music, "../sound/music2.mp3");
                             }
                             save_player_data(player);
                             save_gamedata(&mut miner_list);
@@ -403,7 +403,7 @@ fn main() -> io::Result<()> {
 
                         if key.code == keybinds.enter && menu_selection == 2 {
                             #[cfg(not(target_arch = "aarch64"))]
-                            sink_sfx.append(get_source("interact.mp3"));
+                            play_audio(&sink_sfx, "../sound/interact.mp3");
                             prev_was_ingame = true;
                             current_screen = Screens::Settings;
                             break;
@@ -411,7 +411,7 @@ fn main() -> io::Result<()> {
 
                         if key.code == keybinds.enter && menu_selection == 3 {
                             #[cfg(not(target_arch = "aarch64"))]
-                            sink_sfx.append(get_source("interact.mp3"));
+                            play_audio(&sink_sfx, "../sound/interact.mp3");
                             prev_was_ingame = true;
                             current_screen = Screens::DeviceManagement;
                             break;
@@ -420,7 +420,7 @@ fn main() -> io::Result<()> {
                         if key.code == keybinds.use_miner  {
                             #[cfg(not(target_arch = "aarch64"))] {
                                 sink_sfx.stop();
-                                sink_sfx.append(get_source("mining.mp3"));
+                                play_audio(&sink_sfx, "../sound/mining.mp3");
                             }
                             generate_bytes(bytestrings); //Just for testing purposes
                             player.bits += 1*&player.miners;
@@ -429,7 +429,7 @@ fn main() -> io::Result<()> {
 
                         if key.code == keybinds.sell_bits && player.bits > 0 {
                             #[cfg(not(target_arch = "aarch64"))]
-                            sink_sfx.append(get_source("sell.mp3"));
+                            play_audio(&sink_sfx, "../sound/sell.mp3");
                             player.money += player.bits as f64;
                             player.bits = 0;
                             continue;
@@ -437,7 +437,7 @@ fn main() -> io::Result<()> {
 
                         if key.code == keybinds.sell_bytes && player.bytes > 0 {
                             #[cfg(not(target_arch = "aarch64"))]
-                            sink_sfx.append(get_source("sell.mp3"));
+                            play_audio(&sink_sfx, "../sound/sell.mp3");
                             player.money += player.bytes as f64 * 10.0;
                             player.bytes = 0;
                             continue;
@@ -446,7 +446,7 @@ fn main() -> io::Result<()> {
                         if key.code == keybinds.use_converter && player.bits >= 8*player.converters {
                             #[cfg(not(target_arch = "aarch64"))] {
                                 sink_sfx.stop();
-                                sink_sfx.append(get_source("interact.mp3"));
+                                play_audio(&sink_sfx, "../sound/interact.mp3");
                             }
                             player.bytes += 1*player.converters;
                             player.bits -= 8*player.converters;
@@ -456,7 +456,7 @@ fn main() -> io::Result<()> {
                         if key.code == keybinds.buy_miner && player.money >= player.miner_price {
                             #[cfg(not(target_arch = "aarch64"))] {
                                 sink_sfx.stop();
-                                sink_sfx.append(get_source("bought.mp3"));
+                                play_audio(&sink_sfx, "../sound/bought.mp3");
                             }
                             player.miners += 1;
                             player.money -= player.miner_price;
@@ -472,7 +472,7 @@ fn main() -> io::Result<()> {
                         if key.code == keybinds.buy_converter && player.money >= player.converter_price {
                             #[cfg(not(target_arch = "aarch64"))] {
                                 sink_sfx.stop();
-                                sink_sfx.append(get_source("bought.mp3"));
+                                play_audio(&sink_sfx, "../sound/bought.mp3");
                             }
                             player.converters += 1;
                             player.money -= player.converter_price;
@@ -482,14 +482,14 @@ fn main() -> io::Result<()> {
 
                         else {
                             #[cfg(not(target_arch = "aarch64"))]
-                            sink_sfx.append(get_source("fail.mp3"));
+                            play_audio(&sink_sfx, "../sound/fail.mp3");
                         }
                     }
                 }
 
                 #[cfg(not(target_arch = "aarch64"))]
                 if sink_music.len() == 0 {
-                    sink_music.append(get_source("music1.mp3"));
+                    play_audio(&sink_music, "../sound/music1.mp3");
                 }
 
 
@@ -507,7 +507,7 @@ fn main() -> io::Result<()> {
                 if key.kind == KeyEventKind::Press {
                     if key.code == keybinds.back {
                         #[cfg(not(target_arch = "aarch64"))]
-                        sink_sfx.append(get_source("interact.mp3"));
+                        play_audio(&sink_sfx, "../sound/interact.mp3");
                         current_screen = Screens::Game;
                     }
 
