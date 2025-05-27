@@ -126,7 +126,8 @@ pub fn render_main_menu(
                 .border_type(BorderType::Thick)
                 .padding(Padding::vertical(1))
                 .title(" Main Menu ")
-                .title_alignment(Alignment::Center))
+                .title_alignment(Alignment::Center)
+                .title_bottom(" Made by Elias Stettmayer | © 2025 "))
             .white()
             .bg(Color::Indexed(232));
 
