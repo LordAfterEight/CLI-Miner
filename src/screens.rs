@@ -279,7 +279,7 @@ pub fn render_keybinds_menu(
 
         let menu_ui = Paragraph::new(Text::from(game_ui))
             .block(Block::bordered()
-            .border_type(BorderType::Double)
+            .border_type(BorderType::Thick)
             .padding(Padding::proportional(1))
             .title(" Settings >> Keybinds ")
             .title_alignment(Alignment::Center))
@@ -345,7 +345,7 @@ pub fn render_game(
 
         let menus_ui = Paragraph::new(Text::from(menus))
             .block(Block::bordered()
-            .border_type(BorderType::Rounded)
+            .border_type(BorderType::Thick)
             .padding(Padding::proportional(1))
             .title(" Menus ")
             .title_alignment(Alignment::Center))
@@ -354,7 +354,7 @@ pub fn render_game(
 
         let resources_ui = Paragraph::new(resources)
             .block(Block::bordered()
-            .border_type(BorderType::Rounded)
+            .border_type(BorderType::Thick)
             .padding(Padding::proportional(1))
             .title(" Resources ")
             .title_alignment(Alignment::Center))
@@ -363,7 +363,7 @@ pub fn render_game(
 
         let devices_ui = Paragraph::new(devices)
             .block(Block::bordered()
-            .border_type(BorderType::Rounded)
+            .border_type(BorderType::Thick)
             .padding(Padding::proportional(1))
             .title(" Devices ")
             .title_alignment(Alignment::Center))
@@ -392,7 +392,7 @@ pub fn render_game(
 
         let data_ui = Paragraph::new(data)
             .block(Block::bordered()
-            .border_type(BorderType::Rounded)
+            .border_type(BorderType::Thick)
             .padding(Padding::proportional(1))
             .title(" Bytes | Data Strings ")
             .title_alignment(Alignment::Center))
@@ -424,7 +424,7 @@ pub fn render_device_management(
 
         let devices_ui = Paragraph::new(devices)
             .block(Block::bordered()
-            .border_type(BorderType::Rounded)
+            .border_type(BorderType::Thick)
             .padding(Padding::proportional(1))
             .title(" Device Management ")
             .title_alignment(Alignment::Center))
