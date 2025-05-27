@@ -1,7 +1,7 @@
 use ratatui::{
     text::{Text,Line,Span},
     layout::Alignment,
-    style::Stylize,
+    style::{Stylize,Color},
     widgets::{Paragraph,Block,BorderType,Padding},
     DefaultTerminal,
     prelude::{Constraint,Layout,Rect,Direction}
@@ -128,15 +128,15 @@ pub fn render_main_menu(
                 .title(" Main Menu ")
                 .title_alignment(Alignment::Center))
             .white()
-            .on_black();
+            .bg(Color::Indexed(232));
 
         let news_block = Paragraph::new(Text::from(news_vec))
             .block(Block::bordered()
-                .border_type(BorderType::Rounded)
+                .border_type(BorderType::Thick)
                 .padding(Padding::vertical(2))
                 .title(" What's new? "))
             .white()
-            .on_black();
+            .bg(Color::Indexed(233));
 
         let news_area = centered_rect(50, 30, frame.area());
 
@@ -200,7 +200,7 @@ pub fn render_settings_menu(
             .title(" Settings ")
             .title_alignment(Alignment::Center))
             .white()
-            .on_black();
+            .bg(Color::Indexed(232));
 
         frame.render_widget(menu_ui, frame.area());
     });
@@ -284,7 +284,7 @@ pub fn render_keybinds_menu(
             .title(" Settings >> Keybinds ")
             .title_alignment(Alignment::Center))
             .white()
-            .on_black();
+            .bg(Color::Indexed(232));
 
         frame.render_widget(menu_ui, frame.area());
     });
@@ -350,7 +350,7 @@ pub fn render_game(
             .title(" Menus ")
             .title_alignment(Alignment::Center))
             .white()
-            .on_black();
+            .bg(Color::Indexed(232));
 
         let resources_ui = Paragraph::new(resources)
             .block(Block::bordered()
@@ -359,7 +359,7 @@ pub fn render_game(
             .title(" Resources ")
             .title_alignment(Alignment::Center))
             .white()
-            .on_black();
+            .bg(Color::Indexed(232));
 
         let devices_ui = Paragraph::new(devices)
             .block(Block::bordered()
@@ -368,7 +368,7 @@ pub fn render_game(
             .title(" Devices ")
             .title_alignment(Alignment::Center))
             .white()
-            .on_black();
+            .bg(Color::Indexed(232));
 
         let bytestring1 = draw_data(bytestrings.bytestring_1);
         let bytestring2 = draw_data(bytestrings.bytestring_2);
@@ -397,7 +397,7 @@ pub fn render_game(
             .title(" Bytes | Data Strings ")
             .title_alignment(Alignment::Center))
             .light_green()
-            .on_black();
+            .bg(Color::Indexed(232));
 
         let [left, right] = Layout::horizontal([Constraint::Fill(1); 2]).areas(frame.area());
         let [top, middle, bottom] = Layout::vertical([Constraint::Fill(1); 3]).areas(left);
@@ -429,7 +429,7 @@ pub fn render_device_management(
             .title(" Device Management ")
             .title_alignment(Alignment::Center))
             .white()
-            .on_black();
+            .bg(Color::Indexed(232));
 
 
         frame.render_widget(devices_ui, frame.area());
