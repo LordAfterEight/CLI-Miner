@@ -4,7 +4,7 @@ use ratatui::{
     style::Stylize,
     widgets::{Paragraph,Block,BorderType,Padding},
     DefaultTerminal,
-    prelude::{Constraint,Layout}
+    prelude::{Constraint,Layout,Rect,Direction}
 };
 use crate::{
     Player,
@@ -23,6 +23,28 @@ fn draw_data(byte: u8) -> Line<'static> {
     return data
 }
 
+fn centered_rect(percent_x: u16, percent_y: u16, r: Rect) -> Rect {
+    // Cut the given rectangle into three vertical pieces
+    let popup_layout = Layout::default()
+        .direction(Direction::Vertical)
+        .constraints([
+            Constraint::Percentage((100 - percent_y) / 2),
+            Constraint::Percentage(percent_y),
+            Constraint::Percentage((100 - percent_y) / 2),
+        ])
+        .split(r);
+
+    // Then cut the middle vertical piece into three width-wise pieces
+    Layout::default()
+        .direction(Direction::Horizontal)
+        .constraints([
+            Constraint::Percentage((100 - percent_x) / 2),
+            Constraint::Percentage(percent_x),
+            Constraint::Percentage((100 - percent_x) / 2),
+        ])
+        .split(popup_layout[1])[1] // Return the middle chunk
+}
+
 pub fn render_main_menu(
     terminal: &mut DefaultTerminal,
     state: String,
@@ -34,14 +56,20 @@ pub fn render_main_menu(
 
         let empty = Line::from("");
 
-        let info  = Line::from("Build date: 11.04.2025").centered();
+        let info  = Line::from("Build date: 27.05.2025").centered();
 
-        let news  = Line::from("What's new?                                  ").centered().underlined();
-        let news1 =  Line::from("-- Refactored internal way of playing audio").centered();
-        let _news2 = Line::from("-> No effect on gameplay                  ").centered();
+        //let news  = Line::from("What's new?                                             ").centered().underlined();
+        let news1  = Line::from("- Refactored handling of devices on source level (WIP)").centered();
+        let _news2 = Line::from(" ").centered();
         let _news3 = Line::from(" ").centered();
 
-        let title = Line::from("CLI-Miner »«  |  V0.2.6 Dev Build")
+        let news_vec = Text::from(vec![
+            news1,
+            _news2,
+            _news3
+        ]);
+
+        let title = Line::from("CLI-Miner »«  |  V0.2.7 Dev Build")
             .magenta()
             .centered()
             .bold()
@@ -71,7 +99,7 @@ pub fn render_main_menu(
         let mut os_message = Line::from("");
 
         if os_is_android {
-            os_message = Line::from("Due to compatibility issues with Android audio playback is not working yet")
+            os_message = Line::from("Due to compatibility issues with Android audio playback is not working")
             .white()
             .on_red()
             .centered()
@@ -88,9 +116,6 @@ pub fn render_main_menu(
             empty.clone(),
             client_message,
             empty.clone(),
-            news,
-            news1,
-            _news2,
             empty.clone(),
             empty,
             os_message
@@ -98,14 +123,25 @@ pub fn render_main_menu(
 
         let menu_ui = Paragraph::new(Text::from(game_ui))
             .block(Block::bordered()
-            .border_type(BorderType::Thick)
-            .padding(Padding::vertical(1))
-            .title(" Main Menu ")
-            .title_alignment(Alignment::Center))
+                .border_type(BorderType::Thick)
+                .padding(Padding::vertical(1))
+                .title(" Main Menu ")
+                .title_alignment(Alignment::Center))
             .white()
             .on_black();
 
+        let news_block = Paragraph::new(Text::from(news_vec))
+            .block(Block::bordered()
+                .border_type(BorderType::Rounded)
+                .padding(Padding::vertical(2))
+                .title(" What's new? "))
+            .white()
+            .on_black();
+
+        let news_area = centered_rect(50, 30, frame.area());
+
         frame.render_widget(menu_ui, frame.area());
+        frame.render_widget(news_block, news_area);
     });
 }
 

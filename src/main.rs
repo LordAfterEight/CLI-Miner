@@ -37,8 +37,8 @@ fn main() -> io::Result<()> {
     let mut current_screen = Screens::Start;
     let mut prev_was_ingame = false;
     let mut key_is_selected = false;
-    let mut miner_list = &mut Vec::new();
-    let mut miner_list = read_gamedata(&mut miner_list);
+    let mut miner_list: &mut Vec<Device> = &mut Vec::new();
+    //let mut miner_list = read_gamedata(&mut miner_list);
 
 
     //#[cfg(not(target_arch = "aarch64"))] {
@@ -119,13 +119,14 @@ fn main() -> io::Result<()> {
     sleep(250);
 
     let mut client = DiscordIpcClient::new("1335715218851893389").expect("");
+    let mut client_state = false;
+
     if client.connect().is_ok() {
         println!("{}", "[✓] Connected successfully\n".green());
-    }
-    if client.connect().is_err() {
+        client_state = true;
+    } else {
         println!("{}", "[!] Connection failed\n".truecolor(250,125,0));
     }
-    let client_state = client.connect().is_ok();
 
     sleep(500);
     let icon = Assets::new();
@@ -241,7 +242,9 @@ fn main() -> io::Result<()> {
 
                     match key.code {
                         KeyCode::Up => setting_position -= 1,
+
                         KeyCode::Down => setting_position +=1,
+
                         KeyCode::Char('+') => match setting_position {
                             1 => settings.frame_delay += 1,
                             2 => settings.sfx_volume += 0.05,
@@ -251,25 +254,46 @@ fn main() -> io::Result<()> {
                                 play_audio(&sink_sfx, "../sound/fail.mp3");
                             }
                         },
+
                         KeyCode::Char('-') => match setting_position {
                             1 => match settings.frame_delay {
                                 1 => {
                                     #[cfg(not(target_arch = "aarch64"))]
                                     play_audio(&sink_sfx, "../sound/fail.mp3");
                                 },
-                                _ => settings.frame_delay -= 1},
+                                _ => settings.frame_delay -= 1
+                            },
+
                             2 => match settings.sfx_volume {
                                 0.0 => settings.sfx_volume = 0.0,
-                                _ => settings.sfx_volume -= 0.05},
+                                _ => settings.sfx_volume -= 0.05
+                            },
+
                             3 => match settings.music_volume {
                                 0.0 => settings.music_volume -= 0.0,
-                                _ => settings.music_volume -= 0.05},
-                            _ => {}}, //sink_sfx.append(get_source("fail.mp3"))},
+                                _ => settings.music_volume -= 0.05
+                            },
+
+                            _ => sink_sfx.append(get_source("fail.mp3"))
+                        },
+
+
                         KeyCode::Enter => match setting_position {
                             4 => current_screen = Screens::KeybindSettings,
-                            _ => {}},
-                        _ => {} //sink_sfx.append(get_source("fail.mp3"))
+                            _ => {}
+                        },
+
+                        _ => sink_sfx.append(get_source("fail.mp3"))
                     }
+
+                    if settings.sfx_volume < 0.0 {
+                        settings.sfx_volume = 0.0;
+                    }
+
+                    if settings.music_volume < 0.0 {
+                        settings.music_volume = 0.0;
+                    }
+
                     if setting_position == 5 {setting_position = 1;}
                     if setting_position == 0 {setting_position = 3;}
                 }
@@ -289,7 +313,7 @@ fn main() -> io::Result<()> {
                     if key.code == keybinds.back {
                         current_screen = Screens::Settings;
                         #[cfg(not(target_arch = "aarch64"))]
-                        play_audio(&sink_sfx, "../sound/fail.mp3");
+                        play_audio(&sink_sfx, "../sound/interact.mp3");
                     }
 
                     if key.code == keybinds.nav_up && keybind_selection >= 1 {
