@@ -41,11 +41,11 @@ fn main() -> io::Result<()> {
     //let mut miner_list = read_gamedata(&mut miner_list);
 
 
-    //#[cfg(not(target_arch = "aarch64"))] {
+    #[cfg(not(target_arch = "aarch64"))] {
         let (_stream,stream_handle) = init();
         let sink_music = new_sink(&stream_handle);
         let sink_sfx = new_sink(&stream_handle);
-    //}
+    }
 
 
     _ = clearscreen::clear();
@@ -245,7 +245,7 @@ fn main() -> io::Result<()> {
 
                         KeyCode::Down => setting_position +=1,
 
-                        KeyCode::Char('+') => match setting_position {
+                        KeyCode::Right => match setting_position {
                             1 => settings.frame_delay += 1,
                             2 => settings.sfx_volume += 0.05,
                             3 => settings.music_volume += 0.05,
@@ -255,7 +255,7 @@ fn main() -> io::Result<()> {
                             }
                         },
 
-                        KeyCode::Char('-') => match setting_position {
+                        KeyCode::Left => match setting_position {
                             1 => match settings.frame_delay {
                                 1 => {
                                     #[cfg(not(target_arch = "aarch64"))]
@@ -274,7 +274,7 @@ fn main() -> io::Result<()> {
                                 _ => settings.music_volume -= 0.05
                             },
 
-                            _ => sink_sfx.append(get_source("fail.mp3"))
+                            _ => {}//sink_sfx.append(get_source("fail.mp3"))
                         },
 
 
@@ -283,7 +283,7 @@ fn main() -> io::Result<()> {
                             _ => {}
                         },
 
-                        _ => sink_sfx.append(get_source("fail.mp3"))
+                        _ => {} //sink_sfx.append(get_source("fail.mp3"))
                     }
 
                     if settings.sfx_volume < 0.0 {
