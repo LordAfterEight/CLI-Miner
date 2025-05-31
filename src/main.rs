@@ -140,10 +140,10 @@ fn main() -> io::Result<()> {
     play_audio(&sink_sfx, "../sound/interact.mp3");
     play_audio(&sink_music, "../sound/music2.mp3");
 
-    let os_is_android = false;
+    let mut os_is_android = false;
     #[cfg(target_arch = "aarch64")] {
         println!("{}", "\n[!] target architecture doesn't support audio".truecolor(250,125,0));
-        let os_is_android = true;
+        os_is_android = true;
         sleep(250);
     }
 
@@ -297,7 +297,7 @@ fn main() -> io::Result<()> {
                                 current_screen = Screens::KeybindSettings;
                                 play_audio(&sink_sfx, "../sound/interact.mp3");
                             },
-                            _ => play_audio(&sink_sfx, "../sound/fail.mp3")
+                            _ => play_audio(&sink_sfx, "../sound/fail.mp3"
                         },
 
                         _ => play_audio(&sink_sfx, "../sound/fail.mp3")
