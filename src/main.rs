@@ -140,10 +140,10 @@ fn main() -> io::Result<()> {
     play_audio(&sink_sfx, "../sound/interact.mp3");
     play_audio(&sink_music, "../sound/music2.mp3");
 
-    let mut os_is_android = false;
+    let os_is_android = false;
     #[cfg(target_arch = "aarch64")] {
         println!("{}", "\n[!] target architecture doesn't support audio".truecolor(250,125,0));
-        os_is_android = true;
+        let os_is_android = true;
         sleep(250);
     }
 
@@ -211,14 +211,13 @@ fn main() -> io::Result<()> {
             );
 
             set_audio_volume(&sink_sfx, settings.sfx_volume);
-            set_audio_volume(&sink_music, settings.sfx_volume);
+            set_audio_volume(&sink_music, settings.music_volume);
 
             if let event::Event::Key(key) = event::read()? {
                 if key.kind == KeyEventKind::Press {
-                    stop_audio(&sink_sfx);
-                    play_audio(&sink_sfx, "../sound/interact.mp3");
 
                     if key.code == keybinds.back  {
+                        play_audio(&sink_sfx, "../sound/interact.mp3");
                         save_settings_data(settings);
                         if prev_was_ingame {
                             current_screen = Screens::Game;
@@ -227,14 +226,32 @@ fn main() -> io::Result<()> {
                     }
 
                     match key.code {
-                        KeyCode::Up => setting_position -= 1,
+                        KeyCode::Up => {
+                            setting_position -= 1;
+                            play_audio(&sink_sfx, "../sound/interact.mp3");
+                        },
 
-                        KeyCode::Down => setting_position +=1,
+                        KeyCode::Down => {
+                            setting_position +=1;
+                            play_audio(&sink_sfx, "../sound/interact.mp3");
+                        },
 
                         KeyCode::Right => match setting_position {
-                            1 => settings.frame_delay += 1,
-                            2 => settings.sfx_volume += 0.05,
-                            3 => settings.music_volume += 0.05,
+                            1 => {
+                                settings.frame_delay += 1;
+                                play_audio(&sink_sfx, "../sound/interact.mp3");
+                            },
+
+                            2 => {
+                                settings.sfx_volume += 0.05;
+                                play_audio(&sink_sfx, "../sound/interact.mp3");
+                            },
+
+                            3 => {
+                                settings.music_volume += 0.05;
+                                play_audio(&sink_sfx, "../sound/interact.mp3");
+                            },
+
                             _ => {
                                 play_audio(&sink_sfx, "../sound/fail.mp3");
                             }
@@ -245,29 +262,45 @@ fn main() -> io::Result<()> {
                                 1 => {
                                     play_audio(&sink_sfx, "../sound/fail.mp3");
                                 },
-                                _ => settings.frame_delay -= 1
+                                _ => {
+                                    settings.frame_delay -= 1;
+                                    play_audio(&sink_sfx, "../sound/interact.mp3");
+                                },
                             },
 
                             2 => match settings.sfx_volume {
-                                0.0 => settings.sfx_volume = 0.0,
-                                _ => settings.sfx_volume -= 0.05
+                                0.0 => {
+                                    play_audio(&sink_sfx, "../sound/fail.mp3");
+                                },
+                                _ => {
+                                    play_audio(&sink_sfx, "../sound/interact.mp3");
+                                    settings.sfx_volume -= 0.05
+                                }
                             },
 
                             3 => match settings.music_volume {
-                                0.0 => settings.music_volume -= 0.0,
-                                _ => settings.music_volume -= 0.05
+                                0.0 => {
+                                    play_audio(&sink_sfx, "../sound/fail.mp3");
+                                },
+                                _ => {
+                                    settings.music_volume -= 0.05;
+                                    play_audio(&sink_sfx, "../sound/interact.mp3");
+                                },
                             },
 
-                            _ => {}//sink_sfx.append(get_source("fail.mp3"))
+                            _ => play_audio(&sink_sfx, "../sound/fail.mp3")
                         },
 
 
                         KeyCode::Enter => match setting_position {
-                            4 => current_screen = Screens::KeybindSettings,
-                            _ => {}
+                            4 => {
+                                current_screen = Screens::KeybindSettings;
+                                play_audio(&sink_sfx, "../sound/interact.mp3");
+                            },
+                            _ => play_audio(&sink_sfx, "../sound/fail.mp3")
                         },
 
-                        _ => {} //sink_sfx.append(get_source("fail.mp3"))
+                        _ => play_audio(&sink_sfx, "../sound/fail.mp3")
                     }
 
                     if settings.sfx_volume < 0.0 {
@@ -299,13 +332,13 @@ fn main() -> io::Result<()> {
                         play_audio(&sink_sfx, "../sound/interact.mp3");
                     }
 
-                    if key.code == keybinds.nav_up && keybind_selection >= 1 {
+                    if key.code == keybinds.nav_up {
                         keybind_selection -= 1;
-                        play_audio(&sink_sfx, "../sound/fail.mp3");
+                        play_audio(&sink_sfx, "../sound/interact.mp3");
                     };
                     if key.code == keybinds.nav_down {
                         keybind_selection += 1;
-                        play_audio(&sink_sfx, "../sound/fail.mp3");
+                        play_audio(&sink_sfx, "../sound/interact.mp3");
                     }
                     match keybind_selection {
                         0 => keybind_selection = 8,
@@ -315,7 +348,7 @@ fn main() -> io::Result<()> {
 
                     if key.code == keybinds.enter && key_is_selected == false {
                         key_is_selected=true;
-                        play_audio(&sink_sfx, "../sound/fail.mp3");
+                        play_audio(&sink_sfx, "../sound/interact.mp3");
                     };
 
                     while key_is_selected {
@@ -349,10 +382,6 @@ fn main() -> io::Result<()> {
             }
         }
 
-        if sink_music.len() == 0 {
-            play_audio(&sink_music, "../sound/music2.mp3");
-        }
-
         while current_screen == Screens::Game {     //GAME
             render_game(
                 &mut terminal,
@@ -370,13 +399,22 @@ fn main() -> io::Result<()> {
                 if let event::Event::Key(key) = event::read()? {
                     if key.kind == KeyEventKind::Press {
                         if key.code == keybinds.nav_up {
-                            menu_selection-=1;
-                            play_audio(&sink_sfx, "../sound/interact.mp3");
+                            if menu_selection > 1 {
+                                menu_selection-=1;
+                                play_audio(&sink_sfx, "../sound/interact.mp3");
+                            } else {
+                                play_audio(&sink_sfx, "../sound/fail.mp3");
+                            }
                             continue;
                         };
+
                         if key.code == keybinds.nav_down && menu_selection >= 1 {
-                            menu_selection += 1;
-                            play_audio(&sink_sfx, "../sound/interact.mp3");
+                            if menu_selection < 3 {
+                                menu_selection+=1;
+                                play_audio(&sink_sfx, "../sound/interact.mp3");
+                            } else {
+                                play_audio(&sink_sfx, "../sound/fail.mp3");
+                            }
                             continue;
                         }
                         match menu_selection {

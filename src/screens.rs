@@ -56,12 +56,12 @@ pub fn render_main_menu(
 
         let empty = Line::from("");
 
-        let info  = Line::from("Build date: 28.05.2025").centered();
+        let info  = Line::from("Build date: 31.05.2025").centered();
 
         //let news  = Line::from("What's new?                                             ").centered().underlined();
-        let news1  = Line::from("- Minor changes on source level").centered();
-        let _news2 = Line::from(" ").centered();
-        let _news3 = Line::from(" ").centered();
+        let news1  = Line::from("- Fixed wrong audio playing on navigation in the keybinds submenu").centered();
+        let _news2 = Line::from("- Fixed unintentionally setting music volume to sfx volume when  ").centered();
+        let _news3 = Line::from("  entering the settings menu for the first time                  ").centered();
 
         let news_vec = Text::from(vec![
             news1,
@@ -69,7 +69,7 @@ pub fn render_main_menu(
             _news3
         ]);
 
-        let title = Line::from("CLI-Miner »«  |  V0.2.8 Dev Build")
+        let title = Line::from("CLI-Miner »«  |  V0.2.9 Dev Build")
             .magenta()
             .centered()
             .bold()
@@ -139,7 +139,7 @@ pub fn render_main_menu(
             .white()
             .bg(Color::Indexed(233));
 
-        let news_area = centered_rect(50, 30, frame.area());
+        let news_area = centered_rect(62, 30, frame.area());
 
         frame.render_widget(menu_ui, frame.area());
         frame.render_widget(news_block, news_area);
@@ -300,7 +300,6 @@ pub fn render_game(
     keybinds: &mut Keybinds
 ) {
     let _ = terminal.draw(|frame| {
-        let nav_info = Line::from("Navigate with arrow keys");
         let empty = Line::from("");
         let mut mainmenu = Line::from(format!("Main menu"))
             .light_red();
@@ -315,7 +314,6 @@ pub fn render_game(
         }
 
         let menus = Text::from(vec![
-            nav_info,
             empty,
             mainmenu,
             settings,
@@ -349,7 +347,8 @@ pub fn render_game(
             .border_type(BorderType::Thick)
             .padding(Padding::proportional(1))
             .title(" Menus ")
-            .title_alignment(Alignment::Center))
+            .title_alignment(Alignment::Center)
+            .title_bottom(" Navigate with Arrow keys "))
             .white()
             .bg(Color::Indexed(232));
 
