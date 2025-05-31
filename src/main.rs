@@ -297,7 +297,7 @@ fn main() -> io::Result<()> {
                                 current_screen = Screens::KeybindSettings;
                                 play_audio(&sink_sfx, "../sound/interact.mp3");
                             },
-                            _ => play_audio(&sink_sfx, "../sound/fail.mp3"
+                            _ => play_audio(&sink_sfx, "../sound/fail.mp3")
                         },
 
                         _ => play_audio(&sink_sfx, "../sound/fail.mp3")
