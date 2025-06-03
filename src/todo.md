@@ -32,5 +32,6 @@ Todo list is ranked by priority
     - [ ] Background sounds (weather)
     - [X] High volume warning in settings
     - [ ] Discord Rich Presence setting
+    - [ ] Save menu (more than 1 save file etc.)
 
 Last updated: 03/06/2025
