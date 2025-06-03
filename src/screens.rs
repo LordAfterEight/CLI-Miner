@@ -160,15 +160,15 @@ pub fn render_settings_menu(
             .centered();
 
         let mut frame_delay = Line::from(
-            format!("Frame Delay:  {}ms [<-]/[->]", settings.frame_delay))
+            format!("Frame Delay:    {}ms [◄]/[►]", settings.frame_delay))
             .centered();
 
         let mut sfx_volume = Line::from(
-            format!("SFX Volume:   {:.2} [<-]/[->]", settings.sfx_volume))
+            format!("♫ SFX Volume:   {:.2} [◄]/[►]", settings.sfx_volume))
             .centered();
 
         let mut music_volume = Line::from(
-            format!("Music Volume: {:.2} [<-]/[->]", settings.music_volume))
+            format!("♫ Music Volume: {:.2} [◄]/[►]", settings.music_volume))
             .centered();
 
         let mut keybind_menu = Line::from("Keybinds").centered();
@@ -221,21 +221,21 @@ pub fn render_keybinds_menu(
             .centered();
 
 
-        let mut key_back = Line::from(format!("Back: [{}]", keybinds.back))
+        let mut key_back =          Line::from(format!("Back:                [{}]", keybinds.back))
             .centered();
-        let mut key_enter = Line::from(format!("Confirm: [{}]", keybinds.enter))
+        let mut key_enter =         Line::from(format!("Confirm:         [{}]", keybinds.enter))
             .centered();
-        let mut key_nav_up = Line::from(format!("Navigate up: [{}]", keybinds.nav_up))
+        let mut key_nav_up =        Line::from(format!("▲ Navigate up:      [{}]", keybinds.nav_up))
             .centered();
-        let mut key_nav_down = Line::from(format!("Navigate down: [{}]", keybinds.nav_down))
+        let mut key_nav_down =      Line::from(format!("▼ Navigate down:  [{}]", keybinds.nav_down))
             .centered();
-        let mut key_use_miner = Line::from(format!("Use Miner: [{}]", keybinds.use_miner))
+        let mut key_use_miner =     Line::from(format!("Use Miner:       [{}]", keybinds.use_miner))
             .centered();
-        let mut key_use_converter = Line::from(format!("Use Converter: [{}]", keybinds.use_converter))
+        let mut key_use_converter = Line::from(format!("Use Converter:       [{}]", keybinds.use_converter))
             .centered();
-        let mut key_sell_bits = Line::from(format!("Sell Bits: [{}]", keybinds.sell_bits))
+        let mut key_sell_bits =     Line::from(format!("Sell Bits:           [{}]", keybinds.sell_bits))
             .centered();
-        let mut key_sell_bytes = Line::from(format!("Sell Bytes: [{}]", keybinds.sell_bytes))
+        let mut key_sell_bytes =    Line::from(format!("Sell Bytes:          [{}]", keybinds.sell_bytes))
             .centered();
 
         match keybind_selection {
@@ -348,7 +348,7 @@ pub fn render_game(
             .padding(Padding::proportional(1))
             .title(" Menus ")
             .title_alignment(Alignment::Center)
-            .title_bottom(" Navigate with Arrow keys "))
+            .title_bottom(" Navigation: ▲ | ▼ "))
             .white()
             .bg(Color::Indexed(232));
 
