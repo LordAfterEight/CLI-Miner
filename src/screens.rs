@@ -79,19 +79,19 @@ pub fn render_main_menu(
             .centered()
             .light_red();
 
-        let settings = Line::from("Settings [e]")
+        let settings = Line::from("⛭ Settings [e]")
             .centered();
 
-        let start = Line::from(format!("{} [{}]", state, keybinds.enter))
+        let start = Line::from(format!("🕹 {} [{}]", state, keybinds.enter))
             .centered()
             .light_green();
 
-        let mut client_message = Line::from("Not connected to Discord client")
+        let mut client_message = Line::from("❌ Not connected to Discord client")
             .centered()
             .red();
 
         if client {
-            client_message = Line::from("Connected to Discord client")
+            client_message = Line::from("✅ Connected to Discord client")
             .centered()
             .green();
         }
@@ -99,7 +99,7 @@ pub fn render_main_menu(
         let mut os_message = Line::from("");
 
         if os_is_android {
-            os_message = Line::from("Due to compatibility issues with Android audio playback is not working")
+            os_message = Line::from("❕ Due to compatibility issues with Android audio playback is not working")
             .white()
             .on_red()
             .centered()
