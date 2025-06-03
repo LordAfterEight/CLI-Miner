@@ -56,7 +56,7 @@ pub fn render_main_menu(
 
         let empty = Line::from("");
 
-        let info  = Line::from("Build date: 31.05.2025").centered();
+        let info  = Line::from("Build date: 03.06.2025").centered();
 
         //let news  = Line::from("What's new?                                             ").centered().underlined();
         let news1  = Line::from("- Fixed wrong audio playing on navigation in the keybinds submenu").centered();
@@ -69,7 +69,7 @@ pub fn render_main_menu(
             _news3
         ]);
 
-        let title = Line::from("CLI-Miner »«  |  V0.2.9 Dev Build")
+        let title = Line::from("CLI-Miner »«  |  V0.2.11 Dev Build")
             .magenta()
             .centered()
             .bold()
