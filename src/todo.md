@@ -1,6 +1,6 @@
 Todo list is ranked by priority
 
-1. Menus/Windows (and functional switching between them):
+1. Menus/Windows:
     - [X] Main menu
     - [X] Settings menu (WIP)
     - [X] Game (WIP)
@@ -33,4 +33,4 @@ Todo list is ranked by priority
     - [X] High volume warning in settings
     - [ ] Discord Rich Presence setting
 
-Last updated: 10/04/2025
+Last updated: 03/06/2025

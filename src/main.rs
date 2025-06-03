@@ -37,7 +37,6 @@ fn main() -> io::Result<()> {
     let mut prev_was_ingame = false;
     let mut key_is_selected = false;
     let mut miner_list: &mut Vec<Device> = &mut Vec::new();
-    //let mut miner_list = read_gamedata(&mut miner_list);
 
 
     let (_stream,stream_handle) = init();
@@ -76,6 +75,7 @@ fn main() -> io::Result<()> {
     println!("{}", "[✓] Player instance created".green());
     sleep(100);
     read_player_data(player);
+    let mut miner_list = read_gamedata(player);
     println!("{} {}", "  ┗━[i] Loaded player: ".cyan(), player.nickname);
     sleep(250);
 
@@ -169,9 +169,6 @@ fn main() -> io::Result<()> {
                         play_audio(&sink_sfx, "../sound/interact.mp3");
                         definitions::sleep(300);
                         ratatui::restore();
-                        for i in 0..miner_list.len() {
-                            println!("Miner {} ID: {}", i, miner_list[i].id);
-                        }
                         return Ok(());
                     }
 
@@ -428,7 +425,7 @@ fn main() -> io::Result<()> {
                             stop_audio(&sink_music);
                             play_audio(&sink_music, "../sound/music2.mp3");
                             save_player_data(player);
-                            save_gamedata(&mut miner_list);
+                            save_gamedata(&mut miner_list, player);
                             prev_was_ingame = false;
                             current_screen = Screens::Start;
                             game.rich_presence_state = "In Main Menu".to_string();
@@ -488,11 +485,16 @@ fn main() -> io::Result<()> {
                             player.miners += 1;
                             player.money -= player.miner_price;
                             player.miner_price *= 1.5;
-                            miner_list.push(Device {
-                                id: rand::random_range(10000..99999),
-                                integrity: 100,
-                                efficiency: 1
-                            });
+                            for i in 0..16 {
+                                if miner_list[i].id == 0 {
+                                    miner_list[i] = Device {
+                                        id: rand::random_range(10000..99999),
+                                        integrity: 100,
+                                        efficiency: 1
+                                    };
+                                    break
+                                }
+                            }
                             continue;
                         }
 

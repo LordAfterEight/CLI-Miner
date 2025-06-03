@@ -143,7 +143,7 @@ pub fn read_settings_data(
     return settings
 }
 
-pub fn save_gamedata(miner_list: &mut Vec<Device>) {
+pub fn save_gamedata(miner_list: &mut Vec<Device>, player: &mut Player) {
     let filepath = "../data/gamedata.json";
     let mut file = File::options()
         .read(true)
@@ -154,37 +154,70 @@ pub fn save_gamedata(miner_list: &mut Vec<Device>) {
     file.seek(SeekFrom::Start(0)).unwrap();
 
     let mut datastruct: Vec<Value> = Vec::new();
-    for i in 0..miner_list.len() {
-        datastruct.push(json!({
-            format!("miner{i}") : {
-                "ID" : miner_list[i].id.to_owned()
-            }
-        }))
-    }
+    let data = json!({
+        format!("miner{}", 1) : miner_list[0].id.to_owned(),
+        format!("miner{}", 2) : miner_list[1].id.to_owned(),
+        format!("miner{}", 3) : miner_list[2].id.to_owned(),
+        format!("miner{}", 4) : miner_list[3].id.to_owned(),
+        format!("miner{}", 5) : miner_list[4].id.to_owned(),
+        format!("miner{}", 6) : miner_list[5].id.to_owned(),
+        format!("miner{}", 7) : miner_list[6].id.to_owned(),
+        format!("miner{}", 8) : miner_list[7].id.to_owned(),
+        format!("miner{}", 9) : miner_list[8].id.to_owned(),
+        format!("miner{}", 10) : miner_list[9].id.to_owned(),
+        format!("miner{}", 11) : miner_list[10].id.to_owned(),
+        format!("miner{}", 12) : miner_list[11].id.to_owned(),
+        format!("miner{}", 13) : miner_list[12].id.to_owned(),
+        format!("miner{}", 14) : miner_list[13].id.to_owned(),
+        format!("miner{}", 15) : miner_list[14].id.to_owned(),
+        format!("miner{}", 16) : miner_list[15].id.to_owned()
+    });
 
-    serde_json::to_writer(&file, &datastruct).unwrap();
+    serde_json::to_writer(&file, &data).unwrap();
+
     drop(file);
 }
 
-pub fn read_gamedata(miner_list: &mut Vec<Device>) -> &mut Vec<Device> {
-    let file = match File::open("../data/gamedata.json") {
-        Ok(file) => file,
-        Err(error) => panic!("{} {}\n{}",
-            "    [X] Error while opening file: ".bold().red(),
-            error,
-            "Check if 'gamedata.json' is at CLI-Miner/data/".yellow()
-        )
-    };
+pub fn read_gamedata(player: &mut Player) -> Vec<Device> {
+    if player.miners > 0 {
+        let mut device_ids: Vec<u32> = vec![00000;20];
+        let file = match File::open("../data/gamedata.json") {
+            Ok(file) => file,
+            Err(error) => panic!("{} {}\n{}",
+                "    [X] Error while opening file: ".bold().red(),
+                error,
+                "Check if 'gamedata.json' is at CLI-Miner/data/".yellow()
+            )
+        };
 
-    let miner: serde_json::Value = serde_json::from_reader(&file).expect(&"    [X] Gamedata file error".bold().red());
+        let miner: serde_json::Value = serde_json::from_reader(&file).expect(&"    [X] Gamedata file error".bold().red());
 
-    for i in 0..50 {
-        miner_list[i].id = miner.get(format!("miner{i}")).expect("Value must exist")
-            .as_u64().expect("Could not convert Value") as u32;
+        for i in 0..player.miners {
+            device_ids[i] = miner.get(format!("miner{}", i+1)).expect("Value must exist")
+                .as_u64().expect("Could not convert Value") as u32;
+            //println!("Fetched ID of miner {}: {}",&i, &device_ids[i]);
+        }
+
+        drop(file);
+        println!("{}", "  ┣━[i] Loading devices...".cyan());
+
+        let mut miner_list = Vec::<Device>::new();
+        for i in 0..20 {
+            miner_list.push(
+                Device{
+                    id: device_ids[i],
+                    integrity: 100,
+                    efficiency: 1
+                }
+            )
+        }
+
+        return miner_list
+    } else {
+        println!("{}", "  ┣━[i] No devices to load".yellow());
+        let mut miner_list = Vec::<Device>::new();
+        return miner_list
     }
-
-    drop(file);
-    return miner_list
 }
 /*
 pub fn save_keybinds_data(keybinds: &mut Keybinds) {

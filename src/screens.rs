@@ -419,7 +419,9 @@ pub fn render_device_management(
 
         let mut devices: Vec<Line> = Vec::new();
         for i in 0..miner_list.len() {
-            devices.push(Line::from(format!("Miner {}  |  ID={}", i, miner_list[i].id)));
+            if miner_list[i].id > 0 {
+                devices.push(Line::from(format!("Miner {}  |  ID={}", i, miner_list[i].id)));
+            }
         };
 
         let devices_ui = Paragraph::new(devices)
