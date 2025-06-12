@@ -449,7 +449,7 @@ fn main() -> io::Result<()> {
                             break;
                         }
 
-                        if key.code == keybinds.use_miner  {
+                        if key.code == keybinds.use_miner && player.miners > 0  {
                             stop_audio(&sink_sfx);
                             play_audio(&sink_sfx, "../sound/mining.mp3");
                             generate_bytes(bytestrings); //Just for testing purposes

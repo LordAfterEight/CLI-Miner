@@ -33,5 +33,8 @@ Todo list is ranked by priority
     - [X] High volume warning in settings
     - [ ] Discord Rich Presence setting
     - [ ] Save menu (more than 1 save file etc.)
+    - [ ] First time "login" screen
+    - [ ] Fix timer restarting on main menu entering (DRP)
+    - [ ] Fix music not looping correctly
 
-Last updated: 03/06/2025
+Last updated: 12/06/2025

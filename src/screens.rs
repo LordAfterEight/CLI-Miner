@@ -56,20 +56,20 @@ pub fn render_main_menu(
 
         let empty = Line::from("");
 
-        let info  = Line::from("Build date: 03.06.2025").centered();
+        let info  = Line::from("Build date: 12.06.2025").centered();
 
         //let news  = Line::from("What's new?                                             ").centered().underlined();
-        let news1  = Line::from("- Fixed wrong audio playing on navigation in the keybinds submenu").centered();
-        let _news2 = Line::from("- Fixed unintentionally setting music volume to sfx volume when  ").centered();
-        let _news3 = Line::from("  entering the settings menu for the first time                  ").centered();
 
-        let news_vec = Text::from(vec![
-            news1,
-            _news2,
-            _news3
+        let news = Text::from(vec![
+            Line::from("").centered(),
+            Line::from("").centered(),
+            Line::from("").centered()
         ]);
 
-        let title = Line::from("CLI-Miner »«  |  V0.2.11 Dev Build")
+        let title = Line::from(format!("{} »«  |  V{} Dev Build",
+            env!("CARGO_PKG_NAME"),
+            env!("CARGO_PKG_VERSION")
+        ))
             .magenta()
             .centered()
             .bold()
@@ -131,11 +131,11 @@ pub fn render_main_menu(
             .white()
             .bg(Color::Indexed(232));
 
-        let news_block = Paragraph::new(Text::from(news_vec))
+        let news_block = Paragraph::new(Text::from(news))
             .block(Block::bordered()
-                .border_type(BorderType::Thick)
+                .border_type(BorderType::Rounded)
                 .padding(Padding::vertical(2))
-                .title(" What's new? "))
+                .title(format!(" What's new? | v{} ", env!("CARGO_PKG_VERSION"))))
             .white()
             .bg(Color::Indexed(233));
 
@@ -160,18 +160,18 @@ pub fn render_settings_menu(
             .centered();
 
         let mut frame_delay = Line::from(
-            format!("Frame Delay:    {}ms [◄]/[►]", settings.frame_delay))
+            format!(" Frame Delay:        {}ms [◄]/[►] ", settings.frame_delay))
             .centered();
 
         let mut sfx_volume = Line::from(
-            format!("♫ SFX Volume:   {:.2} [◄]/[►]", settings.sfx_volume))
+            format!(" ♫ SFX Volume:       {:.2} [◄]/[►] ", settings.sfx_volume))
             .centered();
 
         let mut music_volume = Line::from(
-            format!("♫ Music Volume: {:.2} [◄]/[►]", settings.music_volume))
+            format!(" ♫ Music Volume:     {:.2} [◄]/[►] ", settings.music_volume))
             .centered();
 
-        let mut keybind_menu = Line::from("Keybinds").centered();
+        let mut keybind_menu = Line::from(" Keybinds ").centered();
 
         match setting_position {
             1 => frame_delay=frame_delay.black().on_white(),
@@ -199,6 +199,7 @@ pub fn render_settings_menu(
             .border_type(BorderType::Double)
             .padding(Padding::proportional(1))
             .title(" Settings ")
+            .title_bottom(" Navigation: ▲ ¦ ▼ ")
             .title_alignment(Alignment::Center))
             .white()
             .bg(Color::Indexed(232));
@@ -221,21 +222,21 @@ pub fn render_keybinds_menu(
             .centered();
 
 
-        let mut key_back =          Line::from(format!("Back:                [{}]", keybinds.back))
+        let mut key_back =          Line::from(format!("Back:                    [{}]", keybinds.back))
             .centered();
-        let mut key_enter =         Line::from(format!("Confirm:         [{}]", keybinds.enter))
+        let mut key_enter =         Line::from(format!("Confirm:             [{}]", keybinds.enter))
             .centered();
-        let mut key_nav_up =        Line::from(format!("▲ Navigate up:      [{}]", keybinds.nav_up))
+        let mut key_nav_up =        Line::from(format!("▲ Navigate up:          [{}]", keybinds.nav_up))
             .centered();
-        let mut key_nav_down =      Line::from(format!("▼ Navigate down:  [{}]", keybinds.nav_down))
+        let mut key_nav_down =      Line::from(format!("▼ Navigate down:      [{}]", keybinds.nav_down))
             .centered();
-        let mut key_use_miner =     Line::from(format!("Use Miner:       [{}]", keybinds.use_miner))
+        let mut key_use_miner =     Line::from(format!("Use Miner:           [{}]", keybinds.use_miner))
             .centered();
-        let mut key_use_converter = Line::from(format!("Use Converter:       [{}]", keybinds.use_converter))
+        let mut key_use_converter = Line::from(format!("Use Converter:           [{}]", keybinds.use_converter))
             .centered();
-        let mut key_sell_bits =     Line::from(format!("Sell Bits:           [{}]", keybinds.sell_bits))
+        let mut key_sell_bits =     Line::from(format!("Sell Bits:               [{}]", keybinds.sell_bits))
             .centered();
-        let mut key_sell_bytes =    Line::from(format!("Sell Bytes:          [{}]", keybinds.sell_bytes))
+        let mut key_sell_bytes =    Line::from(format!("Sell Bytes:              [{}]", keybinds.sell_bytes))
             .centered();
 
         match keybind_selection {
@@ -348,7 +349,7 @@ pub fn render_game(
             .padding(Padding::proportional(1))
             .title(" Menus ")
             .title_alignment(Alignment::Center)
-            .title_bottom(" Navigation: ▲ | ▼ "))
+            .title_bottom(" Navigation: ▲ ¦ ▼ "))
             .white()
             .bg(Color::Indexed(232));
 
