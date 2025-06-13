@@ -9,6 +9,7 @@ use ratatui::{
 use crate::{
     Player,
     GameSettings,
+    GameState,
     Bytestrings,
     Keybinds,
     Device,
@@ -56,13 +57,11 @@ pub fn render_main_menu(
 
         let empty = Line::from("");
 
-        let info  = Line::from("Build date: 12.06.2025").centered();
-
-        //let news  = Line::from("What's new?                                             ").centered().underlined();
+        let info  = Line::from("Build date: 13.06.2025").centered();
 
         let news = Text::from(vec![
-            Line::from("").centered(),
-            Line::from("").centered(),
+            Line::from("- Removed Discord Rich Presence for now (Code refactor)").centered(),
+            Line::from("- Fixed file reading and writing errors                ").centered(),
             Line::from("").centered()
         ]);
 
@@ -135,7 +134,7 @@ pub fn render_main_menu(
             .block(Block::bordered()
                 .border_type(BorderType::Rounded)
                 .padding(Padding::vertical(2))
-                .title(format!(" What's new? | v{} ", env!("CARGO_PKG_VERSION"))))
+                .title(format!(" What's new? | V{} ", env!("CARGO_PKG_VERSION"))))
             .white()
             .bg(Color::Indexed(233));
 
@@ -150,7 +149,8 @@ pub fn render_settings_menu(
     terminal: &mut DefaultTerminal,
     settings: &mut GameSettings,
     setting_position: u8,
-    keybinds: &mut Keybinds
+    keybinds: &mut Keybinds,
+    gamestate: &mut GameState
 ) {
     let _ = terminal.draw(|frame| {
         let empty = Line::from("");
@@ -171,13 +171,24 @@ pub fn render_settings_menu(
             format!(" ♫ Music Volume:     {:.2} [◄]/[►] ", settings.music_volume))
             .centered();
 
+        let mut drp_setting = Line::from(
+            format!(" Discord Rich Presence:  disabled "))
+            .centered();
+
+        if settings.drp_enabled == true {
+            drp_setting = Line::from(
+                format!(" Discord Rich Presence:   enabled "))
+                .centered();
+        }
+
         let mut keybind_menu = Line::from(" Keybinds ").centered();
 
         match setting_position {
             1 => frame_delay=frame_delay.black().on_white(),
             2 => sfx_volume=sfx_volume.black().on_white(),
             3 => music_volume=music_volume.black().on_white(),
-            4 => keybind_menu=keybind_menu.black().on_white(),
+            4 => drp_setting=drp_setting.black().on_white(),
+            5 => keybind_menu=keybind_menu.black().on_white(),
             _ => ()
         }
 
@@ -190,6 +201,7 @@ pub fn render_settings_menu(
             frame_delay,
             sfx_volume,
             music_volume,
+            drp_setting,
             empty,
             keybind_menu
         ]);

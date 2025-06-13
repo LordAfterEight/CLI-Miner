@@ -21,6 +21,7 @@ pub fn save_player_data(data: &mut Player) {
     let mut file = File::options()
         .read(true)
         .write(true)
+        .truncate(true)
         .open(filepath)
         .expect("[X] Could not open file");
 
@@ -93,6 +94,7 @@ pub fn save_settings_data(settings: &mut GameSettings) {
     let mut file = File::options()
         .read(true)
         .write(true)
+        .truncate(true)
         .open(filepath)
         .expect("[X] Could not open file");
 
@@ -101,7 +103,8 @@ pub fn save_settings_data(settings: &mut GameSettings) {
     let datastruct = json!({
         "sfx_volume" : &settings.sfx_volume.to_owned(),
         "music_volume" : &settings.music_volume.to_owned(),
-        "frame_delay" : &settings.frame_delay.to_owned()
+        "frame_delay" : &settings.frame_delay.to_owned(),
+        "drp_enable" : &settings.drp_enabled.to_owned()
     });
 
     serde_json::to_writer(&file, &datastruct).unwrap();
@@ -138,6 +141,9 @@ pub fn read_settings_data(
     settings.frame_delay = data.get("frame_delay").expect("Value must exist")
         .as_u64().expect("Could not convert value");
 
+    settings.drp_enabled = data.get("drp_enable").expect("Value must exist")
+        .as_bool().expect("Could not convert value");
+
 
     drop(file);
     return settings
@@ -148,6 +154,7 @@ pub fn save_gamedata(miner_list: &mut Vec<Device>, player: &mut Player) {
     let mut file = File::options()
         .read(true)
         .write(true)
+        .truncate(true)
         .open(filepath)
         .expect("[X] Could not open file");
 

@@ -97,7 +97,8 @@ fn main() -> io::Result<()> {
     let settings = &mut GameSettings {
         sfx_volume: 0.5,
         music_volume: 0.5,
-        frame_delay: 65
+        frame_delay: 65,
+        drp_enabled: false
     };
     println!("{}", "[✓] Settings instance created".green());
     read_settings_data(settings);
@@ -112,28 +113,20 @@ fn main() -> io::Result<()> {
     println!("{}", "[✓] GameState instance created\n".green());
     sleep(100);
 
-    println!("{}", "[i] Attempting to connect to Discord client...".cyan());
+    println!("{}", "[i] Attempting to connect to Discord client...\n(This can take some time, please be patient)\n".cyan());
     sleep(250);
 
     let mut client = DiscordIpcClient::new("1335715218851893389").expect("");
     let mut client_state = false;
 
-    if client.connect().is_ok() {
-        println!("{}", "[✓] Connected successfully\n".green());
-        client_state = true;
-    } else {
-        println!("{}", "[!] Connection failed\n".truecolor(250,125,0));
+    if settings.drp_enabled == true {
+        println!("{}","[i] Discord Rich presence is currently not available as\n    the code for the integration is being rewritten".yellow())
     }
 
     sleep(500);
-    let icon = Assets::new();
-    let small_image = icon.small_image("../assets/rich_presence_icon.png");
 
-    _ = client.set_activity(activity::Activity::new()
-        .state(format!("{}",game.rich_presence_state).as_str())
-        .activity_type(activity::ActivityType::Playing)
-        .assets(small_image)
-    );
+    if settings.drp_enabled == true {
+    }
 
     set_audio_volume(&sink_sfx, settings.sfx_volume);
     set_audio_volume(&sink_music, settings.music_volume);
@@ -151,6 +144,8 @@ fn main() -> io::Result<()> {
     sleep(500);
 
     let mut terminal = ratatui::init();
+
+    let mut client_activity = activity::Activity::new();
     loop {
 
         while current_screen == Screens::Start {    //MAIN MENU
@@ -185,9 +180,6 @@ fn main() -> io::Result<()> {
                         game.state="Back to Game".to_string();
                         current_screen = Screens::Game;
                         game.rich_presence_state = "Mining".to_string();
-                        _ = client.set_activity(activity::Activity::new()
-                            .state(format!("{}",game.rich_presence_state).as_str())
-                        );
                         break;
                     }
                     else {continue}
@@ -204,7 +196,8 @@ fn main() -> io::Result<()> {
                 &mut terminal,
                 settings,
                 setting_position,
-                keybinds
+                keybinds,
+                game
             );
 
             set_audio_volume(&sink_sfx, settings.sfx_volume);
@@ -291,6 +284,13 @@ fn main() -> io::Result<()> {
 
                         KeyCode::Enter => match setting_position {
                             4 => {
+                                settings.drp_enabled = !settings.drp_enabled;
+                                play_audio(&sink_sfx, "../sound/interact.mp3");
+                                if settings.drp_enabled {client.connect();}
+                                if !settings.drp_enabled {client.close();}
+                            },
+
+                            5 => {
                                 current_screen = Screens::KeybindSettings;
                                 play_audio(&sink_sfx, "../sound/interact.mp3");
                             },
@@ -308,7 +308,7 @@ fn main() -> io::Result<()> {
                         settings.music_volume = 0.0;
                     }
 
-                    if setting_position == 5 {setting_position = 1;}
+                    if setting_position == 6 {setting_position = 1;}
                     if setting_position == 0 {setting_position = 3;}
                 }
             }
@@ -395,6 +395,7 @@ fn main() -> io::Result<()> {
 
                 if let event::Event::Key(key) = event::read()? {
                     if key.kind == KeyEventKind::Press {
+
                         if key.code == keybinds.nav_up {
                             if menu_selection > 1 {
                                 menu_selection-=1;
@@ -429,9 +430,6 @@ fn main() -> io::Result<()> {
                             prev_was_ingame = false;
                             current_screen = Screens::Start;
                             game.rich_presence_state = "In Main Menu".to_string();
-                            _ = client.set_activity(activity::Activity::new()
-                                .state(format!("{}",game.rich_presence_state).as_str())
-                            );
                             break;
                         }
 

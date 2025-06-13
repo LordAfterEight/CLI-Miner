@@ -9,7 +9,7 @@ Todo list is ranked by priority
     1. [X] Basics (mining, selling, buying)
     2. [X] Game saving ( [ ] ? autosave)
     3. [X] Expanded basics (converting, etc.)
-    4. [ ] Devices as instances of a respective struct
+    4. [ ] Devices as instances of a respective strucs
     5. [ ] Intermediate Processing (i.e. data strings)
     6. [ ] QoL: Automation
     7. [ ] QoL: Programmable logic system
@@ -31,7 +31,8 @@ Todo list is ranked by priority
     - [ ] Automatic Game Updates
     - [ ] Background sounds (weather)
     - [X] High volume warning in settings
-    - [ ] Discord Rich Presence setting
+    - [X] Discord Rich Presence setting
+    - [ ] Refactor Discord Rich Presence integration
     - [ ] Save menu (more than 1 save file etc.)
     - [ ] First time "login" screen
     - [ ] Fix timer restarting on main menu entering (DRP)
