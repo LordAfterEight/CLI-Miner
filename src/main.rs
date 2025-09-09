@@ -309,7 +309,7 @@ fn main() -> io::Result<()> {
                     }
 
                     if setting_position == 6 {setting_position = 1;}
-                    if setting_position == 0 {setting_position = 3;}
+                    if setting_position == 0 {setting_position = 4;}
                 }
             }
         }

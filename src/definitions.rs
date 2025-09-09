@@ -17,7 +17,7 @@ pub fn binary_to_string(byte: u8) -> String {
 
 
 pub fn save_player_data(data: &mut Player) {
-    let filepath = "../data/save.json";
+    let filepath = "data/save.json";
     let mut file = File::options()
         .read(true)
         .write(true)
@@ -47,7 +47,7 @@ pub fn read_player_data(player: &mut Player) -> &mut Player {
     println!("{}", "  ┣━[i] Attempting to read data...".cyan());
     sleep(250);
 
-    let playerdata = match File::open("../data/save.json") {
+    let playerdata = match File::open("data/save.json") {
         Ok(file) => file,
         Err(error) => panic!("{} {}\n{}",
             "    [X] Error while opening file".bold().red(),
@@ -90,7 +90,7 @@ pub fn read_player_data(player: &mut Player) -> &mut Player {
 
 
 pub fn save_settings_data(settings: &mut GameSettings) {
-    let filepath = "../data/settings.json";
+    let filepath = "data/settings.json";
     let mut file = File::options()
         .read(true)
         .write(true)
@@ -114,7 +114,7 @@ pub fn save_settings_data(settings: &mut GameSettings) {
 pub fn read_settings_data(
     settings: &mut GameSettings
 ) -> &mut GameSettings {
-    let filepath = "../data/settings.json";
+    let filepath = "data/settings.json";
     println!("{}", "  ┣━[i] Attempting to read settings file...".cyan());
     sleep(250);
 
@@ -150,7 +150,7 @@ pub fn read_settings_data(
 }
 
 pub fn save_gamedata(miner_list: &mut Vec<Device>, player: &mut Player) {
-    let filepath = "../data/gamedata.json";
+    let filepath = "data/gamedata.json";
     let mut file = File::options()
         .read(true)
         .write(true)
@@ -188,7 +188,7 @@ pub fn save_gamedata(miner_list: &mut Vec<Device>, player: &mut Player) {
 pub fn read_gamedata(player: &mut Player) -> Vec<Device> {
     if player.miners > 0 {
         let mut device_ids: Vec<u32> = vec![00000;20];
-        let file = match File::open("../data/gamedata.json") {
+        let file = match File::open("data/gamedata.json") {
             Ok(file) => file,
             Err(error) => panic!("{} {}\n{}",
                 "    [X] Error while opening file: ".bold().red(),
