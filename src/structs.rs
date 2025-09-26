@@ -127,11 +127,15 @@ impl Button {
         }
     }
 
-    pub fn is_clicked(&self, mouse_x: f32, mouse_y: f32) -> bool {
-        mouse_x >= self.x
+    pub fn is_clicked(&self) -> bool {
+        let (mouse_x, mouse_y) = mouse_position();
+        match mouse_x >= self.x
             && mouse_x <= self.x + self.width
             && mouse_y >= self.y
-            && mouse_y <= self.y + self.height
+            && mouse_y <= self.y + self.height {
+            true => is_mouse_button_released(MouseButton::Left),
+            false => false,
+        }
     }
 
     pub fn draw(&self) {

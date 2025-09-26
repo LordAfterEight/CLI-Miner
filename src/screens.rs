@@ -59,6 +59,10 @@ pub fn render_main_menu() {
     play_button.draw();
     settings_button.draw();
     exit_button.draw();
+
+    if exit_button.is_clicked() {
+        std::process::exit(0);
+    }
 }
 
 pub fn render_settings_screen() {
