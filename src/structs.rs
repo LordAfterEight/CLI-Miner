@@ -1,3 +1,5 @@
+use macroquad::prelude::*;
+
 #[derive(Debug)]
 pub struct Game {
     /// Name of the game save
@@ -104,4 +106,68 @@ pub enum Screens {
     PauseMenu,
     DeviceManagement,
     GameOver,
+}
+
+pub struct Button {
+    label: String,
+    x: f32,
+    y: f32,
+    width: f32,
+    height: f32,
+}
+
+impl Button {
+    pub fn new(label: &str, x: f32, y: f32, width: f32, height: f32) -> Self {
+        Self {
+            label: label.to_string(),
+            x,
+            y,
+            width,
+            height,
+        }
+    }
+
+    pub fn is_clicked(&self, mouse_x: f32, mouse_y: f32) -> bool {
+        mouse_x >= self.x
+            && mouse_x <= self.x + self.width
+            && mouse_y >= self.y
+            && mouse_y <= self.y + self.height
+    }
+
+    pub fn draw(&self) {
+        draw_button(&self.label, self.x, self.y, self.width, self.height, Alignment::Center);
+    }
+}
+
+pub fn draw_button(text: &str, x: f32, y: f32, width: f32, height: f32, alignment: Alignment) {
+    let (mouse_x, mouse_y) = mouse_position();
+    let is_hovered = mouse_x >= x && mouse_x <= x + width && mouse_y >= y && mouse_y <= y + height;
+    let text_size = 30.0;
+    let text_dimensions = measure_text(text, None, text_size as u16, 1.0);
+    let (text_x, text_y) = match alignment {
+        Alignment::Left => (x + 10.0, y + (height + text_dimensions.height) / 2.0),
+        Alignment::Center => (x + (width - text_dimensions.width) / 2.0, y + (height + text_dimensions.height) / 2.0),
+        Alignment::Right => (x + width - text_dimensions.width - 10.0, y + (height + text_dimensions.height) / 2.0),
+    };
+
+    match is_hovered {
+        false => {
+            draw_rectangle(x, y, width, height, Color::new(0.1,0.1,0.1,1.0));
+            draw_rectangle_lines(x, y, width, height, 2.0, Color::new(0.6,0.2,0.2,1.0));
+        },
+        true => {
+            draw_rectangle(x, y, width, height, Color::new(0.15,0.15,0.15,1.0));
+            match is_mouse_button_down(MouseButton::Left) {
+                false => draw_rectangle_lines(x, y, width, height, 2.0, Color::new(0.6,0.6,0.3,1.0)),
+                true => draw_rectangle_lines(x, y, width, height, 2.0, Color::new(0.3,0.6,0.3,1.0)),
+            }
+        }
+    }
+    draw_text(text, text_x, text_y, text_size, WHITE);
+}
+
+pub enum Alignment {
+    Left,
+    Center,
+    Right,
 }
