@@ -3,15 +3,15 @@ use macroquad::prelude::*;
 #[derive(Debug)]
 pub struct Game {
     /// Name of the game save
-    save_name: String,
+    pub save_name: String,
     /// Directory where the save is stored
-    save_dir: String,
+    pub save_dir: String,
     /// Game data
-    data: Data,
+    pub data: Data,
     /// Game settings
-    settings: Settings,
-    devices: Vec<Device>,
-    current_screen: Screens,
+    pub settings: Settings,
+    pub devices: Vec<Device>,
+    pub current_screen: Screens,
 }
 
 impl Game {

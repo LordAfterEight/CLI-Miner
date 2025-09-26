@@ -32,5 +32,15 @@ async fn main() {
     loop {
         crate::screens::render_main_menu();
         macroquad::window::next_frame().await;
+
+        match game.current_screen {
+            crate::structs::Screens::MainMenu => {
+                if sink_music.empty() {
+                    rotilities::play_audio(&sink_music, "./sound/Main Menu.mp3");
+                }
+            },
+
+            _ => {}
+        }
     }
 }
