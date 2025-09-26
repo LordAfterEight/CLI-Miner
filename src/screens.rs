@@ -13,12 +13,22 @@ pub fn render_main_menu() {
     let title = "CLI-MINER »«";
     let title_font_size = 60.0;
 
+    let subtitle = format!("V{}", env!("CARGO_PKG_VERSION"));
+
     draw_text(
         title,
         (screen_w - measure_text(title, None, title_font_size as u16, 1.0).width) / 2.0,
         screen_h / 4.0,
         title_font_size,
         WHITE,
+    );
+
+    draw_text(
+        &subtitle,
+        (screen_w - measure_text(&subtitle, None, 30, 1.0).width) / 2.0,
+        screen_h / 4.0 + 40.0,
+        30.0,
+        LIGHTGRAY,
     );
 
     draw_line(
