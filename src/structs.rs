@@ -127,6 +127,14 @@ impl Button {
         }
     }
 
+    pub fn is_hovered(&self) -> bool {
+        let (mouse_x, mouse_y) = mouse_position();
+        mouse_x >= self.x
+            && mouse_x <= self.x + self.width
+            && mouse_y >= self.y
+            && mouse_y <= self.y + self.height
+    }
+
     pub fn is_clicked(&self) -> bool {
         let (mouse_x, mouse_y) = mouse_position();
         match mouse_x >= self.x

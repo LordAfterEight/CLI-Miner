@@ -43,7 +43,7 @@ pub fn render_main_menu() {
     draw_text("© Elias Stettmayer, 2025", screen_w - 280.0, screen_h - 20.0, 25.0, GRAY);
 
     let play_button = crate::structs::Button::new(
-        "Start Game",
+        "Play",
         screen_w / 2.0 - 100.0,
         screen_h / 2.0 - 25.0,
         200.0,
@@ -65,6 +65,36 @@ pub fn render_main_menu() {
         200.0,
         35.0,
     );
+
+    if play_button.is_hovered() {
+        draw_text(
+            "Start the game",
+            screen_w / 2.0 - measure_text("Start the game", None, 25, 1.0).width / 2.0,
+            screen_h / 2.0 - 60.0,
+            25.0,
+            SKYBLUE,
+        );
+    }
+
+    if settings_button.is_hovered() {
+        draw_text(
+            "Adjust your settings",
+            screen_w / 2.0 - measure_text("Adjust your settings", None, 25, 1.0).width / 2.0,
+            screen_h / 2.0 - 60.0,
+            25.0,
+            YELLOW,
+        );
+    }
+
+    if exit_button.is_hovered() {
+        draw_text(
+            "Exit the game",
+            screen_w / 2.0 - measure_text("Exit the game", None, 25, 1.0).width / 2.0,
+            screen_h / 2.0 - 60.0,
+            25.0,
+            RED,
+        );
+    }
 
     play_button.draw();
     settings_button.draw();
