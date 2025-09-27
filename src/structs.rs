@@ -12,6 +12,7 @@ pub struct Game {
     pub settings: Settings,
     pub devices: Vec<Device>,
     pub current_screen: Screens,
+    pub previous_screen: Option<Screens>,
     pub fonts: Vec<Font>,
 }
 
@@ -24,6 +25,7 @@ impl Game {
             settings: Settings::init(),
             devices: Vec::new(),
             current_screen: Screens::MainMenu,
+            previous_screen: None,
             fonts: vec![
                 load_ttf_font_from_bytes(include_bytes!("../assets/fonts/ProFont/ProFontIIxNerdFont-Regular.ttf")).unwrap(),
                 load_ttf_font_from_bytes(include_bytes!("../assets/fonts/Terminus/TerminessNerdFont-Regular.ttf")).unwrap(),
@@ -55,13 +57,13 @@ impl Data {
 /// Contains game settings like volume, difficulty, etc.
 pub struct Settings {
     /// Musuc volume
-    mus_vol: f32,
+    pub mus_vol: f32,
     /// Sound effects volume
-    sfx_vol: f32,
+    pub sfx_vol: f32,
     /// Fine-tunable difficulty level (0-255)
-    difficulty: u8,
+    pub difficulty: u8,
     /// Whether Discord Rich Presence is enabled or not
-    discord_rich_presence: bool,
+    pub discord_rich_presence: bool,
 }
 
 impl Settings {
@@ -103,7 +105,7 @@ pub enum DeviceType {
     Extractor,
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq)]
 pub enum Screens {
     MainMenu,
     SettingsMenu,
@@ -114,11 +116,11 @@ pub enum Screens {
 }
 
 pub struct Button {
-    label: String,
-    x: f32,
-    y: f32,
-    width: f32,
-    height: f32,
+    pub label: String,
+    pub x: f32,
+    pub y: f32,
+    pub width: f32,
+    pub height: f32,
 }
 
 impl Button {
@@ -140,13 +142,22 @@ impl Button {
             && mouse_y <= self.y + self.height
     }
 
-    pub fn is_clicked(&self) -> bool {
+    pub fn is_clicked(&self, sink_sfx: &rotilities::Sink) -> bool {
         let (mouse_x, mouse_y) = mouse_position();
         match mouse_x >= self.x
             && mouse_x <= self.x + self.width
             && mouse_y >= self.y
             && mouse_y <= self.y + self.height {
-            true => is_mouse_button_released(MouseButton::Left),
+            true => {
+                let ret_value = is_mouse_button_released(MouseButton::Left);
+                if macroquad::input::is_mouse_button_pressed(macroquad::input::MouseButton::Left) {
+                    rotilities::play_audio(sink_sfx, "./assets/sound/interact_p1.mp3");
+                }
+                if ret_value == true {
+                    rotilities::play_audio(sink_sfx, "./assets/sound/interact_p2.mp3");
+                }
+                ret_value
+            },
             false => false,
         }
     }
@@ -185,7 +196,7 @@ pub fn draw_button(text: &str, x: f32, y: f32, width: f32, height: f32, alignmen
         text_x,
         text_y,
         TextParams {
-            font: font,
+            font: if font.is_some() { font } else { None },
             font_size: text_size as u16,
             color: Color::new(1.0, 1.0, 1.0, 1.0),
             ..Default::default()
