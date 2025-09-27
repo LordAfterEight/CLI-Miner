@@ -12,6 +12,7 @@ pub struct Game {
     pub settings: Settings,
     pub devices: Vec<Device>,
     pub current_screen: Screens,
+    pub fonts: Vec<Font>,
 }
 
 impl Game {
@@ -23,6 +24,10 @@ impl Game {
             settings: Settings::init(),
             devices: Vec::new(),
             current_screen: Screens::MainMenu,
+            fonts: vec![
+                load_ttf_font_from_bytes(include_bytes!("../assets/fonts/ProFont/ProFontIIxNerdFont-Regular.ttf")).unwrap(),
+                load_ttf_font_from_bytes(include_bytes!("../assets/fonts/Terminus/TerminessNerdFont-Regular.ttf")).unwrap(),
+            ],
         }
     }
 }
@@ -146,36 +151,46 @@ impl Button {
         }
     }
 
-    pub fn draw(&self) {
-        draw_button(&self.label, self.x, self.y, self.width, self.height, Alignment::Center);
+    pub fn draw(&self, font: Option<&Font>) {
+        draw_button(&self.label, self.x, self.y, self.width, self.height, Alignment::Center, font);
     }
 }
 
-pub fn draw_button(text: &str, x: f32, y: f32, width: f32, height: f32, alignment: Alignment) {
+pub fn draw_button(text: &str, x: f32, y: f32, width: f32, height: f32, alignment: Alignment, font: Option<&Font>) {
     let (mouse_x, mouse_y) = mouse_position();
     let is_hovered = mouse_x >= x && mouse_x <= x + width && mouse_y >= y && mouse_y <= y + height;
-    let text_size = 30.0;
+    let text_size = 25.0;
     let text_dimensions = measure_text(text, None, text_size as u16, 1.0);
     let (text_x, text_y) = match alignment {
-        Alignment::Left => (x + 10.0, y + (height + text_dimensions.height) / 2.0),
-        Alignment::Center => (x + (width - text_dimensions.width) / 2.0, y + (height + text_dimensions.height) / 2.0),
-        Alignment::Right => (x + width - text_dimensions.width - 10.0, y + (height + text_dimensions.height) / 2.0),
+        Alignment::Left => (x + 10.0, y + (height + text_dimensions.height) / 2.0 + text_size / 3.3),
+        Alignment::Center => (x + (width - text_dimensions.width) / 2.0, y + height / 2.0 + text_size / 3.3),
+        Alignment::Right => (x + width - text_dimensions.width - 10.0, y + height / 2.0 + text_size / 3.3),
     };
 
     match is_hovered {
         false => {
-            draw_rectangle(x, y, width, height, Color::new(0.1,0.1,0.1,1.0));
+            draw_rectangle(x, y, width, height, Color::new(0.05,0.05,0.05,1.0));
             draw_rectangle_lines(x, y, width, height, 2.0, Color::new(0.6,0.2,0.2,1.0));
         },
         true => {
-            draw_rectangle(x, y, width, height, Color::new(0.15,0.15,0.15,1.0));
+            draw_rectangle(x, y, width, height, Color::new(0.1,0.1,0.1,1.0));
             match is_mouse_button_down(MouseButton::Left) {
-                false => draw_rectangle_lines(x, y, width, height, 2.0, Color::new(0.6,0.6,0.3,1.0)),
-                true => draw_rectangle_lines(x, y, width, height, 2.0, Color::new(0.3,0.6,0.3,1.0)),
+                false => draw_rectangle_lines(x, y, width, height, 4.0, Color::new(0.6,0.6,0.3,1.0)),
+                true => draw_rectangle_lines(x, y, width, height, 6.0, Color::new(0.3,0.6,0.3,1.0)),
             }
         }
     }
-    draw_text(text, text_x, text_y, text_size, WHITE);
+    draw_text_ex(
+        text,
+        text_x,
+        text_y,
+        TextParams {
+            font: font,
+            font_size: text_size as u16,
+            color: Color::new(1.0, 1.0, 1.0, 1.0),
+            ..Default::default()
+        },
+    );
 }
 
 pub enum Alignment {

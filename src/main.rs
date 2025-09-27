@@ -1,3 +1,5 @@
+use std::io::sink;
+
 use macroquad::prelude::*;
 use macroquad::rand;
 use rotilities;
@@ -22,21 +24,22 @@ fn setup_window() -> macroquad::window::Conf {
 async fn main() {
     let (_stream, stream_handle) = rotilities::init();
     let sink_music = rotilities::new_sink(&stream_handle);
+    let sink_sfx = rotilities::new_sink(&stream_handle);
 
     let mut game = crate::structs::Game::init("LordAfterEight");
 
     println!("Game: {:#?}", game);
 
-    rotilities::play_audio(&sink_music, "./sound/Main Menu.mp3");
+    rotilities::play_audio(&sink_music, "./assets/sound/Main Menu.mp3");
 
     loop {
-        crate::screens::render_main_menu();
+        crate::screens::render_main_menu(&mut game, &sink_sfx);
         macroquad::window::next_frame().await;
 
         match game.current_screen {
             crate::structs::Screens::MainMenu => {
                 if sink_music.empty() {
-                    rotilities::play_audio(&sink_music, "./sound/Main Menu.mp3");
+                    rotilities::play_audio(&sink_music, "./assets/sound/Main Menu.mp3");
                 }
             },
 

@@ -7,28 +7,37 @@ pub enum Alignment {
     Right,
 }
 
-pub fn render_main_menu() {
+pub fn render_main_menu(game: &mut Game, sink_sfx: &rotilities::Sink) {
     let (screen_w, screen_h) = (macroquad::window::screen_width(), macroquad::window::screen_height());
 
     let title = "CLI-MINER »«";
+
     let title_font_size = 60.0;
 
     let subtitle = format!("V{}", env!("CARGO_PKG_VERSION"));
 
-    draw_text(
+    draw_text_ex(
         title,
-        (screen_w - measure_text(title, None, title_font_size as u16, 1.0).width) / 2.0,
+        (screen_w - measure_text(title, None, title_font_size as u16, 1.0).width) / 2.0 - 22.0,
         screen_h / 4.0,
-        title_font_size,
-        WHITE,
+        TextParams {
+            font_size: title_font_size as u16,
+            color: WHITE,
+            font: Some(&game.fonts[1]),
+            ..Default::default()
+        },
     );
 
-    draw_text(
+    draw_text_ex(
         &subtitle,
-        (screen_w - measure_text(&subtitle, None, 30, 1.0).width) / 2.0,
+        (screen_w - measure_text(&subtitle, None, 30, 1.0).width) / 2.0 - 20.0,
         screen_h / 4.0 + 40.0,
-        30.0,
-        LIGHTGRAY,
+        TextParams {
+            font_size: 30,
+            color: GRAY,
+            font: Some(&game.fonts[0]),
+            ..Default::default()
+        },
     );
 
     draw_line(
@@ -96,12 +105,23 @@ pub fn render_main_menu() {
         );
     }
 
-    play_button.draw();
-    settings_button.draw();
-    exit_button.draw();
+    play_button.draw(Some(&game.fonts[1]));
+    settings_button.draw(Some(&game.fonts[1]));
+    exit_button.draw(Some(&game.fonts[1]));
 
     if exit_button.is_clicked() {
+        rotilities::play_audio(sink_sfx, "./assets/sound/interact.mp3");
+        std::thread::sleep(std::time::Duration::from_millis(500));
         std::process::exit(0);
+    }
+
+    if settings_button.is_clicked() {
+        rotilities::play_audio(sink_sfx, "./assets/sound/interact.mp3");
+        game.current_screen = Screens::SettingsMenu;
+    }
+    if play_button.is_clicked() {
+        rotilities::play_audio(sink_sfx, "./assets/sound/interact.mp3");
+        game.current_screen = Screens::InGame;
     }
 }
 
