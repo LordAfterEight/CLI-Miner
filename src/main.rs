@@ -74,7 +74,7 @@ async fn main() {
                 let mut new_volume = game.settings.mus_vol;
                 while game.audio.music_sinks[0].volume() > 0.001 {
                     rotilities::set_audio_volume(&game.audio.music_sinks[0], new_volume);
-                    new_volume *= 0.99;
+                    new_volume *= 0.95;
                     macroquad::window::next_frame().await;
                 }
                 rotilities::stop_audio(&game.audio.music_sinks[0]);
