@@ -48,7 +48,8 @@ async fn main() {
                     let mut new_volume = game.settings.mus_vol;
                     while game.audio.music_sinks[0].volume() > 0.001 {
                         rotilities::set_audio_volume(&game.audio.music_sinks[0], new_volume);
-                        new_volume *= 0.95;
+                            new_volume *= 0.95;
+                        game.cursor.update();
                         crate::screens::render_main_menu(&mut game);
                         macroquad::window::next_frame().await;
                     }
