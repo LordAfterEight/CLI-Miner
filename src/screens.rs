@@ -10,7 +10,7 @@ pub enum Alignment {
 pub fn render_main_menu(game: &mut Game) {
     let (screen_w, screen_h) = (macroquad::window::screen_width(), macroquad::window::screen_height());
 
-    let title = "CLI-MINER »«";
+    let title = "NullByte »«";
 
     let title_font_size = 60.0;
 
@@ -19,7 +19,7 @@ pub fn render_main_menu(game: &mut Game) {
     draw_text_ex(
         title,
         (screen_w - measure_text(title, None, title_font_size as u16, 1.0).width) / 2.0 - 25.0,
-        screen_h / 4.0,
+        screen_h / 4.0 - 10.0,
         TextParams {
             font_size: title_font_size as u16,
             color: WHITE,
@@ -42,9 +42,9 @@ pub fn render_main_menu(game: &mut Game) {
 
     draw_line(
         (screen_w - measure_text(title, None, title_font_size as u16, 1.0).width) / 2.0 - 25.0,
-        screen_h / 4.0 + 10.0,
+        screen_h / 4.0 + 7.0,
         measure_text(title, None, title_font_size as u16, 1.0).width + (screen_w - measure_text(title, None, title_font_size as u16, 1.0).width) / 2.0 + 25.0,
-        screen_h / 4.0 + 10.0,
+        screen_h / 4.0 + 7.0,
         2.0,
         RED,
     );

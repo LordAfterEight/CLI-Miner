@@ -11,7 +11,7 @@ mod input;
 
 fn setup_window() -> macroquad::window::Conf {
     macroquad::window::Conf {
-        window_title: "CLI-Miner".to_owned(),
+        window_title: "NullByte".to_owned(),
         window_width: (1920.0) as i32,
         window_height: (1080.0) as i32,
         high_dpi: false,
@@ -60,9 +60,9 @@ async fn main() {
             },
             crate::structs::Screens::InGame => {
                 let mut new_volume = game.settings.mus_vol;
-                while game.audio.music_sinks[0].volume() > 0.0 {
+                while game.audio.music_sinks[0].volume() > 0.001 {
                     rotilities::set_audio_volume(&game.audio.music_sinks[0], new_volume);
-                    new_volume -= 0.002;
+                    new_volume *= 0.99;
                     macroquad::window::next_frame().await;
                 }
                 rotilities::stop_audio(&game.audio.music_sinks[0]);
