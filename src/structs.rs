@@ -1,8 +1,6 @@
 use macroquad::prelude::*;
 
 pub struct Game {
-    /// Name of the game save
-    pub save_name: String,
     /// Directory where the save is stored
     pub save_dir: String,
     /// Game data
@@ -18,10 +16,9 @@ pub struct Game {
 }
 
 impl Game {
-    pub async fn init(name: &str) -> Self {
+    pub async fn init() -> Self {
         Self {
-            save_name: name.to_string(),
-            save_dir: format!("{}{}", "./data/", name),
+            save_dir: "./data/saves/".to_string(),
             data: Data::init(),
             settings: Settings::init(),
             devices: Vec::new(),
@@ -41,10 +38,19 @@ impl Game {
             cursor: Cursor::new().await,
         }
     }
+
+    pub fn save_game(&self, name: &str) {
+        let file = std::fs::File::options().create(true).write(true).open(format!("{}{}", &self.save_dir, name));
+    }
+
+    pub fn load_game(&mut self, name: &str) {
+        let file = std::fs::File::options().read(true).open(format!("{}{}", &self.save_dir, name));
+    }
 }
 
 #[derive(Debug)]
 pub struct Data {
+    pub player: Player,
     pub bits: u64,
     pub bytes: u64,
     pub bytestrings: u64,
@@ -54,6 +60,7 @@ pub struct Data {
 impl Data {
     pub fn init() -> Self {
         Self {
+            player: Player::new(),
             bits: 0,
             bytes: 0,
             bytestrings: 0,
@@ -153,12 +160,7 @@ impl Button {
     }
 
     pub fn is_clicked(&self, sink_sfx: &rotilities::Sink) -> bool {
-        let (mouse_x, mouse_y) = mouse_position();
-        match mouse_x >= self.x
-            && mouse_x <= self.x + self.width
-            && mouse_y >= self.y
-            && mouse_y <= self.y + self.height
-        {
+        match self.is_hovered() {
             true => {
                 let ret_value = is_mouse_button_released(MouseButton::Left);
                 if macroquad::input::is_mouse_button_pressed(macroquad::input::MouseButton::Left) {
@@ -313,5 +315,98 @@ impl Cursor {
         }
         self.x = x;
         self.y = y;
+    }
+}
+
+pub struct TextInputLabel {
+    pub x: f32,
+    pub y: f32,
+    pub width: f32,
+    pub height: f32,
+    pub text: String,
+    pub is_active: bool,
+}
+
+impl TextInputLabel {
+    pub fn new(x: f32, y: f32, width: f32, height: f32) -> Self {
+        Self {
+            x,
+            y,
+            width,
+            height,
+            text: String::new(),
+            is_active: false,
+        }
+    }
+
+    pub fn is_hovered(&self) -> bool {
+        let (mouse_x, mouse_y) = mouse_position();
+        mouse_x >= self.x
+            && mouse_x <= self.x + self.width
+            && mouse_y >= self.y
+            && mouse_y <= self.y + self.height
+    }
+
+    pub fn update(&mut self, sink_sfx: &rotilities::Sink) -> bool {
+        match self.is_hovered() {
+            true => {
+                let ret_value = is_mouse_button_released(MouseButton::Left);
+                if macroquad::input::is_mouse_button_pressed(macroquad::input::MouseButton::Left) {
+                    rotilities::play_audio(sink_sfx, "./assets/sound/interact_p1.mp3");
+                }
+                if ret_value == true {
+                    rotilities::play_audio(sink_sfx, "./assets/sound/interact_p2.mp3");
+                    self.is_active = !self.is_active;
+                }
+                ret_value
+            }
+            false => false,
+        }
+    }
+
+    pub fn draw(&self, font: Option<&Font>) {
+        let text_size = 15.0;
+        let text_dimensions = measure_text(&self.text, None, text_size as u16, 1.0);
+        let text_x = self.x + 10.0;
+        let text_y = self.y + (self.height + text_dimensions.height) / 2.0;
+
+        match self.is_active {
+            true => {
+                draw_rectangle(self.x, self.y, self.width, self.height, Color::new(0.1, 0.1, 0.1, 1.0));
+                draw_rectangle_lines(self.x, self.y, self.width, self.height, 4.0, Color::new(0.3, 0.6, 0.3, 1.0));
+            }
+            false => {
+                draw_rectangle(self.x, self.y, self.width, self.height, Color::new(0.05, 0.05, 0.05, 1.0));
+                draw_rectangle_lines(self.x, self.y, self.width, self.height, 2.0, Color::new(0.6, 0.2, 0.2, 1.0));
+            }
+        }
+        draw_text_ex(
+            &self.text,
+            text_x,
+            text_y,
+            TextParams {
+                font: font,
+                font_size: text_size as u16,
+                color: Color::new(1.0, 1.0, 1.0, 1.0),
+                ..Default::default()
+            },
+        );
+    }
+}
+
+#[derive(Debug)]
+pub struct Player {
+    pub name: String,
+    pub age: u16,
+    pub location: String,
+}
+
+impl Player {
+    pub fn new() -> Self {
+        Self {
+            name: "".to_string(),
+            age: 18,
+            location: "".to_string()
+        }
     }
 }

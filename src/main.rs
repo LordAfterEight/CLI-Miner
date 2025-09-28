@@ -30,10 +30,13 @@ fn setup_window() -> macroquad::window::Conf {
 async fn main() {
     macroquad::input::show_mouse(false);
 
-    let mut game = crate::structs::Game::init("LordAfterEight").await;
+    let mut game = crate::structs::Game::init().await;
 
     game.audio.music_sinks.push(rotilities::new_sink(&game.audio.stream_handle));
     game.audio.sfx_sinks.push(rotilities::new_sink(&game.audio.stream_handle));
+
+    rotilities::set_audio_volume(&game.audio.music_sinks[0], game.settings.mus_vol);
+    rotilities::set_audio_volume(&game.audio.sfx_sinks[0], game.settings.sfx_vol);
 
     loop {
         match game.current_screen {
@@ -44,7 +47,7 @@ async fn main() {
                 }
             },
             crate::structs::Screens::SaveMenu => {
-                crate::screens::render_save_menu(&mut game);
+                crate::screens::render_save_menu(&mut game).await;
                 if game.audio.music_sinks[0].empty() {
                     rotilities::play_audio(&game.audio.music_sinks[0], "./assets/sound/Main Menu.mp3");
                 }
