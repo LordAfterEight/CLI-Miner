@@ -7,7 +7,7 @@ pub enum Alignment {
     Right,
 }
 
-pub fn render_main_menu(game: &mut Game, sink_sfx: &rotilities::Sink) {
+pub fn render_main_menu(game: &mut Game) {
     let (screen_w, screen_h) = (macroquad::window::screen_width(), macroquad::window::screen_height());
 
     let title = "CLI-MINER »«";
@@ -117,26 +117,123 @@ pub fn render_main_menu(game: &mut Game, sink_sfx: &rotilities::Sink) {
         );
     }
 
+    if play_button.is_hovered() || settings_button.is_hovered() || exit_button.is_hovered() {
+        game.cursor.hovers_clickable = true;
+    } else {
+        game.cursor.hovers_clickable = false;
+    }
+
     play_button.draw(Some(&game.fonts[1]));
     settings_button.draw(Some(&game.fonts[1]));
     exit_button.draw(Some(&game.fonts[1]));
 
-    if exit_button.is_clicked(&sink_sfx) {
+    if exit_button.is_clicked(&game.audio.sfx_sinks[0]) {
         std::thread::sleep(std::time::Duration::from_millis(400));
         std::process::exit(0);
     }
 
-    if settings_button.is_clicked(&sink_sfx) {
+    if settings_button.is_clicked(&game.audio.sfx_sinks[0]) {
         game.current_screen = Screens::SettingsMenu;
         game.previous_screen = Some(Screens::MainMenu);
     }
-    if play_button.is_clicked(&sink_sfx) {
-        game.current_screen = Screens::InGame;
+    if play_button.is_clicked(&game.audio.sfx_sinks[0]) {
+        game.current_screen = Screens::SaveMenu;
         game.previous_screen = Some(Screens::MainMenu);
     }
 }
 
-pub fn render_settings_screen() {
+pub fn render_save_menu(game: &mut Game) {
+    let exit_button = crate::structs::Button::new(
+        "Back",
+        5.0,
+        5.0,
+        100.0,
+        25.0,
+    );
+    exit_button.draw(Some(&game.fonts[1]));
+    if exit_button.is_clicked(&game.audio.sfx_sinks[0]) {
+        game.current_screen = Screens::MainMenu;
+        game.previous_screen = Some(Screens::SaveMenu);
+    }
+
+    draw_text_ex(
+        "Saves",
+        screen_width() / 2.0 - measure_text("Saves", None, 30, 1.0).width / 2.0,
+        30.0,
+        TextParams {
+            font_size: 30,
+            color: WHITE,
+            font: Some(&game.fonts[1]),
+            ..Default::default()
+        },
+    );
+
+    draw_line(
+        0.0,
+        40.0,
+        screen_width(),
+        40.0,
+        2.0,
+        RED,
+    );
+
+    draw_text_ex(
+        format!("{}", chrono::Local::now().format("%H:%M:%S%.3f")).as_str(),
+        screen_width() - 150.0, 30.0,
+        TextParams {
+            font_size: 15,
+            color: WHITE,
+            font: Some(&game.fonts[0]),
+            ..Default::default()
+        },
+    );
+}
+
+pub fn render_settings_screen(game: &mut Game) {
+    let exit_button = crate::structs::Button::new(
+        "Back",
+        5.0,
+        5.0,
+        100.0,
+        25.0,
+    );
+    exit_button.draw(Some(&game.fonts[1]));
+    if exit_button.is_clicked(&game.audio.sfx_sinks[0]) {
+        game.current_screen = Screens::MainMenu;
+        game.previous_screen = Some(Screens::SaveMenu);
+    }
+
+    draw_text_ex(
+        "Settings",
+        screen_width() / 2.0 - measure_text("Settingss", None, 30, 1.0).width / 2.0,
+        30.0,
+        TextParams {
+            font_size: 30,
+            color: WHITE,
+            font: Some(&game.fonts[1]),
+            ..Default::default()
+        },
+    );
+
+    draw_text_ex(
+        format!("{}", chrono::Local::now().format("%H:%M:%S%.3f")).as_str(),
+        screen_width() - 150.0, 30.0,
+        TextParams {
+            font_size: 15,
+            color: WHITE,
+            font: Some(&game.fonts[0]),
+            ..Default::default()
+        },
+    );
+
+    draw_line(
+        0.0,
+        40.0,
+        screen_width(),
+        40.0,
+        2.0,
+        RED,
+    );
 }
 
 pub fn render_game_screen(game: &mut Game) {

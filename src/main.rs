@@ -1,5 +1,3 @@
-use std::io::sink;
-
 use macroquad::prelude::*;
 use macroquad::rand;
 use rotilities;
@@ -24,40 +22,41 @@ fn setup_window() -> macroquad::window::Conf {
 
 #[macroquad::main(setup_window())]
 async fn main() {
-    let mut game = crate::structs::Game::init("LordAfterEight");
-    let (_stream, stream_handle) = rotilities::init();
-    let sink_music = rotilities::new_sink(&stream_handle);
-    let sink_sfx = rotilities::new_sink(&stream_handle);
+    macroquad::input::show_mouse(false);
+    let mut game = crate::structs::Game::init("LordAfterEight").await;
 
-    rotilities::set_audio_volume(&sink_music, game.settings.mus_vol);
-    rotilities::set_audio_volume(&sink_sfx, game.settings.sfx_vol);
-
-    println!("Game: {:#?}", game);
-
-    rotilities::play_audio(&sink_music, "./assets/sound/Main Menu.mp3");
+    game.audio.music_sinks.push(rotilities::new_sink(&game.audio.stream_handle));
+    game.audio.sfx_sinks.push(rotilities::new_sink(&game.audio.stream_handle));
 
     loop {
         match game.current_screen {
             crate::structs::Screens::MainMenu => {
-                crate::screens::render_main_menu(&mut game, &sink_sfx);
-                if sink_music.empty() {
-                    rotilities::play_audio(&sink_music, "./assets/sound/Main Menu.mp3");
+                crate::screens::render_main_menu(&mut game);
+                if game.audio.music_sinks[0].empty() {
+                    rotilities::play_audio(&game.audio.music_sinks[0], "./assets/sound/Main Menu.mp3");
+                }
+            },
+            crate::structs::Screens::SaveMenu => {
+                crate::screens::render_save_menu(&mut game);
+                if game.audio.music_sinks[0].empty() {
+                    rotilities::play_audio(&game.audio.music_sinks[0], "./assets/sound/Main Menu.mp3");
                 }
             },
             crate::structs::Screens::SettingsMenu => {
-                if sink_music.empty() {
-                    rotilities::play_audio(&sink_music, "./assets/sound/Main Menu.mp3");
+                crate::screens::render_settings_screen(&mut game);
+                if game.audio.music_sinks[0].empty() {
+                    rotilities::play_audio(&game.audio.music_sinks[0], "./assets/sound/Main Menu.mp3");
                 }
             },
             crate::structs::Screens::InGame => {
                 let mut new_volume = game.settings.mus_vol;
-                while sink_music.volume() > 0.0 {
-                    rotilities::set_audio_volume(&sink_music, new_volume);
+                while game.audio.music_sinks[0].volume() > 0.0 {
+                    rotilities::set_audio_volume(&game.audio.music_sinks[0], new_volume);
                     new_volume -= 0.002;
                     macroquad::window::next_frame().await;
                 }
-                rotilities::stop_audio(&sink_music);
-                rotilities::set_audio_volume(&sink_music, game.settings.mus_vol);
+                rotilities::stop_audio(&game.audio.music_sinks[0]);
+                rotilities::set_audio_volume(&game.audio.music_sinks[0], game.settings.mus_vol);
                 std::thread::sleep(std::time::Duration::from_millis(1000));
 
                 while game.current_screen == crate::structs::Screens::InGame {
@@ -69,6 +68,7 @@ async fn main() {
             _ => {}
         }
 
+        game.cursor.update();
         macroquad::window::next_frame().await;
     }
 }

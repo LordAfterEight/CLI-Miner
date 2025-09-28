@@ -1,6 +1,5 @@
 use macroquad::prelude::*;
 
-#[derive(Debug)]
 pub struct Game {
     /// Name of the game save
     pub save_name: String,
@@ -14,10 +13,12 @@ pub struct Game {
     pub current_screen: Screens,
     pub previous_screen: Option<Screens>,
     pub fonts: Vec<Font>,
+    pub audio: Audio,
+    pub cursor: Cursor,
 }
 
 impl Game {
-    pub fn init(name: &str) -> Self {
+    pub async fn init(name: &str) -> Self {
         Self {
             save_name: name.to_string(),
             save_dir: format!("{}{}", "./data/", name),
@@ -27,9 +28,17 @@ impl Game {
             current_screen: Screens::MainMenu,
             previous_screen: None,
             fonts: vec![
-                load_ttf_font_from_bytes(include_bytes!("../assets/fonts/ProFont/ProFontIIxNerdFont-Regular.ttf")).unwrap(),
-                load_ttf_font_from_bytes(include_bytes!("../assets/fonts/Terminus/TerminessNerdFont-Regular.ttf")).unwrap(),
+                load_ttf_font_from_bytes(include_bytes!(
+                    "../assets/fonts/ProFont/ProFontIIxNerdFont-Regular.ttf"
+                ))
+                .unwrap(),
+                load_ttf_font_from_bytes(include_bytes!(
+                    "../assets/fonts/Terminus/TerminessNerdFont-Regular.ttf"
+                ))
+                .unwrap(),
             ],
+            audio: Audio::init(),
+            cursor: Cursor::new().await,
         }
     }
 }
@@ -87,7 +96,7 @@ pub struct Device {
     /// This Device's efficiency
     pub efficiency: u8,
     /// The devices unique ID
-    pub id: u8
+    pub id: u8,
 }
 
 #[derive(Debug)]
@@ -108,6 +117,7 @@ pub enum DeviceType {
 #[derive(Debug, PartialEq)]
 pub enum Screens {
     MainMenu,
+    SaveMenu,
     SettingsMenu,
     InGame,
     PauseMenu,
@@ -147,7 +157,8 @@ impl Button {
         match mouse_x >= self.x
             && mouse_x <= self.x + self.width
             && mouse_y >= self.y
-            && mouse_y <= self.y + self.height {
+            && mouse_y <= self.y + self.height
+        {
             true => {
                 let ret_value = is_mouse_button_released(MouseButton::Left);
                 if macroquad::input::is_mouse_button_pressed(macroquad::input::MouseButton::Left) {
@@ -157,37 +168,66 @@ impl Button {
                     rotilities::play_audio(sink_sfx, "./assets/sound/interact_p2.mp3");
                 }
                 ret_value
-            },
+            }
             false => false,
         }
     }
 
     pub fn draw(&self, font: Option<&Font>) {
-        draw_button(&self.label, self.x, self.y, self.width, self.height, Alignment::Center, font);
+        draw_button(
+            &self.label,
+            self.x,
+            self.y,
+            self.width,
+            self.height,
+            Alignment::Center,
+            font,
+        );
     }
 }
 
-pub fn draw_button(text: &str, x: f32, y: f32, width: f32, height: f32, alignment: Alignment, font: Option<&Font>) {
+pub fn draw_button(
+    text: &str,
+    x: f32,
+    y: f32,
+    width: f32,
+    height: f32,
+    alignment: Alignment,
+    font: Option<&Font>,
+) {
     let (mouse_x, mouse_y) = mouse_position();
     let is_hovered = mouse_x >= x && mouse_x <= x + width && mouse_y >= y && mouse_y <= y + height;
     let text_size = 25.0;
     let text_dimensions = measure_text(text, None, text_size as u16, 1.0);
     let (text_x, text_y) = match alignment {
-        Alignment::Left => (x + 10.0, y + (height + text_dimensions.height) / 2.0 + text_size / 3.3),
-        Alignment::Center => (x + (width - text_dimensions.width) / 2.0, y + height / 2.0 + text_size / 3.3),
-        Alignment::Right => (x + width - text_dimensions.width - 10.0, y + height / 2.0 + text_size / 3.3),
+        Alignment::Left => (
+            x + 10.0,
+            y + (height + text_dimensions.height) / 2.0 + text_size / 3.3,
+        ),
+        Alignment::Center => (
+            x + (width - text_dimensions.width) / 2.0,
+            y + height / 2.0 + text_size / 3.3,
+        ),
+        Alignment::Right => (
+            x + width - text_dimensions.width - 10.0,
+            y + height / 2.0 + text_size / 3.3,
+        ),
     };
 
     match is_hovered {
         false => {
-            draw_rectangle(x, y, width, height, Color::new(0.05,0.05,0.05,1.0));
-            draw_rectangle_lines(x, y, width, height, 2.0, Color::new(0.6,0.2,0.2,1.0));
-        },
+            draw_rectangle(x, y, width, height, Color::new(0.05, 0.05, 0.05, 1.0));
+            draw_rectangle_lines(x, y, width, height, 2.0, Color::new(0.6, 0.2, 0.2, 1.0));
+        }
         true => {
-            draw_rectangle(x, y, width, height, Color::new(0.1,0.1,0.1,1.0));
+            draw_rectangle(x, y, width, height, Color::new(0.1, 0.1, 0.1, 1.0));
             match is_mouse_button_down(MouseButton::Left) {
-                false => draw_rectangle_lines(x, y, width, height, 4.0, Color::new(0.6,0.6,0.3,1.0)),
-                true => draw_rectangle_lines(x, y, width, height, 6.0, Color::new(0.3,0.6,0.3,1.0)),
+                false => {
+                    draw_rectangle_lines(x, y, width, height, 4.0, Color::new(0.6, 0.6, 0.3, 1.0))
+                }
+                true => {
+                    draw_rectangle_lines(x, y, width, height, 6.0, Color::new(0.3, 0.6, 0.3, 1.0))
+                }
             }
         }
     }
@@ -204,8 +244,74 @@ pub fn draw_button(text: &str, x: f32, y: f32, width: f32, height: f32, alignmen
     );
 }
 
+pub struct Audio {
+    pub stream: rotilities::OutputStream,
+    pub stream_handle: rotilities::OutputStreamHandle,
+    pub music_sinks: Vec<rotilities::Sink>,
+    pub sfx_sinks: Vec<rotilities::Sink>,
+}
+
+impl Audio {
+    pub fn init() -> Self {
+        let (stream, stream_handle) = rotilities::init();
+        Self {
+            stream: stream,
+            stream_handle: stream_handle,
+            music_sinks: Vec::new(),
+            sfx_sinks: Vec::new(),
+        }
+    }
+}
+
 pub enum Alignment {
     Left,
     Center,
     Right,
+}
+
+pub struct Cursor {
+    pub x: f32,
+    pub y: f32,
+    pub sprite: Texture2D,
+    pub sprite_hover: Texture2D,
+    pub sprite_click: Texture2D,
+    pub hovers_clickable: bool,
+}
+
+impl Cursor {
+    pub async fn new() -> Self {
+        let (x, y) = mouse_position();
+        Self {
+            x,
+            y,
+            sprite: load_texture("./assets/sprites/Cursor.png")
+                .await
+                .expect("Failed to load cursor sprite"),
+            sprite_hover: load_texture("./assets/sprites/Cursor_hover.png")
+                .await
+                .expect("Failed to load cursor hover sprite"),
+            sprite_click: load_texture("./assets/sprites/Cursor_click.png")
+                .await
+                .expect("Failed to load cursor click sprite"),
+            hovers_clickable: false,
+        }
+    }
+
+    pub fn update(&mut self) {
+        let (x, y) = mouse_position();
+        match self.hovers_clickable {
+            true => {
+                if is_mouse_button_down(MouseButton::Left) {
+                    draw_texture(&self.sprite_click, x - self.sprite_click.width() / 2.0, y - self.sprite_click.height() / 2.0, WHITE);
+                } else {
+                    draw_texture(&self.sprite_hover, x - self.sprite_hover.width() / 2.0, y - self.sprite_hover.height() / 2.0, WHITE);
+                }
+            }
+            false => {
+                draw_texture(&self.sprite, x - self.sprite.width() / 2.0, y - self.sprite.height() / 2.0, WHITE);
+            }
+        }
+        self.x = x;
+        self.y = y;
+    }
 }
