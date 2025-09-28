@@ -177,6 +177,12 @@ pub fn render_save_menu(game: &mut Game) {
         RED,
     );
 
+    if exit_button.is_hovered() {
+        game.cursor.hovers_clickable = true;
+    } else {
+        game.cursor.hovers_clickable = false;
+    }
+
     draw_text_ex(
         format!("{}", chrono::Local::now().format("%H:%M:%S%.3f")).as_str(),
         screen_width() - 150.0, 30.0,
@@ -225,6 +231,12 @@ pub fn render_settings_screen(game: &mut Game) {
             ..Default::default()
         },
     );
+
+    if exit_button.is_hovered() {
+        game.cursor.hovers_clickable = true;
+    } else {
+        game.cursor.hovers_clickable = false;
+    }
 
     draw_line(
         0.0,

@@ -1,3 +1,4 @@
+use macroquad::miniquad::conf::Icon;
 use macroquad::prelude::*;
 use macroquad::rand;
 use rotilities;
@@ -16,6 +17,11 @@ fn setup_window() -> macroquad::window::Conf {
         high_dpi: false,
         window_resizable: false,
         fullscreen: true,
+        icon: Some(Icon {
+            small: include_bytes!("../assets/sprites/Icon_16x16.bin").clone(),
+            medium: include_bytes!("../assets/sprites/Icon_32x32.bin").clone(),
+            big: include_bytes!("../assets/sprites/Icon_64x64.bin").clone(),
+        }),
         ..Default::default()
     }
 }
@@ -23,6 +29,7 @@ fn setup_window() -> macroquad::window::Conf {
 #[macroquad::main(setup_window())]
 async fn main() {
     macroquad::input::show_mouse(false);
+
     let mut game = crate::structs::Game::init("LordAfterEight").await;
 
     game.audio.music_sinks.push(rotilities::new_sink(&game.audio.stream_handle));
