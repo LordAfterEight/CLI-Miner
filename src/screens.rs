@@ -16,6 +16,19 @@ pub fn render_main_menu(game: &mut Game) {
 
     let subtitle = format!("V{}", env!("CARGO_PKG_VERSION"));
 
+    let time = &format!("{}", chrono::Local::now().format("%H:%M:%S"));
+
+    draw_text_ex(
+        time,
+        (screen_w - measure_text(time, Some(&game.fonts[0]), 25, 1.0).width) / 2.0, 50.0,
+        TextParams {
+            font_size: 25,
+            color: WHITE,
+            font: Some(&game.fonts[0]),
+            ..Default::default()
+        },
+    );
+
     draw_text_ex(
         title,
         (screen_w - measure_text(title, None, title_font_size as u16, 1.0).width) / 2.0 - 25.0,
