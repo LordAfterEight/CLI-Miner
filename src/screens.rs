@@ -88,55 +88,41 @@ pub fn render_main_menu(game: &mut Game) {
         35.0,
     );
 
+    let info_text: String;
+    let info_text_color: Color;
+
     if play_button.is_hovered() {
-        draw_text_ex(
-            "Start your adventure",
-            screen_w / 2.0 - measure_text("Start your adventure", None, 15, 1.5).width / 2.0,
-            screen_h / 2.0 - 50.0,
-            TextParams {
-                font_size: 15,
-                color: GREEN,
-                font: Some(&game.fonts[0]),
-                ..Default::default()
-            },
-        );
-    }
-
-    if settings_button.is_hovered() {
-        draw_text_ex(
-            "Adjust your preferences",
-            screen_w / 2.0 - measure_text("Adjust your preferences", None, 15, 1.5).width / 2.0,
-            screen_h / 2.0 - 50.0,
-            TextParams {
-                font_size: 15,
-                color: YELLOW,
-                font: Some(&game.fonts[0]),
-                ..Default::default()
-            },
-        );
-    }
-
-    if exit_button.is_hovered() {
-        draw_text_ex(
-            "Quit the game",
-            screen_w / 2.0 - measure_text("Quit the game", None, 15, 1.5).width / 2.0,
-            screen_h / 2.0 - 50.0,
-            TextParams {
-                font_size: 15,
-                color: RED,
-                font: Some(&game.fonts[0]),
-                ..Default::default()
-            },
-        );
+        info_text = "Start your Adventure".to_string();
+        info_text_color = GREEN;
+    } else if settings_button.is_hovered() {
+        info_text = "Adjust your Preferences".to_string();
+        info_text_color = YELLOW;
+    } else if exit_button.is_hovered() {
+        info_text = "Quit the Game".to_string();
+        info_text_color = RED;
+    } else {
+        info_text = "".to_string();
+        info_text_color = BLACK;
     }
 
     if play_button.is_hovered() || settings_button.is_hovered() || exit_button.is_hovered() {
         game.cursor.hovers_clickable = true;
+        draw_text_ex(
+            &format!("{}", info_text),
+            screen_w / 2.0 - measure_text(&info_text, None, 15, 1.5).width / 2.0,
+            screen_h / 2.0 - 50.0,
+            TextParams {
+                font_size: 15,
+                color: info_text_color,
+                font: Some(&game.fonts[0]),
+                ..Default::default()
+            },
+        );
     } else {
         game.cursor.hovers_clickable = false;
     }
 
-    play_button.draw(Some(&game.fonts[1]));
+    play_button.draw(None);
     settings_button.draw(Some(&game.fonts[1]));
     exit_button.draw(Some(&game.fonts[1]));
 
@@ -334,7 +320,7 @@ pub fn render_settings_screen(game: &mut Game) {
 
     draw_text_ex(
         "Settings",
-        screen_width() / 2.0 - measure_text("Settingss", None, 30, 1.0).width / 2.0,
+        screen_width() / 2.0 - measure_text("Settings", None, 30, 1.0).width / 2.0,
         30.0,
         TextParams {
             font_size: 30,

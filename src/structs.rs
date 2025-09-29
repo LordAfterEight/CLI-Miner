@@ -238,7 +238,7 @@ pub fn draw_button(
         text_x,
         text_y,
         TextParams {
-            font: if font.is_some() { font } else { None },
+            font: font,
             font_size: text_size as u16,
             color: Color::new(1.0, 1.0, 1.0, 1.0),
             ..Default::default()
@@ -247,7 +247,7 @@ pub fn draw_button(
 }
 
 pub struct Audio {
-    pub stream: rotilities::OutputStream,
+    pub _stream: rotilities::OutputStream,
     pub stream_handle: rotilities::OutputStreamHandle,
     pub music_sinks: Vec<rotilities::Sink>,
     pub sfx_sinks: Vec<rotilities::Sink>,
@@ -257,7 +257,7 @@ impl Audio {
     pub fn init() -> Self {
         let (stream, stream_handle) = rotilities::init();
         Self {
-            stream: stream,
+            _stream: stream,
             stream_handle: stream_handle,
             music_sinks: Vec::new(),
             sfx_sinks: Vec::new(),
