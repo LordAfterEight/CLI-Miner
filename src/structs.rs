@@ -214,7 +214,7 @@ pub struct Player {
 impl Player {
     pub fn new() -> Self {
         Self {
-            name: "".to_string(),
+            name: "Player".to_string(),
             age: 18,
             location: "".to_string()
         }

@@ -121,18 +121,22 @@ pub struct TextInputLabel {
     pub width: f32,
     pub height: f32,
     pub text: String,
+    pub label: Option<String>,
     pub is_active: bool,
+    pub backspace_repeat: u8,
 }
 
 impl TextInputLabel {
-    pub fn new(x: f32, y: f32, width: f32, height: f32) -> Self {
+    pub fn new(label: Option<String>, x: f32, y: f32, width: f32, height: f32) -> Self {
         Self {
             x,
             y,
             width,
             height,
             text: String::new(),
+            label,
             is_active: false,
+            backspace_repeat: 3
         }
     }
 
@@ -161,21 +165,35 @@ impl TextInputLabel {
         }
     }
 
-    pub fn draw(&self, font: Option<&Font>) {
+    pub fn draw(&mut self, font: Option<&Font>) {
         let text_size = 15.0;
-        let text_dimensions = measure_text(&self.text, None, text_size as u16, 1.0);
         let text_x = self.x + 10.0;
-        let text_y = self.y + (self.height + text_dimensions.height) / 2.0;
+        let text_y = self.y + self.height / 2.0 + 5.0;
 
-        match self.is_active {
-            true => {
-                draw_rectangle(self.x, self.y, self.width, self.height, Color::new(0.1, 0.1, 0.1, 1.0));
-                draw_rectangle_lines(self.x, self.y, self.width, self.height, 4.0, Color::new(0.3, 0.6, 0.3, 1.0));
-            }
-            false => {
-                draw_rectangle(self.x, self.y, self.width, self.height, Color::new(0.05, 0.05, 0.05, 1.0));
-                draw_rectangle_lines(self.x, self.y, self.width, self.height, 2.0, Color::new(0.6, 0.2, 0.2, 1.0));
-            }
+        draw_rectangle(self.x, self.y, self.width, self.height, Color::new(0.05, 0.05, 0.05, 1.0));
+
+        if self.is_active {
+            draw_rectangle(self.x, self.y, self.width, self.height, Color::new(0.1, 0.1, 0.1, 1.0));
+            draw_rectangle_lines(self.x, self.y, self.width, self.height, 4.0, Color::new(0.3, 0.6, 0.3, 1.0));
+        } else if self.is_hovered() {
+            draw_rectangle(self.x, self.y, self.width, self.height, Color::new(0.1, 0.1, 0.1, 1.0));
+            draw_rectangle_lines(self.x, self.y, self.width, self.height, 4.0, Color::new(0.6, 0.6, 0.3, 1.0));
+        } else {
+            draw_rectangle_lines(self.x, self.y, self.width, self.height, 2.0, Color::new(0.6, 0.2, 0.2, 1.0));
+        }
+
+        if self.label.is_some() {
+            draw_text_ex(
+                &self.label.as_ref().unwrap(),
+                self.x - 150.0,
+                text_y,
+                TextParams {
+                    font: font,
+                    font_size: text_size as u16,
+                    color: Color::new(1.0, 1.0, 1.0, 1.0),
+                    ..Default::default()
+                },
+            );
         }
         draw_text_ex(
             &self.text,
@@ -190,23 +208,40 @@ impl TextInputLabel {
         );
     }
 
-    /// Handles any global keyboard input. Returns a bool if Enter was pressed
-    pub fn use_input(&mut self, game: &mut crate::structs::Game) -> bool {
-        if is_key_pressed(KeyCode::Backspace) {
-            self.text.pop();
+    /// Handles any global keyboard input. Returns either Some(String) containing a copy of the label text or None
+    pub fn use_input(&mut self, game: &mut crate::structs::Game) -> Option<String> {
+        if self.is_active {
+            if is_key_down(KeyCode::Backspace) {
+                if self.backspace_repeat <= 0 {
+                    self.text.pop();
+                    self.backspace_repeat = 4;
+                    None
+                } else {
+                    self.backspace_repeat -= 1;
+                    None
+                }
+            } else if is_key_pressed(KeyCode::Escape){
+                self.is_active = false;
+                None
+            } else {
+                if is_key_pressed(KeyCode::Enter) {
+                    return Some(self.text.clone())
+                }
+                match macroquad::input::get_char_pressed() {
+                    Some(c) => {
+                        if self.text.len() < 30 {
+                            self.text.push(c);
+                        } else {
+                            rotilities::play_audio(&game.audio.sfx_sinks[0], "./assets/sound/fail.mp3");
+                        }
+                        macroquad::input::clear_input_queue();
+                        return None
+                    },
+                    None => None
+                }
+            }
+        } else {
+            return None
         }
-        if is_key_pressed(KeyCode::Enter) {
-            game.data.player.name = self.text.clone();
-            game.current_screen = crate::structs::Screens::InGame;
-            game.previous_screen = Some(crate::structs::Screens::SaveMenu);
-            return true
-        }
-        match macroquad::input::get_char_pressed() {
-            Some(c) => {
-                self.text.push(c);
-            },
-            None => {}
-        }
-        return false
     }
 }

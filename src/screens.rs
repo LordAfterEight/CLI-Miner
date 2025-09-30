@@ -123,7 +123,7 @@ pub fn render_main_menu(game: &mut Game) {
         game.cursor.hovers_clickable = false;
     }
 
-    play_button.draw(None);
+    play_button.draw(Some(&game.fonts[1]));
     settings_button.draw(Some(&game.fonts[1]));
     exit_button.draw(Some(&game.fonts[1]));
 
@@ -154,9 +154,20 @@ pub async fn render_save_menu(game: &mut Game) {
     let mut col1 = WHITE;
     let mut col2 = GRAY;
 
+    let newgame_label_x_alignment = screen_width() / 2.0 + 250.0;
+
     let mut name_label = crate::ui::TextInputLabel::new(
-        screen_width() / 2.0 + 250.0,
+        Some("Name:".to_string()),
+        newgame_label_x_alignment,
         screen_height() / 3.0 - 20.0,
+        300.0,
+        30.0,
+    );
+
+    let mut age_label = crate::ui::TextInputLabel::new(
+        Some("Age:".to_string()),
+        newgame_label_x_alignment,
+        screen_height() / 3.0 + 20.0,
         300.0,
         30.0,
     );
@@ -205,18 +216,6 @@ pub async fn render_save_menu(game: &mut Game) {
                 font_size: 25,
                 color: col2,
                 font: Some(&game.fonts[1]),
-                ..Default::default()
-            },
-        );
-
-        draw_text_ex(
-            "Name: ",
-            screen_width() / 2.0 - measure_text("Name: ", None, 20, 1.0).width / 2.0 + 100.0,
-            screen_height() / 3.0,
-            TextParams {
-                font_size: 20,
-                color: col2,
-                font: Some(&game.fonts[0]),
                 ..Default::default()
             },
         );
@@ -275,16 +274,28 @@ pub async fn render_save_menu(game: &mut Game) {
             break;
         }
 
-        if name_label.is_hovered() {
+        if name_label.is_hovered() || age_label.is_hovered() {
             game.cursor.hovers_clickable = true;
         }
 
         if name_label.is_active {
-            name_label.use_input(game);
+            game.data.player.name = match name_label.use_input(game) {
+                Some(c) => c,
+                None => "Player".to_string()
+            };
+        }
+
+        if age_label.is_active {
+            game.data.player.age = match age_label.use_input(game) {
+                Some(c) => c.parse().unwrap(),
+                None => 18
+            };
         }
 
         name_label.update(&game.audio.sfx_sinks[0]);
         name_label.draw(Some(&game.fonts[0]));
+        age_label.update(&game.audio.sfx_sinks[0]);
+        age_label.draw(Some(&game.fonts[0]));
         exit_button.draw(Some(&game.fonts[1]));
         game.cursor.update();
         macroquad::window::next_frame().await;
