@@ -1,6 +1,5 @@
 use macroquad::miniquad::conf::Icon;
 use macroquad::prelude::*;
-use macroquad::rand;
 use rotilities;
 
 use crate::screens::render_game_screen;
@@ -8,6 +7,7 @@ use crate::screens::render_game_screen;
 mod screens;
 mod structs;
 mod input;
+mod ui;
 
 fn setup_window() -> macroquad::window::Conf {
     macroquad::window::Conf {

@@ -1,4 +1,5 @@
 use macroquad::prelude::*;
+use crate::ui::{Button, TextInputLabel};
 use crate::structs::*;
 
 pub enum Alignment {
@@ -64,7 +65,7 @@ pub fn render_main_menu(game: &mut Game) {
 
     draw_text("© Elias Stettmayer, 2025", screen_w - 280.0, screen_h - 20.0, 25.0, GRAY);
 
-    let play_button = crate::structs::Button::new(
+    let play_button = crate::ui::Button::new(
         "Play",
         screen_w / 2.0 - 100.0,
         screen_h / 2.0 - 25.0,
@@ -72,7 +73,7 @@ pub fn render_main_menu(game: &mut Game) {
         35.0,
     );
 
-    let settings_button = crate::structs::Button::new(
+    let settings_button = crate::ui::Button::new(
         "Settings",
         screen_w / 2.0 - 100.0,
         screen_h / 2.0 + 25.0,
@@ -80,7 +81,7 @@ pub fn render_main_menu(game: &mut Game) {
         35.0,
     );
 
-    let exit_button = crate::structs::Button::new(
+    let exit_button = crate::ui::Button::new(
         "Exit",
         screen_w / 2.0 - 100.0,
         screen_h / 2.0 + 75.0,
@@ -142,7 +143,7 @@ pub fn render_main_menu(game: &mut Game) {
 }
 
 pub async fn render_save_menu(game: &mut Game) {
-    let exit_button = crate::structs::Button::new(
+    let exit_button = crate::ui::Button::new(
         "Back",
         5.0,
         5.0,
@@ -153,7 +154,7 @@ pub async fn render_save_menu(game: &mut Game) {
     let mut col1 = WHITE;
     let mut col2 = GRAY;
 
-    let mut name_label = crate::structs::TextInputLabel::new(
+    let mut name_label = crate::ui::TextInputLabel::new(
         screen_width() / 2.0 + 250.0,
         screen_height() / 3.0 - 20.0,
         300.0,
@@ -305,7 +306,7 @@ pub async fn render_save_menu(game: &mut Game) {
 }
 
 pub fn render_settings_screen(game: &mut Game) {
-    let exit_button = crate::structs::Button::new(
+    let exit_button = crate::ui::Button::new(
         "Back",
         5.0,
         5.0,
