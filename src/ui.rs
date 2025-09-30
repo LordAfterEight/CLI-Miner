@@ -189,4 +189,24 @@ impl TextInputLabel {
             },
         );
     }
+
+    /// Handles any global keyboard input. Returns a bool if Enter was pressed
+    pub fn use_input(&mut self, game: &mut crate::structs::Game) -> bool {
+        if is_key_pressed(KeyCode::Backspace) {
+            self.text.pop();
+        }
+        if is_key_pressed(KeyCode::Enter) {
+            game.data.player.name = self.text.clone();
+            game.current_screen = crate::structs::Screens::InGame;
+            game.previous_screen = Some(crate::structs::Screens::SaveMenu);
+            return true
+        }
+        match macroquad::input::get_char_pressed() {
+            Some(c) => {
+                self.text.push(c);
+            },
+            None => {}
+        }
+        return false
+    }
 }

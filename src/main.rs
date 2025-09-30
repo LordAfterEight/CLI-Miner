@@ -43,7 +43,7 @@ async fn main() {
             crate::structs::Screens::MainMenu => {
                 crate::screens::render_main_menu(&mut game);
                 if game.audio.music_sinks[0].empty() {
-                    rotilities::play_audio(&game.audio.music_sinks[0], "./assets/sound/Main Menu.mp3");
+                    rotilities::play_audio(&game.audio.music_sinks[0], "./assets/sound/NullByte (Main Menu theme).mp3");
                 } else if game.previous_screen == Some(crate::structs::Screens::InGame) {
                     let mut new_volume = game.settings.mus_vol;
                     while game.audio.music_sinks[0].volume() > 0.001 {
@@ -61,13 +61,13 @@ async fn main() {
             crate::structs::Screens::SaveMenu => {
                 crate::screens::render_save_menu(&mut game).await;
                 if game.audio.music_sinks[0].empty() {
-                    rotilities::play_audio(&game.audio.music_sinks[0], "./assets/sound/Main Menu.mp3");
+                    rotilities::play_audio(&game.audio.music_sinks[0], "./assets/sound/Nullbyte (Main Menu theme).mp3");
                 }
             },
             crate::structs::Screens::SettingsMenu => {
                 crate::screens::render_settings_screen(&mut game);
                 if game.audio.music_sinks[0].empty() {
-                    rotilities::play_audio(&game.audio.music_sinks[0], "./assets/sound/Main Menu.mp3");
+                    rotilities::play_audio(&game.audio.music_sinks[0], "./assets/sound/NullByte (Main Menu theme).mp3");
                 }
             },
             crate::structs::Screens::InGame => {

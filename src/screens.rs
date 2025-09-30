@@ -280,21 +280,7 @@ pub async fn render_save_menu(game: &mut Game) {
         }
 
         if name_label.is_active {
-            if is_key_pressed(KeyCode::Backspace) {
-                name_label.text.pop();
-            }
-            if is_key_pressed(KeyCode::Enter) {
-                game.data.player.name = name_label.text.clone();
-                game.current_screen = Screens::InGame;
-                game.previous_screen = Some(Screens::SaveMenu);
-                break;
-            }
-            match macroquad::input::get_char_pressed() {
-                Some(c) => {
-                    name_label.text.push(c);
-                },
-                None => {}
-            }
+            name_label.use_input(game);
         }
 
         name_label.update(&game.audio.sfx_sinks[0]);
