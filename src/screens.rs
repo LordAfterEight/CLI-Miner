@@ -399,7 +399,7 @@ pub async fn render_game_screen(game: &mut Game) {
         macroquad::window::next_frame().await;
     }
 
-    while alpha >= 0.1 {
+    while alpha >= 0.01 {
         draw_text_ex(
             "Prime System",
             screen_width() / 2.0 - measure_text("Prime System", Some(&game.fonts[1]), 30, 1.0).width / 2.0,
