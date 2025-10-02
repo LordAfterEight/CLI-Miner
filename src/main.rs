@@ -80,14 +80,10 @@ async fn main() {
                 rotilities::stop_audio(&game.audio.music_sinks[0]);
                 rotilities::set_audio_volume(&game.audio.music_sinks[0], game.settings.mus_vol);
                 std::thread::sleep(std::time::Duration::from_millis(1000));
+                rotilities::play_audio(&game.audio.music_sinks[0], "./assets/sound/Prime.mp3");
 
-                while game.current_screen == crate::structs::Screens::InGame {
-                    render_game_screen(&mut game);
-                    if game.audio.music_sinks[0].empty() {
-                        rotilities::play_audio(&game.audio.music_sinks[0], "./assets/sound/Prime.mp3");
-                    }
-                    macroquad::window::next_frame().await;
-                }
+                render_game_screen(&mut game).await;
+                macroquad::window::next_frame().await;
             },
 
             _ => {}

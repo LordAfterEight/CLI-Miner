@@ -208,24 +208,24 @@ impl TextInputLabel {
         );
     }
 
-    /// Handles any global keyboard input. Returns either Some(String) containing a copy of the label text or None
-    pub fn use_input(&mut self, game: &mut crate::structs::Game) -> Option<String> {
+    /// Handles any global keyboard input. Returns a bool (set if [ENTER] is pressed) and either Some(String) containing a copy of the label text or None
+    pub fn use_input(&mut self, game: &mut crate::structs::Game) -> (bool, Option<String>) {
         if self.is_active {
             if is_key_down(KeyCode::Backspace) {
                 if self.backspace_repeat <= 0 {
                     self.text.pop();
                     self.backspace_repeat = 4;
-                    None
+                    (false, None)
                 } else {
                     self.backspace_repeat -= 1;
-                    None
+                    (false, None)
                 }
             } else if is_key_pressed(KeyCode::Escape){
                 self.is_active = false;
-                None
+                (false, None)
             } else {
                 if is_key_pressed(KeyCode::Enter) {
-                    return Some(self.text.clone())
+                    return (true, Some(self.text.clone()))
                 }
                 match macroquad::input::get_char_pressed() {
                     Some(c) => {
@@ -235,13 +235,13 @@ impl TextInputLabel {
                             rotilities::play_audio(&game.audio.sfx_sinks[0], "./assets/sound/fail.mp3");
                         }
                         macroquad::input::clear_input_queue();
-                        return None
+                        return (false, None)
                     },
-                    None => None
+                    None => (false, None)
                 }
             }
         } else {
-            return None
+            return (false, None)
         }
     }
 }

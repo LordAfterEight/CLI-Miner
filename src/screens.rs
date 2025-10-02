@@ -278,18 +278,26 @@ pub async fn render_save_menu(game: &mut Game) {
             game.cursor.hovers_clickable = true;
         }
 
+        let (enter_pressed, name_label_text) = name_label.use_input(game);
+        let age_label_text = age_label.use_input(game).1;
+
         if name_label.is_active {
-            game.data.player.name = match name_label.use_input(game) {
+            game.data.player.name = match name_label_text {
                 Some(c) => c,
                 None => "Player".to_string()
             };
         }
 
         if age_label.is_active {
-            game.data.player.age = match age_label.use_input(game) {
-                Some(c) => c.parse().unwrap(),
+            game.data.player.age = match age_label_text {
+                Some(c) => if c.len() > 0 { c.parse().unwrap() } else { 18 },
                 None => 18
             };
+        }
+
+        if enter_pressed {
+            game.current_screen = Screens::InGame;
+            break;
         }
 
         name_label.update(&game.audio.sfx_sinks[0]);
@@ -355,33 +363,91 @@ pub fn render_settings_screen(game: &mut Game) {
     );
 }
 
-pub fn render_game_screen(game: &mut Game) {
-    draw_text_ex(
-        "In-Game Screen",
-        20.0,
-        40.0,
-        TextParams {
-            font_size: 30,
-            color: WHITE,
-            font: Some(&game.fonts[1]),
-            ..Default::default()
-        },
-    );
+pub async fn render_game_screen(game: &mut Game) {
+    let mut alpha = 0.0;
+    let mut frames = 0;
 
-    draw_text_ex(
-        "Press 'Esc' to return to Main Menu",
-        20.0,
-        80.0,
-        TextParams {
-            font_size: 20,
-            color: GRAY,
-            font: Some(&game.fonts[0]),
-            ..Default::default()
-        },
-    );
+    while alpha < 255.0 {
+        draw_text_ex(
+            "Prime System",
+            screen_width() / 2.0 - measure_text("Prime System", Some(&game.fonts[1]), 30, 1.0).width / 2.0,
+            screen_height() / 2.0,
+            TextParams {
+                font_size: 30,
+                color: Color::from_rgba(255, 255, 255, alpha as u8),
+                font: Some(&game.fonts[1]),
+                ..Default::default()
+            },
+        );
+        alpha += 1.0;
+        macroquad::window::next_frame().await;
+    }
 
-    if is_key_pressed(KeyCode::Escape) {
-        game.current_screen = Screens::MainMenu;
-        game.previous_screen = Some(Screens::InGame);
+    while frames < 200 {
+        draw_text_ex(
+            "Prime System",
+            screen_width() / 2.0 - measure_text("Prime System", Some(&game.fonts[1]), 30, 1.0).width / 2.0,
+            screen_height() / 2.0,
+            TextParams {
+                font_size: 30,
+                color: Color::from_rgba(255, 255, 255, 255),
+                font: Some(&game.fonts[1]),
+                ..Default::default()
+            },
+        );
+        frames += 1;
+        macroquad::window::next_frame().await;
+    }
+
+    while alpha >= 0.1 {
+        draw_text_ex(
+            "Prime System",
+            screen_width() / 2.0 - measure_text("Prime System", Some(&game.fonts[1]), 30, 1.0).width / 2.0,
+            screen_height() / 2.0,
+            TextParams {
+                font_size: 30,
+                color: Color::from_rgba(255, 255, 255, alpha as u8),
+                font: Some(&game.fonts[1]),
+                ..Default::default()
+            },
+        );
+        alpha *= 0.98;
+        macroquad::window::next_frame().await;
+    }
+
+    loop {
+        draw_text_ex(
+            "In-Game Screen",
+            20.0,
+            40.0,
+            TextParams {
+                font_size: 30,
+                color: WHITE,
+                font: Some(&game.fonts[1]),
+                ..Default::default()
+            },
+        );
+
+        draw_text_ex(
+            "Press 'Esc' to return to Main Menu",
+            20.0,
+            80.0,
+            TextParams {
+                font_size: 20,
+                color: GRAY,
+                font: Some(&game.fonts[0]),
+                ..Default::default()
+            },
+        );
+
+        if is_key_pressed(KeyCode::Escape) {
+            game.current_screen = Screens::MainMenu;
+            game.previous_screen = Some(Screens::InGame);
+            break;
+        }
+
+
+        game.cursor.update();
+        macroquad::window::next_frame().await;
     }
 }
