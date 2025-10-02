@@ -370,10 +370,10 @@ pub async fn render_game_screen(game: &mut Game) {
     while alpha < 255.0 {
         draw_text_ex(
             "Prime System",
-            screen_width() / 2.0 - measure_text("Prime System", Some(&game.fonts[1]), 30, 1.0).width / 2.0,
-            screen_height() / 2.0,
+            screen_width() / 2.0 - measure_text("Prime System", Some(&game.fonts[1]), 50, 1.0).width / 2.0,
+            screen_height() / 2.0 - measure_text("Prime System", Some(&game.fonts[1]), 50, 1.0).height / 2.0,
             TextParams {
-                font_size: 30,
+                font_size: 50,
                 color: Color::from_rgba(255, 255, 255, alpha as u8),
                 font: Some(&game.fonts[1]),
                 ..Default::default()
@@ -386,10 +386,10 @@ pub async fn render_game_screen(game: &mut Game) {
     while frames < 200 {
         draw_text_ex(
             "Prime System",
-            screen_width() / 2.0 - measure_text("Prime System", Some(&game.fonts[1]), 30, 1.0).width / 2.0,
-            screen_height() / 2.0,
+            screen_width() / 2.0 - measure_text("Prime System", Some(&game.fonts[1]), 50, 1.0).width / 2.0,
+            screen_height() / 2.0 - measure_text("Prime System", Some(&game.fonts[1]), 50, 1.0).height / 2.0,
             TextParams {
-                font_size: 30,
+                font_size: 50,
                 color: Color::from_rgba(255, 255, 255, 255),
                 font: Some(&game.fonts[1]),
                 ..Default::default()
@@ -402,10 +402,10 @@ pub async fn render_game_screen(game: &mut Game) {
     while alpha >= 0.01 {
         draw_text_ex(
             "Prime System",
-            screen_width() / 2.0 - measure_text("Prime System", Some(&game.fonts[1]), 30, 1.0).width / 2.0,
-            screen_height() / 2.0,
+            screen_width() / 2.0 - measure_text("Prime System", Some(&game.fonts[1]), 50, 1.0).width / 2.0,
+            screen_height() / 2.0 - measure_text("Prime System", Some(&game.fonts[1]), 50, 1.0).height / 2.0,
             TextParams {
-                font_size: 30,
+                font_size: 50,
                 color: Color::from_rgba(255, 255, 255, alpha as u8),
                 font: Some(&game.fonts[1]),
                 ..Default::default()
