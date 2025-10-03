@@ -1,6 +1,6 @@
-use macroquad::prelude::*;
-use crate::ui::{Button, TextInputLabel};
 use crate::structs::*;
+use crate::ui::{Button, TextInputLabel};
+use macroquad::prelude::*;
 
 pub enum Alignment {
     Left,
@@ -9,7 +9,10 @@ pub enum Alignment {
 }
 
 pub fn render_main_menu(game: &mut Game) {
-    let (screen_w, screen_h) = (macroquad::window::screen_width(), macroquad::window::screen_height());
+    let (screen_w, screen_h) = (
+        macroquad::window::screen_width(),
+        macroquad::window::screen_height(),
+    );
 
     let title = "NullByte »«";
 
@@ -21,7 +24,8 @@ pub fn render_main_menu(game: &mut Game) {
 
     draw_text_ex(
         time,
-        (screen_w - measure_text(time, Some(&game.fonts[0]), 25, 1.0).width) / 2.0, 50.0,
+        (screen_w - measure_text(time, Some(&game.fonts[0]), 25, 1.0).width) / 2.0,
+        50.0,
         TextParams {
             font_size: 25,
             color: WHITE,
@@ -57,13 +61,21 @@ pub fn render_main_menu(game: &mut Game) {
     draw_line(
         (screen_w - measure_text(title, None, title_font_size as u16, 1.0).width) / 2.0 - 25.0,
         screen_h / 4.0 + 7.0,
-        measure_text(title, None, title_font_size as u16, 1.0).width + (screen_w - measure_text(title, None, title_font_size as u16, 1.0).width) / 2.0 + 25.0,
+        measure_text(title, None, title_font_size as u16, 1.0).width
+            + (screen_w - measure_text(title, None, title_font_size as u16, 1.0).width) / 2.0
+            + 25.0,
         screen_h / 4.0 + 7.0,
         2.0,
         RED,
     );
 
-    draw_text("© Elias Stettmayer, 2025", screen_w - 280.0, screen_h - 20.0, 25.0, GRAY);
+    draw_text(
+        "© Elias Stettmayer, 2025",
+        screen_w - 280.0,
+        screen_h - 20.0,
+        25.0,
+        GRAY,
+    );
 
     let play_button = crate::ui::Button::new(
         "Play",
@@ -71,6 +83,7 @@ pub fn render_main_menu(game: &mut Game) {
         screen_h / 2.0 - 25.0,
         200.0,
         35.0,
+        crate::ui::ButtonType::Push,
     );
 
     let settings_button = crate::ui::Button::new(
@@ -79,6 +92,7 @@ pub fn render_main_menu(game: &mut Game) {
         screen_h / 2.0 + 25.0,
         200.0,
         35.0,
+        crate::ui::ButtonType::Push,
     );
 
     let exit_button = crate::ui::Button::new(
@@ -87,6 +101,7 @@ pub fn render_main_menu(game: &mut Game) {
         screen_h / 2.0 + 75.0,
         200.0,
         35.0,
+        crate::ui::ButtonType::Push,
     );
 
     let info_text: String;
@@ -143,13 +158,8 @@ pub fn render_main_menu(game: &mut Game) {
 }
 
 pub async fn render_save_menu(game: &mut Game) {
-    let exit_button = crate::ui::Button::new(
-        "Back",
-        5.0,
-        5.0,
-        100.0,
-        25.0,
-    );
+    let exit_button =
+        crate::ui::Button::new("Back", 5.0, 2.5, 100.0, 30.0, crate::ui::ButtonType::Push);
 
     let mut col1 = WHITE;
     let mut col2 = GRAY;
@@ -187,7 +197,8 @@ pub async fn render_save_menu(game: &mut Game) {
 
         draw_text_ex(
             format!("{}", chrono::Local::now().format("%H:%M:%S%.3f")).as_str(),
-            screen_width() - 150.0, 30.0,
+            screen_width() - 150.0,
+            30.0,
             TextParams {
                 font_size: 15,
                 color: WHITE,
@@ -220,14 +231,7 @@ pub async fn render_save_menu(game: &mut Game) {
             },
         );
 
-        draw_line(
-            0.0,
-            40.0,
-            screen_width(),
-            40.0,
-            2.0,
-            RED,
-        );
+        draw_line(0.0, 40.0, screen_width(), 40.0, 2.0, RED);
 
         draw_line(
             screen_width() / 2.0,
@@ -284,14 +288,20 @@ pub async fn render_save_menu(game: &mut Game) {
         if name_label.is_active {
             game.data.player.name = match name_label_text {
                 Some(c) => c,
-                None => "Player".to_string()
+                None => "Player".to_string(),
             };
         }
 
         if age_label.is_active {
             game.data.player.age = match age_label_text {
-                Some(c) => if c.len() > 0 { c.parse().unwrap() } else { 18 },
-                None => 18
+                Some(c) => {
+                    if c.len() > 0 {
+                        c.parse().unwrap()
+                    } else {
+                        18
+                    }
+                }
+                None => 18,
             };
         }
 
@@ -312,57 +322,63 @@ pub async fn render_save_menu(game: &mut Game) {
     }
 }
 
-pub fn render_settings_screen(game: &mut Game) {
-    let exit_button = crate::ui::Button::new(
-        "Back",
-        5.0,
-        5.0,
-        100.0,
-        25.0,
-    );
-    exit_button.draw(Some(&game.fonts[1]));
-    if exit_button.is_clicked(&game.audio.sfx_sinks[0]) {
-        game.current_screen = Screens::MainMenu;
-        game.previous_screen = Some(Screens::SaveMenu);
-    }
+pub async fn render_settings_screen(game: &mut Game) {
+    let exit_button =
+        crate::ui::Button::new("Back", 5.0, 2.5, 100.0, 30.0, crate::ui::ButtonType::Push);
 
-    draw_text_ex(
+    let mut window = crate::ui::PopupWindow::new(
         "Settings",
-        screen_width() / 2.0 - measure_text("Settings", None, 30, 1.0).width / 2.0,
-        30.0,
-        TextParams {
-            font_size: 30,
-            color: WHITE,
-            font: Some(&game.fonts[1]),
-            ..Default::default()
-        },
+        screen_width() / 2.0 - 200.0,
+        screen_height() / 2.0 - 100.0,
+        400.0,
+        200.0,
+        Vec::new(),
     );
 
-    draw_text_ex(
-        format!("{}", chrono::Local::now().format("%H:%M:%S%.3f")).as_str(),
-        screen_width() - 150.0, 30.0,
-        TextParams {
-            font_size: 15,
-            color: WHITE,
-            font: Some(&game.fonts[0]),
-            ..Default::default()
-        },
-    );
+    loop {
+        draw_text_ex(
+            "Settings",
+            screen_width() / 2.0 - measure_text("Settings", None, 30, 1.0).width / 2.0,
+            30.0,
+            TextParams {
+                font_size: 30,
+                color: WHITE,
+                font: Some(&game.fonts[1]),
+                ..Default::default()
+            },
+        );
 
-    if exit_button.is_hovered() {
-        game.cursor.hovers_clickable = true;
-    } else {
-        game.cursor.hovers_clickable = false;
+        draw_text_ex(
+            format!("{}", chrono::Local::now().format("%H:%M:%S%.3f")).as_str(),
+            screen_width() - 150.0,
+            30.0,
+            TextParams {
+                font_size: 15,
+                color: WHITE,
+                font: Some(&game.fonts[0]),
+                ..Default::default()
+            },
+        );
+
+        draw_line(0.0, 40.0, screen_width(), 40.0, 2.0, RED);
+
+        if exit_button.is_hovered() {
+            game.cursor.hovers_clickable = true;
+        } else {
+            game.cursor.hovers_clickable = false;
+        }
+
+        if exit_button.is_clicked(&game.audio.sfx_sinks[0]) {
+            game.current_screen = Screens::MainMenu;
+            game.previous_screen = Some(Screens::SaveMenu);
+            break;
+        }
+
+        exit_button.draw(Some(&game.fonts[1]));
+        window.draw();
+        game.cursor.update();
+        macroquad::window::next_frame().await;
     }
-
-    draw_line(
-        0.0,
-        40.0,
-        screen_width(),
-        40.0,
-        2.0,
-        RED,
-    );
 }
 
 pub async fn render_game_screen(game: &mut Game) {
@@ -372,8 +388,10 @@ pub async fn render_game_screen(game: &mut Game) {
     while alpha < 255.0 {
         draw_text_ex(
             "Prime System",
-            screen_width() / 2.0 - measure_text("Prime System", Some(&game.fonts[1]), 50, 1.0).width / 2.0,
-            screen_height() / 2.0 - measure_text("Prime System", Some(&game.fonts[1]), 50, 1.0).height / 2.0,
+            screen_width() / 2.0
+                - measure_text("Prime System", Some(&game.fonts[1]), 50, 1.0).width / 2.0,
+            screen_height() / 2.0
+                - measure_text("Prime System", Some(&game.fonts[1]), 50, 1.0).height / 2.0,
             TextParams {
                 font_size: 50,
                 color: Color::from_rgba(255, 255, 255, alpha as u8),
@@ -388,8 +406,10 @@ pub async fn render_game_screen(game: &mut Game) {
     while frames < 215 {
         draw_text_ex(
             "Prime System",
-            screen_width() / 2.0 - measure_text("Prime System", Some(&game.fonts[1]), 50, 1.0).width / 2.0,
-            screen_height() / 2.0 - measure_text("Prime System", Some(&game.fonts[1]), 50, 1.0).height / 2.0,
+            screen_width() / 2.0
+                - measure_text("Prime System", Some(&game.fonts[1]), 50, 1.0).width / 2.0,
+            screen_height() / 2.0
+                - measure_text("Prime System", Some(&game.fonts[1]), 50, 1.0).height / 2.0,
             TextParams {
                 font_size: 50,
                 color: Color::from_rgba(255, 255, 255, 255),
@@ -404,8 +424,10 @@ pub async fn render_game_screen(game: &mut Game) {
     while alpha >= 0.01 {
         draw_text_ex(
             "Prime System",
-            screen_width() / 2.0 - measure_text("Prime System", Some(&game.fonts[1]), 50, 1.0).width / 2.0,
-            screen_height() / 2.0 - measure_text("Prime System", Some(&game.fonts[1]), 50, 1.0).height / 2.0,
+            screen_width() / 2.0
+                - measure_text("Prime System", Some(&game.fonts[1]), 50, 1.0).width / 2.0,
+            screen_height() / 2.0
+                - measure_text("Prime System", Some(&game.fonts[1]), 50, 1.0).height / 2.0,
             TextParams {
                 font_size: 50,
                 color: Color::from_rgba(255, 255, 255, alpha as u8),
@@ -447,7 +469,6 @@ pub async fn render_game_screen(game: &mut Game) {
             game.previous_screen = Some(Screens::InGame);
             break;
         }
-
 
         game.cursor.update();
         macroquad::window::next_frame().await;

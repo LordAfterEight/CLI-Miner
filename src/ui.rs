@@ -1,5 +1,5 @@
-use macroquad::prelude::*;
 use crate::screens::Alignment;
+use macroquad::prelude::*;
 
 pub struct Button {
     pub label: String,
@@ -7,16 +7,30 @@ pub struct Button {
     pub y: f32,
     pub width: f32,
     pub height: f32,
+    pub button_type: ButtonType,
+}
+
+pub enum ButtonType {
+    Push,
+    Toggle,
 }
 
 impl Button {
-    pub fn new(label: &str, x: f32, y: f32, width: f32, height: f32) -> Self {
+    pub fn new(
+        label: &str,
+        x: f32,
+        y: f32,
+        width: f32,
+        height: f32,
+        button_type: ButtonType,
+    ) -> Self {
         Self {
             label: label.to_string(),
             x,
             y,
             width,
             height,
+            button_type,
         }
     }
 
@@ -91,13 +105,27 @@ pub fn draw_button(
             draw_rectangle_lines(x, y, width, height, 2.0, Color::new(0.6, 0.2, 0.2, 1.0));
         }
         true => {
-            draw_rectangle(x, y, width, height, Color::new(0.1, 0.1, 0.1, 1.0));
             match is_mouse_button_down(MouseButton::Left) {
                 false => {
+                    draw_rectangle(x, y, width, height, Color::new(0.1, 0.1, 0.1, 1.0));
                     draw_rectangle_lines(x, y, width, height, 4.0, Color::new(0.6, 0.6, 0.3, 1.0))
                 }
                 true => {
-                    draw_rectangle_lines(x, y, width, height, 6.0, Color::new(0.3, 0.6, 0.3, 1.0))
+                    for i in 0..10 {
+                        draw_rectangle(
+                            x + i as f32,
+                            y + i as f32,
+                            width - (i as f32 * 2.0),
+                            height - (i as f32 * 2.0),
+                            Color::new(
+                                0.05 + i as f32 * 0.01,
+                                0.05 + i as f32 * 0.01,
+                                0.05 + i as f32 * 0.01,
+                                1.0,
+                            ),
+                        );
+                    }
+                    draw_rectangle_lines(x, y, width, height, 4.0, Color::new(0.3, 0.6, 0.3, 1.0))
                 }
             }
         }
@@ -136,7 +164,7 @@ impl TextInputLabel {
             text: String::new(),
             label,
             is_active: false,
-            backspace_repeat: 3
+            backspace_repeat: 3,
         }
     }
 
@@ -170,16 +198,62 @@ impl TextInputLabel {
         let text_x = self.x + 10.0;
         let text_y = self.y + self.height / 2.0 + 5.0;
 
-        draw_rectangle(self.x, self.y, self.width, self.height, Color::new(0.05, 0.05, 0.05, 1.0));
+        draw_rectangle(
+            self.x,
+            self.y,
+            self.width,
+            self.height,
+            Color::new(0.05, 0.05, 0.05, 1.0),
+        );
 
         if self.is_active {
-            draw_rectangle(self.x, self.y, self.width, self.height, Color::new(0.1, 0.1, 0.1, 1.0));
-            draw_rectangle_lines(self.x, self.y, self.width, self.height, 4.0, Color::new(0.3, 0.6, 0.3, 1.0));
+            for i in 0..10 {
+                draw_rectangle(
+                    self.x + i as f32,
+                    self.y + i as f32,
+                    self.width - (i as f32 * 2.0),
+                    self.height - (i as f32 * 2.0),
+                    Color::new(
+                        0.05 + i as f32 * 0.01,
+                        0.05 + i as f32 * 0.01,
+                        0.05 + i as f32 * 0.01,
+                        1.0,
+                    ),
+                );
+            }
+            draw_rectangle_lines(
+                self.x,
+                self.y,
+                self.width,
+                self.height,
+                4.0,
+                Color::new(0.3, 0.6, 0.3, 1.0),
+            );
         } else if self.is_hovered() {
-            draw_rectangle(self.x, self.y, self.width, self.height, Color::new(0.1, 0.1, 0.1, 1.0));
-            draw_rectangle_lines(self.x, self.y, self.width, self.height, 4.0, Color::new(0.6, 0.6, 0.3, 1.0));
+            draw_rectangle(
+                self.x,
+                self.y,
+                self.width,
+                self.height,
+                Color::new(0.1, 0.1, 0.1, 1.0),
+            );
+            draw_rectangle_lines(
+                self.x,
+                self.y,
+                self.width,
+                self.height,
+                4.0,
+                Color::new(0.6, 0.6, 0.3, 1.0),
+            );
         } else {
-            draw_rectangle_lines(self.x, self.y, self.width, self.height, 2.0, Color::new(0.6, 0.2, 0.2, 1.0));
+            draw_rectangle_lines(
+                self.x,
+                self.y,
+                self.width,
+                self.height,
+                2.0,
+                Color::new(0.6, 0.2, 0.2, 1.0),
+            );
         }
 
         if self.label.is_some() {
@@ -225,23 +299,74 @@ impl TextInputLabel {
                 (false, None)
             } else {
                 if is_key_pressed(KeyCode::Enter) {
-                    return (true, Some(self.text.clone()))
+                    return (true, Some(self.text.clone()));
                 }
                 match macroquad::input::get_char_pressed() {
                     Some(c) => {
                         if self.text.len() < 30 && (c.is_alphabetic() || c.is_numeric()) {
                             self.text.push(c);
                         } else {
-                            rotilities::play_audio(&game.audio.sfx_sinks[0], "./assets/sound/fail.mp3");
+                            rotilities::play_audio(
+                                &game.audio.sfx_sinks[0],
+                                "./assets/sound/fail.mp3",
+                            );
                         }
                         macroquad::input::clear_input_queue();
-                        return (false, None)
-                    },
-                    None => (false, None)
+                        return (false, None);
+                    }
+                    None => (false, None),
                 }
             }
         } else {
-            return (false, None)
+            return (false, None);
         }
+    }
+}
+
+pub struct PopupWindow {
+    x: f32,
+    y: f32,
+    width: f32,
+    height: f32,
+    text: String,
+    buttons: Vec<Button>,
+}
+
+impl PopupWindow {
+    pub fn new(text: &str, x: f32, y: f32, width: f32, height: f32, buttons: Vec<Button>) -> Self {
+        Self {
+            text: text.to_string(),
+            x,
+            y,
+            width,
+            height,
+            buttons,
+        }
+    }
+
+    pub fn draw(&mut self) {
+        for i in 0..20 {
+            draw_rectangle(
+                self.x + i as f32,
+                self.y + i as f32,
+                self.width - (i as f32 * 2.0),
+                self.height - (i as f32 * 2.0),
+                Color::new(
+                    0.05 + i as f32 * 0.0025,
+                    0.05 + i as f32 * 0.0025,
+                    0.05 + i as f32 * 0.0025,
+                    1.0,
+                ),
+            );
+        }
+
+        draw_rectangle_lines(
+            self.x,
+            self.y,
+            self.width,
+            self.height,
+            2.0,
+            Color::new(0.6, 0.2, 0.2, 1.0),
+        );
     }
 }

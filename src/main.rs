@@ -65,7 +65,7 @@ async fn main() {
                 }
             },
             crate::structs::Screens::SettingsMenu => {
-                crate::screens::render_settings_screen(&mut game);
+                crate::screens::render_settings_screen(&mut game).await;
                 if game.audio.music_sinks[0].empty() {
                     rotilities::play_audio(&game.audio.music_sinks[0], "./assets/sound/NullByte (Main Menu theme).mp3");
                 }

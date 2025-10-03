@@ -40,6 +40,15 @@ impl Game {
         }
     }
 
+    pub fn create_game_file(&self) {
+        let path = format!("{}{}", &self.save_dir, &self.data.player.name);
+        let mut file = std::fs::File::options()
+            .write(true)
+            .truncate(true)
+            .open(&path)
+            .expect(&format!("File at \"{}\" could not be opened", path));
+    }
+
     pub fn save_game(&self) {
         let path = format!("{}{}", &self.save_dir, &self.data.player.name);
         let mut file = std::fs::File::options()
