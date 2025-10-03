@@ -45,6 +45,7 @@ impl Game {
         let mut file = std::fs::File::options()
             .write(true)
             .truncate(true)
+            .create(true)
             .open(&path)
             .expect(&format!("File at \"{}\" could not be opened", path));
     }
@@ -63,7 +64,7 @@ impl Game {
     }
 
     pub fn load_game(&mut self, name: &str) {
-        let path = format!("{}{}", &self.save_dir, &self.data.player.name);
+        let path = format!("{}{}", &self.save_dir, name);
         let file = std::fs::File::options()
             .read(true)
             .open(&path)

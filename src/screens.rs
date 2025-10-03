@@ -182,7 +182,29 @@ pub async fn render_save_menu(game: &mut Game) {
         30.0,
     );
 
-    loop {
+    let mut saves = Vec::<Button>::new();
+
+    let mut i = 0.0;
+
+    for save in std::fs::read_dir("./data/saves/").unwrap() {
+        let save = save.unwrap();
+        let save_path = save.path();
+
+        if save_path.is_file() {
+            saves.push(Button::new(
+                &format!("{}", save_path.to_str().unwrap().trim_start_matches("./data/saves/")),
+                400.0,
+                300.0 + i * 35.0,
+                250.0,
+                30.0,
+                crate::ui::ButtonType::Push,
+            ));
+        }
+
+        i += 1.0;
+    }
+
+    while game.current_screen == Screens::SaveMenu {
         draw_text_ex(
             "Saves",
             screen_width() / 2.0 - measure_text("Saves", None, 30, 1.0).width / 2.0,
@@ -273,7 +295,7 @@ pub async fn render_save_menu(game: &mut Game) {
         }
 
         if exit_button.is_clicked(&game.audio.sfx_sinks[0]) {
-            game.current_screen = Screens::MainMenu;
+            game.current_screen = game.previous_screen.take().unwrap();
             game.previous_screen = Some(Screens::SaveMenu);
             break;
         }
@@ -308,7 +330,7 @@ pub async fn render_save_menu(game: &mut Game) {
         if enter_pressed && name_label.text.len() > 0 {
             game.current_screen = Screens::InGame;
             game.cursor.hovers_clickable = false;
-            game.save_game();
+            game.create_game_file();
             break;
         }
 
@@ -317,21 +339,31 @@ pub async fn render_save_menu(game: &mut Game) {
         age_label.update(&game.audio.sfx_sinks[0]);
         age_label.draw(Some(&game.fonts[0]));
         exit_button.draw(Some(&game.fonts[1]));
+        for button in &saves {
+            button.draw(Some(&game.fonts[1]));
+            if button.is_clicked(&game.audio.sfx_sinks[0]) {
+                game.load_game(button.label.trim_start_matches("./data/saves/"));
+                game.current_screen = Screens::InGame;
+                break;
+            }
+        }
         game.cursor.update();
         macroquad::window::next_frame().await;
     }
 }
 
 pub async fn render_settings_screen(game: &mut Game) {
-    let exit_button =
+    let back_button =
         crate::ui::Button::new("Back", 5.0, 2.5, 100.0, 30.0, crate::ui::ButtonType::Push);
+    let main_menu_button =
+        crate::ui::Button::new("Main Menu", 5.0, screen_height() - 35.0, 150.0, 30.0, crate::ui::ButtonType::Push);
 
     let mut window = crate::ui::PopupWindow::new(
-        "Settings",
-        screen_width() / 2.0 - 200.0,
-        screen_height() / 2.0 - 100.0,
-        400.0,
-        200.0,
+        "This is the settings menu.\nHere you can adjust your preferences like\naudio volume, difficulty, Discord Rich Presence, etc.",
+        screen_width() / 2.0 - 300.0,
+        screen_height() / 2.0 - 150.0,
+        600.0,
+        300.0,
         Vec::new(),
     );
 
@@ -362,115 +394,124 @@ pub async fn render_settings_screen(game: &mut Game) {
 
         draw_line(0.0, 40.0, screen_width(), 40.0, 2.0, RED);
 
-        if exit_button.is_hovered() {
+        if back_button.is_hovered() {
             game.cursor.hovers_clickable = true;
         } else {
             game.cursor.hovers_clickable = false;
         }
 
-        if exit_button.is_clicked(&game.audio.sfx_sinks[0]) {
-            game.current_screen = Screens::MainMenu;
+        if back_button.is_clicked(&game.audio.sfx_sinks[0]) {
+            game.current_screen = game.previous_screen.take().unwrap();
             game.previous_screen = Some(Screens::SaveMenu);
             break;
         }
 
-        exit_button.draw(Some(&game.fonts[1]));
-        window.draw();
+        back_button.draw(Some(&game.fonts[1]));
+        if game.previous_screen == Some(Screens::InGame) {
+            main_menu_button.draw(Some(&game.fonts[1]));
+            if main_menu_button.is_clicked(&game.audio.sfx_sinks[0]) {
+                game.save_game();
+                game.data = crate::structs::Data::init();
+                game.previous_screen = Some(Screens::InGame);
+                game.current_screen = Screens::MainMenu;
+                break;
+            }
+        }
+        window.draw(Some(&game.fonts[0]));
         game.cursor.update();
         macroquad::window::next_frame().await;
     }
 }
 
 pub async fn render_game_screen(game: &mut Game) {
-    let mut alpha = 0.0;
-    let mut frames = 0;
+    if game.previous_screen.take().unwrap() == Screens::MainMenu {
+        let mut alpha = 0.0;
+        let mut frames = 0;
 
-    while alpha < 255.0 {
-        draw_text_ex(
-            "Prime System",
-            screen_width() / 2.0
-                - measure_text("Prime System", Some(&game.fonts[1]), 50, 1.0).width / 2.0,
-            screen_height() / 2.0
-                - measure_text("Prime System", Some(&game.fonts[1]), 50, 1.0).height / 2.0,
-            TextParams {
-                font_size: 50,
-                color: Color::from_rgba(255, 255, 255, alpha as u8),
-                font: Some(&game.fonts[1]),
-                ..Default::default()
-            },
-        );
-        alpha += 1.0;
-        macroquad::window::next_frame().await;
+        let mut new_volume = game.settings.mus_vol;
+        while game.audio.music_sinks[0].volume() > 0.001 {
+            rotilities::set_audio_volume(&game.audio.music_sinks[0], new_volume);
+            new_volume *= 0.95;
+            macroquad::window::next_frame().await;
+        }
+        rotilities::stop_audio(&game.audio.music_sinks[0]);
+        rotilities::set_audio_volume(&game.audio.music_sinks[0], game.settings.mus_vol);
+        std::thread::sleep(std::time::Duration::from_millis(1000));
+        rotilities::play_audio(&game.audio.music_sinks[0], "./assets/sound/Prime.mp3");
+
+        while alpha < 255.0 {
+            draw_text_ex(
+                "Prime System",
+                screen_width() / 2.0
+                    - measure_text("Prime System", Some(&game.fonts[1]), 50, 1.0).width / 2.0,
+                screen_height() / 2.0
+                    - measure_text("Prime System", Some(&game.fonts[1]), 50, 1.0).height / 2.0,
+                TextParams {
+                    font_size: 50,
+                    color: Color::from_rgba(255, 255, 255, alpha as u8),
+                    font: Some(&game.fonts[1]),
+                    ..Default::default()
+                },
+            );
+            alpha += 1.0;
+            macroquad::window::next_frame().await;
+        }
+
+        while frames < 215 {
+            draw_text_ex(
+                "Prime System",
+                screen_width() / 2.0
+                    - measure_text("Prime System", Some(&game.fonts[1]), 50, 1.0).width / 2.0,
+                screen_height() / 2.0
+                    - measure_text("Prime System", Some(&game.fonts[1]), 50, 1.0).height / 2.0,
+                TextParams {
+                    font_size: 50,
+                    color: Color::from_rgba(255, 255, 255, 255),
+                    font: Some(&game.fonts[1]),
+                    ..Default::default()
+                },
+            );
+            frames += 1;
+            macroquad::window::next_frame().await;
+        }
+
+        while alpha >= 0.01 {
+            draw_text_ex(
+                "Prime System",
+                screen_width() / 2.0
+                    - measure_text("Prime System", Some(&game.fonts[1]), 50, 1.0).width / 2.0,
+                screen_height() / 2.0
+                    - measure_text("Prime System", Some(&game.fonts[1]), 50, 1.0).height / 2.0,
+                TextParams {
+                    font_size: 50,
+                    color: Color::from_rgba(255, 255, 255, alpha as u8),
+                    font: Some(&game.fonts[1]),
+                    ..Default::default()
+                },
+            );
+            alpha *= 0.98;
+            macroquad::window::next_frame().await;
+        }
     }
 
-    while frames < 215 {
-        draw_text_ex(
-            "Prime System",
-            screen_width() / 2.0
-                - measure_text("Prime System", Some(&game.fonts[1]), 50, 1.0).width / 2.0,
-            screen_height() / 2.0
-                - measure_text("Prime System", Some(&game.fonts[1]), 50, 1.0).height / 2.0,
-            TextParams {
-                font_size: 50,
-                color: Color::from_rgba(255, 255, 255, 255),
-                font: Some(&game.fonts[1]),
-                ..Default::default()
-            },
-        );
-        frames += 1;
-        macroquad::window::next_frame().await;
-    }
-
-    while alpha >= 0.01 {
-        draw_text_ex(
-            "Prime System",
-            screen_width() / 2.0
-                - measure_text("Prime System", Some(&game.fonts[1]), 50, 1.0).width / 2.0,
-            screen_height() / 2.0
-                - measure_text("Prime System", Some(&game.fonts[1]), 50, 1.0).height / 2.0,
-            TextParams {
-                font_size: 50,
-                color: Color::from_rgba(255, 255, 255, alpha as u8),
-                font: Some(&game.fonts[1]),
-                ..Default::default()
-            },
-        );
-        alpha *= 0.98;
-        macroquad::window::next_frame().await;
-    }
+    let mut window = crate::ui::PopupWindow::new(
+        "In-Game Screen (WIP)\nHere you will spend most of your time.\n\nPress [ESC] to exit to Main Menu",
+        screen_width() / 2.0 - 300.0,
+        screen_height() / 2.0 - 150.0,
+        600.0,
+        300.0,
+        Vec::new(),
+    );
 
     loop {
-        draw_text_ex(
-            "In-Game Screen",
-            20.0,
-            40.0,
-            TextParams {
-                font_size: 30,
-                color: WHITE,
-                font: Some(&game.fonts[1]),
-                ..Default::default()
-            },
-        );
-
-        draw_text_ex(
-            "Press 'Esc' to return to Main Menu",
-            20.0,
-            80.0,
-            TextParams {
-                font_size: 20,
-                color: GRAY,
-                font: Some(&game.fonts[0]),
-                ..Default::default()
-            },
-        );
-
         if is_key_pressed(KeyCode::Escape) {
-            game.current_screen = Screens::MainMenu;
+            game.current_screen = Screens::SettingsMenu;
             game.previous_screen = Some(Screens::InGame);
             break;
         }
 
         game.cursor.update();
+        window.draw(Some(&game.fonts[0]));
         macroquad::window::next_frame().await;
     }
 }

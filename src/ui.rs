@@ -82,8 +82,8 @@ pub fn draw_button(
 ) {
     let (mouse_x, mouse_y) = mouse_position();
     let is_hovered = mouse_x >= x && mouse_x <= x + width && mouse_y >= y && mouse_y <= y + height;
-    let text_size = 25.0;
-    let text_dimensions = measure_text(text, None, text_size as u16, 1.0);
+    let text_size = 20.0;
+    let text_dimensions = measure_text(text, font, text_size as u16, 1.0);
     let (text_x, text_y) = match alignment {
         Alignment::Left => (
             x + 10.0,
@@ -104,31 +104,29 @@ pub fn draw_button(
             draw_rectangle(x, y, width, height, Color::new(0.05, 0.05, 0.05, 1.0));
             draw_rectangle_lines(x, y, width, height, 2.0, Color::new(0.6, 0.2, 0.2, 1.0));
         }
-        true => {
-            match is_mouse_button_down(MouseButton::Left) {
-                false => {
-                    draw_rectangle(x, y, width, height, Color::new(0.1, 0.1, 0.1, 1.0));
-                    draw_rectangle_lines(x, y, width, height, 4.0, Color::new(0.6, 0.6, 0.3, 1.0))
-                }
-                true => {
-                    for i in 0..10 {
-                        draw_rectangle(
-                            x + i as f32,
-                            y + i as f32,
-                            width - (i as f32 * 2.0),
-                            height - (i as f32 * 2.0),
-                            Color::new(
-                                0.05 + i as f32 * 0.01,
-                                0.05 + i as f32 * 0.01,
-                                0.05 + i as f32 * 0.01,
-                                1.0,
-                            ),
-                        );
-                    }
-                    draw_rectangle_lines(x, y, width, height, 4.0, Color::new(0.3, 0.6, 0.3, 1.0))
-                }
+        true => match is_mouse_button_down(MouseButton::Left) {
+            false => {
+                draw_rectangle(x, y, width, height, Color::new(0.1, 0.1, 0.1, 1.0));
+                draw_rectangle_lines(x, y, width, height, 4.0, Color::new(0.6, 0.6, 0.3, 1.0))
             }
-        }
+            true => {
+                for i in 0..10 {
+                    draw_rectangle(
+                        x + i as f32,
+                        y + i as f32,
+                        width - (i as f32 * 2.0),
+                        height - (i as f32 * 2.0),
+                        Color::new(
+                            0.05 + i as f32 * 0.01,
+                            0.05 + i as f32 * 0.01,
+                            0.05 + i as f32 * 0.01,
+                            1.0,
+                        ),
+                    );
+                }
+                draw_rectangle_lines(x, y, width, height, 4.0, Color::new(0.3, 0.6, 0.3, 1.0))
+            }
+        },
     }
     draw_text_ex(
         text,
@@ -344,7 +342,7 @@ impl PopupWindow {
         }
     }
 
-    pub fn draw(&mut self) {
+    pub fn draw(&mut self, font: Option<&Font>) {
         for i in 0..20 {
             draw_rectangle(
                 self.x + i as f32,
@@ -367,6 +365,19 @@ impl PopupWindow {
             self.height,
             2.0,
             Color::new(0.6, 0.2, 0.2, 1.0),
+        );
+
+        draw_multiline_text_ex(
+            &self.text,
+            self.x + 20.0,
+            self.y + 30.0,
+            Some(1.25),
+            TextParams {
+                font,
+                color: WHITE,
+                font_size: 14,
+                ..Default::default()
+            }
         );
     }
 }
