@@ -220,7 +220,7 @@ impl TextInputLabel {
                     self.backspace_repeat -= 1;
                     (false, None)
                 }
-            } else if is_key_pressed(KeyCode::Escape){
+            } else if is_key_pressed(KeyCode::Escape) {
                 self.is_active = false;
                 (false, None)
             } else {
@@ -229,7 +229,7 @@ impl TextInputLabel {
                 }
                 match macroquad::input::get_char_pressed() {
                     Some(c) => {
-                        if self.text.len() < 30 {
+                        if self.text.len() < 30 && (c.is_alphabetic() || c.is_numeric()) {
                             self.text.push(c);
                         } else {
                             rotilities::play_audio(&game.audio.sfx_sinks[0], "./assets/sound/fail.mp3");

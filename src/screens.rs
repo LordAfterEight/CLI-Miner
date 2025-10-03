@@ -295,8 +295,10 @@ pub async fn render_save_menu(game: &mut Game) {
             };
         }
 
-        if enter_pressed {
+        if enter_pressed && name_label.text.len() > 0 {
             game.current_screen = Screens::InGame;
+            game.cursor.hovers_clickable = false;
+            game.save_game();
             break;
         }
 
@@ -383,7 +385,7 @@ pub async fn render_game_screen(game: &mut Game) {
         macroquad::window::next_frame().await;
     }
 
-    while frames < 200 {
+    while frames < 215 {
         draw_text_ex(
             "Prime System",
             screen_width() / 2.0 - measure_text("Prime System", Some(&game.fonts[1]), 50, 1.0).width / 2.0,

@@ -1,5 +1,6 @@
-use macroquad::prelude::*;
+use std::io::Write;
 
+use macroquad::prelude::*;
 pub struct Game {
     /// Directory where the save is stored
     pub save_dir: String,
@@ -39,16 +40,35 @@ impl Game {
         }
     }
 
-    pub fn save_game(&self, name: &str) {
-        let file = std::fs::File::options().create(true).write(true).open(format!("{}{}", &self.save_dir, name));
+    pub fn save_game(&self) {
+        let path = format!("{}{}", &self.save_dir, &self.data.player.name);
+        let mut file = std::fs::File::options()
+            .create(true)
+            .write(true)
+            .open(&path)
+            .expect(&format!("File at \"{}\" could not be opened", path));
+
+        let data = serde_json::to_string_pretty(&serde_json::json!([&self.data, &self.settings])).unwrap();
+
+        _ = file.write(data.as_bytes());
     }
 
     pub fn load_game(&mut self, name: &str) {
-        let file = std::fs::File::options().read(true).open(format!("{}{}", &self.save_dir, name));
+        let path = format!("{}{}", &self.save_dir, &self.data.player.name);
+        let file = std::fs::File::options()
+            .read(true)
+            .open(&path)
+            .expect(&format!("File at \"{}\" could not be opened", path));
+        let reader = std::io::BufReader::new(file);
+
+        let objects: Vec<serde_json::Value> = serde_json::from_reader(reader).unwrap();
+
+        self.data = serde_json::from_value(objects[0].clone()).unwrap();
+        self.settings = serde_json::from_value(objects[1].clone()).unwrap();
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, serde_derive::Serialize, serde_derive::Deserialize)]
 pub struct Data {
     pub player: Player,
     pub bits: u64,
@@ -69,7 +89,7 @@ impl Data {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, serde_derive::Serialize, serde_derive::Deserialize)]
 /// Contains game settings like volume, difficulty, etc.
 pub struct Settings {
     /// Musuc volume
@@ -93,7 +113,7 @@ impl Settings {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, serde_derive::Serialize, serde_derive::Deserialize)]
 /// Basic Device base class used for all functional equipmentin the game
 pub struct Device {
     /// This Device's name
@@ -106,7 +126,7 @@ pub struct Device {
     pub id: u8,
 }
 
-#[derive(Debug)]
+#[derive(Debug, serde_derive::Serialize, serde_derive::Deserialize)]
 /// The type of a device (e.g. Miner)
 pub enum DeviceType {
     /// Mines Bits
@@ -121,7 +141,7 @@ pub enum DeviceType {
     Extractor,
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, serde_derive::Serialize, serde_derive::Deserialize)]
 pub enum Screens {
     MainMenu,
     SaveMenu,
@@ -190,13 +210,28 @@ impl Cursor {
         match self.hovers_clickable {
             true => {
                 if is_mouse_button_down(MouseButton::Left) {
-                    draw_texture(&self.sprite_click, x - self.sprite_click.width() / 2.0, y - self.sprite_click.height() / 2.0, WHITE);
+                    draw_texture(
+                        &self.sprite_click,
+                        x - self.sprite_click.width() / 2.0,
+                        y - self.sprite_click.height() / 2.0,
+                        WHITE,
+                    );
                 } else {
-                    draw_texture(&self.sprite_hover, x - self.sprite_hover.width() / 2.0, y - self.sprite_hover.height() / 2.0, WHITE);
+                    draw_texture(
+                        &self.sprite_hover,
+                        x - self.sprite_hover.width() / 2.0,
+                        y - self.sprite_hover.height() / 2.0,
+                        WHITE,
+                    );
                 }
             }
             false => {
-                draw_texture(&self.sprite, x - self.sprite.width() / 2.0, y - self.sprite.height() / 2.0, WHITE);
+                draw_texture(
+                    &self.sprite,
+                    x - self.sprite.width() / 2.0,
+                    y - self.sprite.height() / 2.0,
+                    WHITE,
+                );
             }
         }
         self.x = x;
@@ -204,7 +239,7 @@ impl Cursor {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, serde_derive::Serialize, serde_derive::Deserialize)]
 pub struct Player {
     pub name: String,
     pub age: u16,
@@ -216,7 +251,7 @@ impl Player {
         Self {
             name: "Player".to_string(),
             age: 18,
-            location: "".to_string()
+            location: "".to_string(),
         }
     }
 }
