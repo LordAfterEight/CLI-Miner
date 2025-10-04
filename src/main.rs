@@ -2,9 +2,11 @@ use macroquad::miniquad::conf::Icon;
 use macroquad::prelude::*;
 use rotilities;
 
-use crate::screens::render_game_screen;
-
 mod screens;
+mod main_menu;
+mod save_menu;
+mod settings_menu;
+mod game;
 mod structs;
 mod input;
 mod ui;
@@ -46,7 +48,7 @@ async fn main() {
                     while game.audio.music_sinks[0].volume() > 0.001 {
                         rotilities::set_audio_volume(&game.audio.music_sinks[0], new_volume);
                             new_volume *= 0.95;
-                        crate::screens::render_main_menu(&mut game);
+                        crate::main_menu::render_main_menu(&mut game);
                         game.cursor.update();
                         macroquad::window::next_frame().await;
                     }
@@ -56,22 +58,22 @@ async fn main() {
                 } else if game.audio.music_sinks[0].empty() {
                     rotilities::play_audio(&game.audio.music_sinks[0], "./assets/sound/music/NullByte (Main Menu theme).mp3");
                 }
-                crate::screens::render_main_menu(&mut game);
+                crate::main_menu::render_main_menu(&mut game);
             },
             crate::structs::Screens::SaveMenu => {
-                crate::screens::render_save_menu(&mut game).await;
+                crate::save_menu::render_save_menu(&mut game).await;
                 if game.audio.music_sinks[0].empty() {
                     rotilities::play_audio(&game.audio.music_sinks[0], "./assets/sound/music/NullByte (Main Menu theme).mp3");
                 }
             },
             crate::structs::Screens::SettingsMenu => {
-                crate::screens::render_settings_screen(&mut game).await;
+                crate::settings_menu::render_settings_screen(&mut game).await;
                 if game.audio.music_sinks[0].empty() {
                     rotilities::play_audio(&game.audio.music_sinks[0], "./assets/sound/music/NullByte (Main Menu theme).mp3");
                 }
             },
             crate::structs::Screens::InGame => {
-                render_game_screen(&mut game).await;
+                crate::game::render_game_screen(&mut game).await;
             },
 
             _ => {}

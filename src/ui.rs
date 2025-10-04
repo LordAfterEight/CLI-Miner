@@ -1,4 +1,3 @@
-use crate::screens::Alignment;
 use macroquad::prelude::*;
 
 pub struct Button {
@@ -65,7 +64,6 @@ impl Button {
             self.y,
             self.width,
             self.height,
-            Alignment::Center,
             font,
         );
     }
@@ -77,27 +75,16 @@ pub fn draw_button(
     y: f32,
     width: f32,
     height: f32,
-    alignment: Alignment,
     font: Option<&Font>,
 ) {
     let (mouse_x, mouse_y) = mouse_position();
     let is_hovered = mouse_x >= x && mouse_x <= x + width && mouse_y >= y && mouse_y <= y + height;
     let text_size = 20.0;
     let text_dimensions = measure_text(text, font, text_size as u16, 1.0);
-    let (text_x, text_y) = match alignment {
-        Alignment::Left => (
-            x + 10.0,
-            y + (height + text_dimensions.height) / 2.0 + text_size / 3.3,
-        ),
-        Alignment::Center => (
-            x + (width - text_dimensions.width) / 2.0,
-            y + height / 2.0 + text_size / 3.3,
-        ),
-        Alignment::Right => (
-            x + width - text_dimensions.width - 10.0,
-            y + height / 2.0 + text_size / 3.3,
-        ),
-    };
+    let (text_x, text_y) = (
+        x + (width - text_dimensions.width) / 2.0,
+        y + height / 2.0 + text_size / 3.3,
+    );
 
     match is_hovered {
         false => {
