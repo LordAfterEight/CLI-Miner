@@ -178,29 +178,37 @@ pub async fn render_save_menu(game: &mut Game) {
         30.0,
     );
 
-    let mut saves = Vec::<crate::ui::Button>::new();
-
-    let mut i = 0.0;
-
-    for save in std::fs::read_dir("./data/saves/").unwrap() {
-        let save = save.unwrap();
-        let save_path = save.path();
-
-        if save_path.is_file() {
-            saves.push(crate::ui::Button::new(
-                &format!("{}", save_path.to_str().unwrap().trim_start_matches("./data/saves/")),
-                400.0,
-                300.0 + i * 35.0,
-                250.0,
-                30.0,
-                crate::ui::ButtonType::Push,
-            ));
-        }
-
-        i += 1.0;
-    }
 
     while game.current_screen == Screens::SaveMenu {
+        let mut saves = Vec::<crate::ui::Button>::new();
+        let mut del_btns = Vec::<crate::ui::Button>::new();
+        let mut i = 0.0;
+        for save in std::fs::read_dir("./data/saves/").unwrap() {
+            let save = save.unwrap();
+            let save_path = save.path();
+
+            if save_path.is_file() {
+                saves.push(crate::ui::Button::new(
+                    &format!("{}", save_path.to_str().unwrap().trim_start_matches("./data/saves/")),
+                    400.0,
+                    300.0 + i * 35.0,
+                    250.0,
+                    30.0,
+                    crate::ui::ButtonType::Push,
+                ));
+                del_btns.push(crate::ui::Button::new(
+                    "Delete",
+                    250.0,
+                    300.0 + i * 35.0,
+                    100.0,
+                    30.0,
+                    crate::ui::ButtonType::Push,
+                ));
+            }
+
+            i += 1.0;
+        }
+
         draw_text_ex(
             "Saves",
             screen_width() / 2.0 - measure_text("Saves", Some(&game.fonts[1]), 30, 1.0).width / 2.0,
@@ -335,12 +343,19 @@ pub async fn render_save_menu(game: &mut Game) {
         age_label.update(&game.audio.sfx_sinks[0]);
         age_label.draw(Some(&game.fonts[0]));
         exit_button.draw(Some(&game.fonts[1]));
-        for button in &saves {
-            button.draw(Some(&game.fonts[1]));
-            if button.is_clicked(&game.audio.sfx_sinks[0]) {
-                game.load_game(button.label.trim_start_matches("./data/saves/"));
+        for i in 0..saves.len() {
+            saves[i].draw(Some(&game.fonts[1]));
+            if saves[0].is_clicked(&game.audio.sfx_sinks[0]) {
+                game.load_game(saves[0].label.trim_start_matches("./data/saves/"));
                 game.current_screen = Screens::InGame;
                 break;
+            }
+            del_btns[i].draw(Some(&game.fonts[1]));
+            if del_btns[i].is_clicked(&game.audio.sfx_sinks[0]) {
+                match std::fs::remove_file(format!("./data/saves/{}", saves[i].label)) {
+                    Ok(_) => {},
+                    Err(_) => rotilities::play_audio(&game.audio.sfx_sinks[0], "./assets/sound/sfx/fail.mp3")
+                }
             }
         }
         game.cursor.update();
