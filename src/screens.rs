@@ -1,5 +1,4 @@
 use crate::structs::*;
-use crate::ui::{Button, TextInputLabel};
 use macroquad::prelude::*;
 
 pub enum Alignment {
@@ -9,17 +8,15 @@ pub enum Alignment {
 }
 
 pub fn render_main_menu(game: &mut Game) {
+    game.previous_screen = None;
     let (screen_w, screen_h) = (
         macroquad::window::screen_width(),
         macroquad::window::screen_height(),
     );
 
     let title = "NullByte »«";
-
     let title_font_size = 60.0;
-
     let subtitle = format!("V{}", env!("CARGO_PKG_VERSION"));
-
     let time = &format!("{}", chrono::Local::now().format("%H:%M:%S"));
 
     draw_text_ex(
@@ -36,7 +33,7 @@ pub fn render_main_menu(game: &mut Game) {
 
     draw_text_ex(
         title,
-        (screen_w - measure_text(title, None, title_font_size as u16, 1.0).width) / 2.0 - 25.0,
+        (screen_w - measure_text(title, Some(&game.fonts[1]), title_font_size as u16, 1.0).width) / 2.0,
         screen_h / 4.0 - 10.0,
         TextParams {
             font_size: title_font_size as u16,
@@ -48,7 +45,7 @@ pub fn render_main_menu(game: &mut Game) {
 
     draw_text_ex(
         &subtitle,
-        (screen_w - measure_text(&subtitle, None, 30, 1.0).width) / 2.0 - 20.0,
+        (screen_w - measure_text(&subtitle, Some(&game.fonts[0]), 30, 1.0).width) / 2.0,
         screen_h / 4.0 + 40.0,
         TextParams {
             font_size: 30,
@@ -59,11 +56,10 @@ pub fn render_main_menu(game: &mut Game) {
     );
 
     draw_line(
-        (screen_w - measure_text(title, None, title_font_size as u16, 1.0).width) / 2.0 - 25.0,
+        (screen_w - measure_text(title, Some(&game.fonts[1]), title_font_size as u16, 1.0).width) / 2.0,
         screen_h / 4.0 + 7.0,
-        measure_text(title, None, title_font_size as u16, 1.0).width
-            + (screen_w - measure_text(title, None, title_font_size as u16, 1.0).width) / 2.0
-            + 25.0,
+        measure_text(title, Some(&game.fonts[1]), title_font_size as u16, 1.0).width
+            + (screen_w - measure_text(title, Some(&game.fonts[1]), title_font_size as u16, 1.0).width) / 2.0,
         screen_h / 4.0 + 7.0,
         2.0,
         RED,
@@ -182,7 +178,7 @@ pub async fn render_save_menu(game: &mut Game) {
         30.0,
     );
 
-    let mut saves = Vec::<Button>::new();
+    let mut saves = Vec::<crate::ui::Button>::new();
 
     let mut i = 0.0;
 
@@ -191,7 +187,7 @@ pub async fn render_save_menu(game: &mut Game) {
         let save_path = save.path();
 
         if save_path.is_file() {
-            saves.push(Button::new(
+            saves.push(crate::ui::Button::new(
                 &format!("{}", save_path.to_str().unwrap().trim_start_matches("./data/saves/")),
                 400.0,
                 300.0 + i * 35.0,
@@ -207,7 +203,7 @@ pub async fn render_save_menu(game: &mut Game) {
     while game.current_screen == Screens::SaveMenu {
         draw_text_ex(
             "Saves",
-            screen_width() / 2.0 - measure_text("Saves", None, 30, 1.0).width / 2.0,
+            screen_width() / 2.0 - measure_text("Saves", Some(&game.fonts[1]), 30, 1.0).width / 2.0,
             30.0,
             TextParams {
                 font_size: 30,
@@ -231,7 +227,7 @@ pub async fn render_save_menu(game: &mut Game) {
 
         draw_text_ex(
             "Load Game",
-            screen_width() / 4.0 - measure_text("Load Game", None, 25, 1.0).width / 2.0,
+            screen_width() / 4.0 - measure_text("Load Game", Some(&game.fonts[1]), 25, 1.0).width / 2.0,
             180.0,
             TextParams {
                 font_size: 25,
@@ -243,7 +239,7 @@ pub async fn render_save_menu(game: &mut Game) {
 
         draw_text_ex(
             "New Game",
-            3.0 * screen_width() / 4.0 - measure_text("New Game", None, 25, 1.0).width / 2.0,
+            3.0 * screen_width() / 4.0 - measure_text("New Game", Some(&game.fonts[1]), 25, 1.0).width / 2.0,
             180.0,
             TextParams {
                 font_size: 25,

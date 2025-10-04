@@ -1,0 +1,19 @@
+[
+  {
+    "bits": 0,
+    "bytes": 0,
+    "bytestrings": 0,
+    "money": 60.0,
+    "player": {
+      "age": 18,
+      "location": "",
+      "name": "DKP1NK"
+    }
+  },
+  {
+    "difficulty": 122,
+    "discord_rich_presence": true,
+    "mus_vol": 0.5,
+    "sfx_vol": 0.5
+  }
+]

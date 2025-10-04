@@ -41,10 +41,7 @@ async fn main() {
     loop {
         match game.current_screen {
             crate::structs::Screens::MainMenu => {
-                crate::screens::render_main_menu(&mut game);
-                if game.audio.music_sinks[0].empty() {
-                    rotilities::play_audio(&game.audio.music_sinks[0], "./assets/sound/music/NullByte (Main Menu theme).mp3");
-                } else if game.previous_screen == Some(crate::structs::Screens::InGame) {
+                if game.previous_screen == Some(crate::structs::Screens::InGame) {
                     let mut new_volume = game.settings.mus_vol;
                     while game.audio.music_sinks[0].volume() > 0.001 {
                         rotilities::set_audio_volume(&game.audio.music_sinks[0], new_volume);
@@ -56,7 +53,10 @@ async fn main() {
                     rotilities::stop_audio(&game.audio.music_sinks[0]);
                     rotilities::set_audio_volume(&game.audio.music_sinks[0], game.settings.mus_vol);
                     game.previous_screen = None;
+                } else if game.audio.music_sinks[0].empty() {
+                    rotilities::play_audio(&game.audio.music_sinks[0], "./assets/sound/music/NullByte (Main Menu theme).mp3");
                 }
+                crate::screens::render_main_menu(&mut game);
             },
             crate::structs::Screens::SaveMenu => {
                 crate::screens::render_save_menu(&mut game).await;

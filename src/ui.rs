@@ -135,7 +135,7 @@ pub fn draw_button(
         TextParams {
             font: font,
             font_size: text_size as u16,
-            color: Color::new(1.0, 1.0, 1.0, 1.0),
+            color: Color::new(0.8, 0.8, 0.8, 1.0),
             ..Default::default()
         },
     );
@@ -262,7 +262,7 @@ impl TextInputLabel {
                 TextParams {
                     font: font,
                     font_size: text_size as u16,
-                    color: Color::new(1.0, 1.0, 1.0, 1.0),
+                    color: Color::new(0.8, 0.8, 0.8, 1.0),
                     ..Default::default()
                 },
             );
@@ -274,7 +274,7 @@ impl TextInputLabel {
             TextParams {
                 font: font,
                 font_size: text_size as u16,
-                color: Color::new(1.0, 1.0, 1.0, 1.0),
+                color: Color::new(0.8, 0.8, 0.8, 1.0),
                 ..Default::default()
             },
         );
@@ -374,7 +374,7 @@ impl PopupWindow {
             Some(1.25),
             TextParams {
                 font,
-                color: WHITE,
+                color: Color::new(0.8, 0.8, 0.8, 1.0),
                 font_size: 14,
                 ..Default::default()
             }
