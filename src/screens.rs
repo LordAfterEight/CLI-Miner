@@ -437,7 +437,7 @@ pub async fn render_game_screen(game: &mut Game) {
         rotilities::stop_audio(&game.audio.music_sinks[0]);
         rotilities::set_audio_volume(&game.audio.music_sinks[0], game.settings.mus_vol);
         std::thread::sleep(std::time::Duration::from_millis(1000));
-        rotilities::play_audio(&game.audio.music_sinks[0], "./assets/sound/Prime.mp3");
+        rotilities::play_audio(&game.audio.music_sinks[0], "./assets/sound/music/Signal Lost.mp3");
 
         while alpha < 255.0 {
             draw_text_ex(

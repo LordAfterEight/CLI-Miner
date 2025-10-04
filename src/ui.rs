@@ -47,10 +47,10 @@ impl Button {
             true => {
                 let ret_value = is_mouse_button_released(MouseButton::Left);
                 if macroquad::input::is_mouse_button_pressed(macroquad::input::MouseButton::Left) {
-                    rotilities::play_audio(sink_sfx, "./assets/sound/interact_p1.mp3");
+                    rotilities::play_audio(sink_sfx, "./assets/sound/sfx/interact_p1.mp3");
                 }
                 if ret_value == true {
-                    rotilities::play_audio(sink_sfx, "./assets/sound/interact_p2.mp3");
+                    rotilities::play_audio(sink_sfx, "./assets/sound/sfx/interact_p2.mp3");
                 }
                 ret_value
             }
@@ -179,10 +179,10 @@ impl TextInputLabel {
             true => {
                 let ret_value = is_mouse_button_released(MouseButton::Left);
                 if macroquad::input::is_mouse_button_pressed(macroquad::input::MouseButton::Left) {
-                    rotilities::play_audio(sink_sfx, "./assets/sound/interact_p1.mp3");
+                    rotilities::play_audio(sink_sfx, "./assets/sound/sfx/interact_p1.mp3");
                 }
                 if ret_value == true {
-                    rotilities::play_audio(sink_sfx, "./assets/sound/interact_p2.mp3");
+                    rotilities::play_audio(sink_sfx, "./assets/sound/sfx/interact_p2.mp3");
                     self.is_active = !self.is_active;
                 }
                 ret_value
@@ -306,7 +306,7 @@ impl TextInputLabel {
                         } else {
                             rotilities::play_audio(
                                 &game.audio.sfx_sinks[0],
-                                "./assets/sound/fail.mp3",
+                                "./assets/sound/sfx/fail.mp3",
                             );
                         }
                         macroquad::input::clear_input_queue();
